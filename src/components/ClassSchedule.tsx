@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 
 const classes = [
@@ -170,6 +170,22 @@ const ClassSchedule: React.FC = () => {
   const [filterType, setFilterType] = useState<string>('All Types');
   const [filterTrainer, setFilterTrainer] = useState<string>('All Trainers');
   const [filterDate, setFilterDate] = useState<string>('');
+  const [hoveredClass, setHoveredClass] = useState<any>(null);
+  const [showClassDetails, setShowClassDetails] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Track mouse position for tooltip
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
   const getClassTypeColor = (type: string) => {
     switch (type) {
@@ -265,10 +281,10 @@ const ClassSchedule: React.FC = () => {
         </div>
       </div>
 
-      {/* Date Navigation - Only visible in calendar view */}
+      {/* Date Navigation - Only visible in calendar view but simplified */}
       {viewMode === 'calendar' && (
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-4">
+          <div className="flex items-center justify-between">
             <button
               onClick={() => {
                 const newDate = new Date(selectedDate);
@@ -279,9 +295,17 @@ const ClassSchedule: React.FC = () => {
             >
               <ChevronLeft className="h-5 w-5 text-gray-300" />
             </button>
-            <h3 className="text-lg font-semibold text-white">
-              {formatDate(selectedDate)}
-            </h3>
+            <div className="flex space-x-2 items-center">
+              <button 
+                onClick={() => setSelectedDate(new Date())}
+                className="bg-[#165D31] hover:bg-[#073418] text-white px-3 py-1 rounded text-sm transition-colors duration-200"
+              >
+                Today
+              </button>
+              <span className="text-sm font-medium text-gray-300">
+                Week of {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+            </div>
             <button
               onClick={() => {
                 const newDate = new Date(selectedDate);
@@ -394,7 +418,13 @@ const ClassSchedule: React.FC = () => {
                     {dayClasses.map((cls) => (
                       <div
                         key={cls.id}
-                        className="bg-[#3a4148] border-l-4 border-[#165D31] rounded-lg p-2 mb-1 text-xs hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                        className="bg-[#3a4148] border-l-4 border-[#165D31] rounded-lg p-2 mb-1 text-xs hover:shadow-lg transition-all duration-200 cursor-pointer hover:bg-[#434c57]"
+                        onMouseEnter={() => setHoveredClass(cls)}
+                        onMouseLeave={() => setHoveredClass(null)}
+                        onClick={() => {
+                          setSelectedClass(cls);
+                          setShowClassDetails(true);
+                        }}
                       >
                         <div className="font-medium text-white">{cls.name}</div>
                         <div className="text-gray-300">{cls.trainer}</div>
@@ -687,6 +717,136 @@ const ClassSchedule: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Class Details Popup */}
+      {showClassDetails && selectedClass && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={() => setShowClassDetails(false)}>
+          <div 
+            className="bg-[#2A3037] rounded-xl shadow-2xl max-w-md w-full animate-fade-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 border-b border-gray-700">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className={`px-2 py-1 rounded-md text-xs font-medium ${getClassTypeColor(selectedClass.type)}`}>
+                    {selectedClass.type}
+                  </span>
+                </div>
+                <button 
+                  onClick={() => setShowClassDetails(false)}
+                  className="text-gray-400 hover:text-gray-200 text-xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            <div className="p-5 bg-[#2A3037] text-white">
+              <h3 className="text-xl font-bold mb-3">{selectedClass.name}</h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <Calendar className="h-5 w-5 mr-3 mt-0.5 text-gray-300" />
+                  <div>
+                    <div className="font-medium">{new Date(selectedClass.date).toLocaleDateString('en-US', { 
+                      weekday: 'long',
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</div>
+                    <div className="text-sm text-gray-300">Date</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <Clock className="h-5 w-5 mr-3 mt-0.5 text-gray-300" />
+                  <div>
+                    <div className="font-medium">{selectedClass.time} ({selectedClass.duration} minutes)</div>
+                    <div className="text-sm text-gray-300">Time & Duration</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <Users className="h-5 w-5 mr-3 mt-0.5 text-gray-300" />
+                  <div>
+                    <div className="font-medium">
+                      <span className={getCapacityColor(selectedClass.booked, selectedClass.capacity)}>
+                        {selectedClass.booked}/{selectedClass.capacity}
+                      </span> spots filled
+                    </div>
+                    <div className="text-sm text-gray-300">Attendance</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="h-5 w-5 mr-3 mt-0.5 flex justify-center items-center">👤</div>
+                  <div>
+                    <div className="font-medium">{selectedClass.trainer}</div>
+                    <div className="text-sm text-gray-300">Instructor</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="h-5 w-5 mr-3 mt-0.5 flex justify-center items-center">🏠</div>
+                  <div>
+                    <div className="font-medium">{selectedClass.room}</div>
+                    <div className="text-sm text-gray-300">Location</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 flex space-x-2">
+                <button 
+                  onClick={() => {
+                    setShowClassDetails(false);
+                    setShowEditModal(true);
+                  }}
+                  className="flex-1 px-4 py-2 bg-[#3a4148] hover:bg-[#4a5158] text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-1"
+                >
+                  <Edit className="h-4 w-4" />
+                  <span>Edit</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    if (window.confirm(`Are you sure you want to delete ${selectedClass.name}?`)) {
+                      setShowClassDetails(false);
+                      // Here you would typically call a function to delete the class
+                      alert(`Class ${selectedClass.name} deleted successfully!`);
+                    }
+                  }}
+                  className="flex-1 px-4 py-2 bg-[#3a4148] hover:bg-[#4a5158] text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-1"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Hover Class Tooltip */}
+      {hoveredClass && !showClassDetails && (
+        <div 
+          className="fixed z-50 bg-[#2A3037] rounded-lg shadow-xl max-w-xs w-full p-4 text-white animate-fade-in border border-gray-700"
+          style={{
+            left: `${Math.min(window.innerWidth - 320, Math.max(10, mousePosition.x))}px`,
+            top: `${Math.min(window.innerHeight - 200, Math.max(10, mousePosition.y + 10))}px`
+          }}
+        >
+          <div className="flex justify-between items-center mb-2">
+            <span className={`px-2 py-0.5 rounded text-xs font-medium ${getClassTypeColor(hoveredClass.type)}`}>
+              {hoveredClass.type}
+            </span>
+            <span className={`text-xs font-medium ${getCapacityColor(hoveredClass.booked, hoveredClass.capacity)}`}>
+              {hoveredClass.booked}/{hoveredClass.capacity}
+            </span>
+          </div>
+          <div className="font-bold">{hoveredClass.name}</div>
+          <div className="text-sm text-gray-300">{hoveredClass.trainer}</div>
+          <div className="text-xs text-gray-400 mt-1">{hoveredClass.room} • {hoveredClass.time}</div>
+          <div className="text-xs mt-2 text-gray-300">Click for more details</div>
         </div>
       )}
 
