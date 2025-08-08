@@ -97,7 +97,7 @@ function App() {
     switch (activeMenu) {
       case 'dashboard': return <Dashboard selectedBranch={selectedBranch} />;
       case 'users': return <GymUsers selectedBranch={selectedBranch} />;
-      case 'trainers': return <Trainers />;
+      case 'trainers': return <Trainers selectedBranch={selectedBranch} />;
       case 'workouts': return <WorkoutPlans />;
       case 'classes': return <ClassSchedule />;
       case 'attendance': return <Attendance />;
@@ -195,8 +195,8 @@ function App() {
             </h2>
           </div>
           <div className="flex items-center space-x-4">
-            {/* Branch Dropdown - Show on Dashboard and Gym Users pages */}
-            {(activeMenu === 'users' || activeMenu === 'dashboard') && (
+            {/* Branch Dropdown - Show on Dashboard, Gym Users, and Trainers pages */}
+            {(activeMenu === 'users' || activeMenu === 'dashboard' || activeMenu === 'trainers') && (
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setShowBranchDropdown(!showBranchDropdown)}

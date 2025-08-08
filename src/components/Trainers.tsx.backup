@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, Eye, User, Phone, Mail, Calendar, Star, Clock, Award, MapPin, UserCheck, Settings } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Plus, Edit, Trash2, Eye, User, Phone, Mail, Calendar, Star, Clock, Award, MapPin, AlertCircle } from 'lucide-react';
 const branches = [
   'Stonehousepet',
   'Harinathpuram',
@@ -9,6 +9,124 @@ const branches = [
   'BV Nagar',
   'Dhanalakshmi Puram'
 ];
+
+// Staff data
+const staff: Staff[] = [
+  {
+    id: 1,
+    name: 'Raj Patel',
+    email: 'raj.patel@fitpro.com',
+    phone: '+91 98765 43210',
+    role: 'Admin',
+    experience: '6 years',
+    status: 'Active',
+    availability: 'Mon-Fri: 9AM-5PM',
+    joinDate: '2021-05-18',
+    avatar: 'RP',
+    branch: 'Stonehousepet',
+    gender: 'Male',
+    dob: '1988-06-15'
+  },
+  {
+    id: 2,
+    name: 'Anjali Sharma',
+    email: 'anjali.sharma@fitpro.com',
+    phone: '+91 87654 32109',
+    role: 'Manager',
+    experience: '4 years',
+    status: 'Active',
+    availability: 'Mon-Sat: 8AM-4PM',
+    joinDate: '2022-02-10',
+    avatar: 'AS',
+    branch: 'Harinathpuram',
+    gender: 'Female',
+    dob: '1990-09-22'
+  },
+  {
+    id: 3,
+    name: 'Karthik Reddy',
+    email: 'karthik.reddy@fitpro.com',
+    phone: '+91 76543 21098',
+    role: 'Receptionist',
+    experience: '2 years',
+    status: 'Active',
+    availability: 'Tue-Sun: 11AM-7PM',
+    joinDate: '2023-01-05',
+    avatar: 'KR',
+    branch: 'Vanamthopu Center',
+    gender: 'Male',
+    dob: '1995-12-10'
+  },
+  {
+    id: 4,
+    name: 'Priya Mehta',
+    email: 'priya.mehta@fitpro.com',
+    phone: '+91 65432 10987',
+    role: 'Admin',
+    experience: '5 years',
+    status: 'On Leave',
+    availability: 'Mon-Fri: 9AM-5PM',
+    joinDate: '2022-07-20',
+    avatar: 'PM',
+    branch: 'Current Office Center',
+    gender: 'Female',
+    dob: '1992-03-28'
+  },
+  {
+    id: 5,
+    name: 'Sanjay Kumar',
+    email: 'sanjay.kumar@fitpro.com',
+    phone: '+91 54321 09876',
+    role: 'Receptionist',
+    experience: '1 year',
+    status: 'Active',
+    availability: 'Wed-Sun: 12PM-8PM',
+    joinDate: '2023-11-15',
+    avatar: 'SK',
+    branch: 'Vedayapalem',
+    gender: 'Male',
+    dob: '1997-07-05'
+  }
+];
+
+// Define the trainer type
+interface Trainer {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  specialty: string;
+  experience: string;
+  certifications: string[];
+  assignedMembers: number;
+  status: string;
+  rating: number;
+  availability: string;
+  joinDate: string;
+  avatar: string;
+  branch: string;
+  dob?: string;
+  gender?: string;
+}
+
+// Define the staff type
+interface Staff {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  experience: string;
+  status: string;
+  availability: string;
+  joinDate: string;
+  avatar: string;
+  branch: string;
+  gender: string;
+  dob: string;
+}
+
+
 
 const trainers = [
   {
@@ -77,98 +195,11 @@ const trainers = [
   }
 ];
 
-const staff = [
-  {
-    id: 1,
-    name: 'Anjali Sharma',
-    email: 'anjali.sharma@fitpro.com',
-    phone: '+91 98765 43210',
-    role: 'Manager',
-    availability: 'Mon-Sat: 9AM-6PM',
-    status: 'Active',
-    joinDate: '2022-01-10',
-    avatar: 'AS',
-    branch: 'Stonehousepet'
-  },
-  {
-    id: 2,
-    name: 'Rohit Gupta',
-    email: 'rohit.gupta@fitpro.com',
-    phone: '+91 87654 32109',
-    role: 'Receptionist',
-    availability: 'Mon-Fri: 8AM-4PM',
-    status: 'Active',
-    joinDate: '2022-05-15',
-    avatar: 'RG',
-    branch: 'Harinathpuram'
-  },
-  {
-    id: 3,
-    name: 'Priyanka Reddy',
-    email: 'priyanka.reddy@fitpro.com',
-    phone: '+91 76543 21098',
-    role: 'Admin',
-    availability: 'Tue-Sun: 10AM-7PM',
-    status: 'Active',
-    joinDate: '2021-09-20',
-    avatar: 'PR',
-    branch: 'Vanamthopu Center'
-  },
-  {
-    id: 4,
-    name: 'Kiran Kumar',
-    email: 'kiran.kumar@fitpro.com',
-    phone: '+91 65432 10987',
-    role: 'Receptionist',
-    availability: 'Mon-Fri: 12PM-9PM',
-    status: 'On Leave',
-    joinDate: '2023-02-14',
-    avatar: 'KK',
-    branch: 'Current Office Center'
-  },
-  {
-    id: 5,
-    name: 'Swathi Nair',
-    email: 'swathi.nair@fitpro.com',
-    phone: '+91 54321 09876',
-    role: 'Manager',
-    availability: 'Mon-Sat: 8AM-5PM',
-    status: 'Active',
-    joinDate: '2022-11-08',
-    avatar: 'SN',
-    branch: 'Vedayapalem'
-  },
-  {
-    id: 6,
-    name: 'Arun Patel',
-    email: 'arun.patel@fitpro.com',
-    phone: '+91 43210 98765',
-    role: 'Admin',
-    availability: 'Wed-Mon: 11AM-8PM',
-    status: 'Active',
-    joinDate: '2023-04-12',
-    avatar: 'AP',
-    branch: 'BV Nagar'
-  },
-  {
-    id: 7,
-    name: 'Lakshmi Prasad',
-    email: 'lakshmi.prasad@fitpro.com',
-    phone: '+91 32109 87654',
-    role: 'Receptionist',
-    availability: 'Mon-Fri: 6AM-2PM',
-    status: 'Inactive',
-    joinDate: '2022-07-25',
-    avatar: 'LP',
-    branch: 'Dhanalakshmi Puram'
-  }
-];
-
 interface TrainersProps {
-  selectedBranch?: string;
+  selectedBranch: string;
 }
 
-const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranch = 'All Branches' }) => {
+const Trainers: React.FC<TrainersProps> = ({ selectedBranch: propSelectedBranch }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTrainer, setSelectedTrainer] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
@@ -179,36 +210,35 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
   const [showEditStaffModal, setShowEditStaffModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<any>(null);
   const [editStaff, setEditStaff] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'trainers' | 'staff'>('trainers');
+  const [showDeleteStaffModal, setShowDeleteStaffModal] = useState(false);
+  const [staffToDelete, setStaffToDelete] = useState<any>(null);
+  const [showDeleteTrainerModal, setShowDeleteTrainerModal] = useState(false);
+  const [trainerToDelete, setTrainerToDelete] = useState<any>(null);
+  // Use trainers directly without state since we're not modifying positions anymore
+  const trainersList: Trainer[] = trainers;
+  
+  // Filter states
   const [selectedSpecialty, setSelectedSpecialty] = useState('All Specialties');
   const [selectedRole, setSelectedRole] = useState('All Roles');
   const [selectedStatus, setSelectedStatus] = useState('All Status');
-  const [selectedBranch, setSelectedBranch] = useState('All Branches');
+  const [selectedBranch, setSelectedBranch] = useState(propSelectedBranch);
+  
+  // Update local selectedBranch when prop changes
+  useEffect(() => {
+    setSelectedBranch(propSelectedBranch);
+  }, [propSelectedBranch]);
   const [newStaff, setNewStaff] = useState({
     name: '',
     email: '',
     phone: '',
     role: 'Receptionist',
+    experience: '',
     dob: '',
     gender: 'Male',
     availability: '',
     status: 'Active',
     branch: 'Stonehousepet',
     joinDate: new Date().toISOString().split('T')[0]
-  });
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newTrainer, setNewTrainer] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    specialty: 'Strength Training',
-    experience: '',
-    dob: '',
-    gender: 'Male',
-    certifications: [],
-    availability: '',
-    status: 'Active',
-    branch: 'Stonehousepet'
   });
 
   const handleStaffInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -229,6 +259,7 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
       email: '',
       phone: '',
       role: 'Receptionist',
+      experience: '',
       dob: '',
       gender: 'Male',
       availability: '',
@@ -238,39 +269,53 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
     });
   };
 
+  // State to toggle between trainers and staff view
+  const [activeTab, setActiveTab] = useState<'trainers' | 'staff'>('trainers');
+  
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Active': return 'bg-green-100 text-green-800';
-      case 'On Leave': return 'bg-yellow-100 text-yellow-800';
-      case 'Inactive': return 'bg-red-100 text-red-800';
+      case 'Active': return 'bg-green-900/30 text-green-500';
+      case 'On Leave': return 'bg-orange-900/30 text-orange-500';
+      case 'Inactive': return 'bg-red-900/30 text-red-500';
+      case 'Training': return 'bg-blue-900/30 text-blue-500';
       default: return 'bg-gray-700 text-gray-300';
     }
   };
 
-  const filteredTrainers = trainers.filter(trainer => {
-    const matchesSearch = trainer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredTrainers = trainersList.filter(trainer => {
+    // Search term filter
+    const matchesSearch = 
+      trainer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       trainer.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
       trainer.email.toLowerCase().includes(searchTerm.toLowerCase());
     
+    // Specialty filter
     const matchesSpecialty = selectedSpecialty === 'All Specialties' || trainer.specialty === selectedSpecialty;
+    
+    // Status filter
     const matchesStatus = selectedStatus === 'All Status' || trainer.status === selectedStatus;
-    // Use navbar branch selection if available, otherwise use local selectedBranch
-    const effectiveBranch = navbarSelectedBranch !== 'All Branches' ? navbarSelectedBranch : selectedBranch;
-    const matchesBranch = effectiveBranch === 'All Branches' || trainer.branch === effectiveBranch;
+    
+    // Branch filter
+    const matchesBranch = selectedBranch === 'All Branches' || trainer.branch === selectedBranch;
     
     return matchesSearch && matchesSpecialty && matchesStatus && matchesBranch;
   });
   
   const filteredStaff = staff.filter(staffMember => {
-    const matchesSearch = staffMember.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    // Search term filter
+    const matchesSearch = 
+      staffMember.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       staffMember.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
       staffMember.email.toLowerCase().includes(searchTerm.toLowerCase());
     
+    // Role filter
     const matchesRole = selectedRole === 'All Roles' || staffMember.role === selectedRole;
+    
+    // Status filter
     const matchesStatus = selectedStatus === 'All Status' || staffMember.status === selectedStatus;
-    // Use navbar branch selection if available, otherwise use local selectedBranch
-    const effectiveBranch = navbarSelectedBranch !== 'All Branches' ? navbarSelectedBranch : selectedBranch;
-    const matchesBranch = effectiveBranch === 'All Branches' || staffMember.branch === effectiveBranch;
+    
+    // Branch filter
+    const matchesBranch = selectedBranch === 'All Branches' || staffMember.branch === selectedBranch;
     
     return matchesSearch && matchesRole && matchesStatus && matchesBranch;
   });
@@ -285,29 +330,72 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
     setShowEditModal(true);
   };
   
-  const openStaffModal = (staff: any) => {
-    setSelectedStaff(staff);
-    setShowStaffModal(true);
-  };
-  
-  const openEditStaffModal = (staff: any) => {
-    setEditStaff({...staff});
-    setShowEditStaffModal(true);
-  };
-  
   const handleEditTrainer = () => {
     // Logic to update trainer would go here in a real app
     console.log('Updated trainer data:', editTrainer);
     setShowEditModal(false);
     setEditTrainer(null);
   };
-
+  
+  // Staff functions
+  const openStaffModal = (staffMember: any) => {
+    setSelectedStaff(staffMember);
+    setShowStaffModal(true);
+  };
+  
+  const openEditStaffModal = (staffMember: any) => {
+    setEditStaff({...staffMember});
+    setShowEditStaffModal(true);
+  };
+  
   const handleEditStaff = () => {
     // Logic to update staff would go here in a real app
     console.log('Updated staff data:', editStaff);
     setShowEditStaffModal(false);
     setEditStaff(null);
   };
+  
+  // Delete functions
+  const openDeleteStaffModal = (staffMember: any) => {
+    setStaffToDelete(staffMember);
+    setShowDeleteStaffModal(true);
+  };
+  
+  const handleDeleteStaff = () => {
+    // Logic to delete staff would go here in a real app
+    console.log('Deleting staff:', staffToDelete);
+    setShowDeleteStaffModal(false);
+    setStaffToDelete(null);
+    // In a real app, you would update the staff list here
+  };
+  
+  const openDeleteTrainerModal = (trainer: any) => {
+    setTrainerToDelete(trainer);
+    setShowDeleteTrainerModal(true);
+  };
+  
+  const handleDeleteTrainer = () => {
+    // Logic to delete trainer would go here in a real app
+    console.log('Deleting trainer:', trainerToDelete);
+    setShowDeleteTrainerModal(false);
+    setTrainerToDelete(null);
+    // In a real app, you would update the trainers list here
+  };
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTrainer, setNewTrainer] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    specialty: 'Strength Training',
+    experience: '',
+    dob: '',
+    gender: 'Male',
+    certifications: [],
+    availability: '',
+    status: 'Active',
+    branch: 'Stonehousepet'
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -337,37 +425,24 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
     });
   };
 
-  // Calculate totals for cards
-  const totalTrainers = trainers.length;
-  const totalAdmins = staff.filter(s => s.role === 'Admin').length;
-  const totalManagers = staff.filter(s => s.role === 'Manager').length;
-  const totalReceptionists = staff.filter(s => s.role === 'Receptionist').length;
+  // Calculate counts
+  const adminCount = staff.filter(s => s.role === 'Admin').length;
+  const managerCount = staff.filter(s => s.role === 'Manager').length;
+  const receptionistCount = staff.filter(s => s.role === 'Receptionist').length;
+  const trainerCount = trainers.length;
 
   return (
     <div className="space-y-6">
-      
-      {/* Summary Cards */}
+      {/* Count Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm font-medium">Total Trainers</p>
-              <p className="text-3xl font-bold text-white mt-2">{totalTrainers}</p>
+              <p className="text-gray-400 text-sm">Trainers</p>
+              <h3 className="text-2xl font-bold text-white mt-1">{trainerCount}</h3>
             </div>
-            <div className="w-12 h-12 bg-[#7BC843] bg-opacity-20 rounded-lg flex items-center justify-center">
-              <UserCheck className="h-6 w-6 text-[#7BC843]" />
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-400 text-sm font-medium">Total Admins</p>
-              <p className="text-3xl font-bold text-white mt-2">{totalAdmins}</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-500 bg-opacity-20 rounded-lg flex items-center justify-center">
-              <Settings className="h-6 w-6 text-blue-500" />
+            <div className="w-12 h-12 bg-[#7BC843] bg-opacity-20 rounded-full flex items-center justify-center">
+              <Award className="h-6 w-6 text-[#7BC843]" />
             </div>
           </div>
         </div>
@@ -375,11 +450,11 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
         <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm font-medium">Total Managers</p>
-              <p className="text-3xl font-bold text-white mt-2">{totalManagers}</p>
+              <p className="text-gray-400 text-sm">Admins</p>
+              <h3 className="text-2xl font-bold text-white mt-1">{adminCount}</h3>
             </div>
-            <div className="w-12 h-12 bg-purple-500 bg-opacity-20 rounded-lg flex items-center justify-center">
-              <Award className="h-6 w-6 text-purple-500" />
+            <div className="w-12 h-12 bg-[#1E5AB3] bg-opacity-20 rounded-full flex items-center justify-center">
+              <User className="h-6 w-6 text-[#1E5AB3]" />
             </div>
           </div>
         </div>
@@ -387,27 +462,33 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
         <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm font-medium">Total Receptionists</p>
-              <p className="text-3xl font-bold text-white mt-2">{totalReceptionists}</p>
+              <p className="text-gray-400 text-sm">Managers</p>
+              <h3 className="text-2xl font-bold text-white mt-1">{managerCount}</h3>
             </div>
-            <div className="w-12 h-12 bg-orange-500 bg-opacity-20 rounded-lg flex items-center justify-center">
-              <User className="h-6 w-6 text-orange-500" />
+            <div className="w-12 h-12 bg-[#663399] bg-opacity-20 rounded-full flex items-center justify-center">
+              <User className="h-6 w-6 text-[#663399]" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Receptionists</p>
+              <h3 className="text-2xl font-bold text-white mt-1">{receptionistCount}</h3>
+            </div>
+            <div className="w-12 h-12 bg-[#E57373] bg-opacity-20 rounded-full flex items-center justify-center">
+              <User className="h-6 w-6 text-[#E57373]" />
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Tabs and Buttons */}
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
+
+      {/* Header with Add Buttons and Tabs */}
+      <div className="flex flex-col sm:flex-row sm:justify-between items-center mb-6">
         <div className="flex border-b border-gray-700 mb-4 sm:mb-0">
           <button
-            onClick={() => {
-              setActiveTab('trainers');
-              setSelectedSpecialty('All Specialties');
-              setSelectedRole('All Roles');
-              setSelectedStatus('All Status');
-              setSelectedBranch('All Branches');
-            }}
+            onClick={() => setActiveTab('trainers')}
             className={`px-6 py-3 font-medium ${
               activeTab === 'trainers'
                 ? 'border-b-2 border-[#7BC843] text-[#7BC843]'
@@ -417,13 +498,7 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
             Trainers
           </button>
           <button
-            onClick={() => {
-              setActiveTab('staff');
-              setSelectedSpecialty('All Specialties');
-              setSelectedRole('All Roles');
-              setSelectedStatus('All Status');
-              setSelectedBranch('All Branches');
-            }}
+            onClick={() => setActiveTab('staff')}
             className={`px-6 py-3 font-medium ${
               activeTab === 'staff'
                 ? 'border-b-2 border-[#7BC843] text-[#7BC843]'
@@ -437,33 +512,31 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
         <div className="flex space-x-4">
           <button 
             onClick={() => setShowAddStaffModal(true)}
-            className="bg-[#2A3037] hover:bg-[#3A4049] border border-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+            className="bg-[#2A3037] hover:bg-[#3A4049] border border-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
             <span>Add Staff</span>
           </button>
           <button 
             onClick={() => setShowAddModal(true)}
-            className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+            className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
             <span>Add Trainer</span>
           </button>
         </div>
+          className={`px-6 py-3 font-medium ${
+            activeTab === 'staff'
+              ? 'border-b-2 border-[#7BC843] text-[#7BC843]'
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          Staff Members
+        </button>
       </div>
 
       {/* Search and Filters */}
       <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6 mb-6">
-        {/* Branch Filter Indicator */}
-        {navbarSelectedBranch !== 'All Branches' && (
-          <div className="mb-4 p-3 bg-[#7BC843] bg-opacity-10 border border-[#7BC843] rounded-lg">
-            <p className="text-[#7BC843] text-sm font-medium">
-              🏢 Filtering by branch: <span className="font-bold">{navbarSelectedBranch}</span> 
-              <span className="text-gray-300 ml-2">(Use navbar dropdown to change branch)</span>
-            </p>
-          </div>
-        )}
-        
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -475,18 +548,18 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
               className="w-full pl-10 pr-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
             />
           </div>
-          <div className="flex space-x-3">
+          <div className="flex flex-wrap md:flex-nowrap gap-3">
             {activeTab === 'trainers' ? (
               <select 
                 value={selectedSpecialty}
                 onChange={(e) => setSelectedSpecialty(e.target.value)}
                 className="px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
               >
-                <option>All Specialties</option>
-                <option>Strength Training</option>
-                <option>Yoga & Pilates</option>
-                <option>CrossFit & HIIT</option>
-                <option>Cardio & Dance</option>
+                <option value="All Specialties">All Specialties</option>
+                <option value="Strength Training">Strength Training</option>
+                <option value="Yoga & Pilates">Yoga & Pilates</option>
+                <option value="CrossFit & HIIT">CrossFit & HIIT</option>
+                <option value="Cardio & Dance">Cardio & Dance</option>
               </select>
             ) : (
               <select 
@@ -494,10 +567,10 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                 onChange={(e) => setSelectedRole(e.target.value)}
                 className="px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
               >
-                <option>All Roles</option>
-                <option>Admin</option>
-                <option>Manager</option>
-                <option>Receptionist</option>
+                <option value="All Roles">All Roles</option>
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="Receptionist">Receptionist</option>
               </select>
             )}
             <select 
@@ -505,25 +578,19 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
             >
-              <option>All Status</option>
-              <option>Active</option>
-              <option>On Leave</option>
-              <option>Inactive</option>
+              <option value="All Status">All Status</option>
+              <option value="Active">Active</option>
+              <option value="On Leave">On Leave</option>
+              <option value="Inactive">Inactive</option>
             </select>
             <select 
-              value={navbarSelectedBranch !== 'All Branches' ? navbarSelectedBranch : selectedBranch}
-              onChange={(e) => {
-                // Only update local selectedBranch if navbar is set to "All Branches"
-                if (navbarSelectedBranch === 'All Branches') {
-                  setSelectedBranch(e.target.value);
-                }
-              }}
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value)}
               className="px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
-              disabled={navbarSelectedBranch !== 'All Branches'}
             >
-              <option>All Branches</option>
+              <option value="All Branches">All Branches</option>
               {branches.map((branch) => (
-                <option key={branch}>{branch}</option>
+                <option key={branch} value={branch}>{branch}</option>
               ))}
             </select>
           </div>
@@ -533,70 +600,74 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
       {/* Trainers Grid */}
       {activeTab === 'trainers' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTrainers.map((trainer) => (
-          <div key={trainer.id} className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6 hover:bg-[#353c44] transition-colors duration-200">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="w-16 h-16 bg-[#7BC843] rounded-full flex items-center justify-center">
-                <span className="text-black font-bold text-xl">{trainer.avatar}</span>
+          {filteredTrainers.map((trainer) => (
+            <div key={trainer.id} className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6 hover:bg-[#353c44] transition-colors duration-200">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="w-16 h-16 bg-[#7BC843] rounded-full flex items-center justify-center">
+                  <span className="text-black font-bold text-xl">{trainer.avatar}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-white">{trainer.name}</h3>
+                  <p className="text-gray-400 text-sm">{trainer.specialty}</p>
+                  <div className="flex items-center mt-1">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="text-sm text-gray-400 ml-1">{trainer.rating}</span>
+                  </div>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(trainer.status)}`}>
+                  {trainer.status}
+                </span>
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-white">{trainer.name}</h3>
-                <p className="text-gray-400 text-sm">{trainer.specialty}</p>
-                <div className="flex items-center mt-1">
-                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                  <span className="text-sm text-gray-400 ml-1">{trainer.rating}</span>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Branch:</span>
+                  <span className="text-white font-medium text-sm">{trainer.branch}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Experience:</span>
+                  <span className="text-white font-medium text-sm">{trainer.experience}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Assigned Members:</span>
+                  <span className="text-white font-medium text-sm">{trainer.assignedMembers}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Availability:</span>
+                  <span className="text-white font-medium text-sm">{trainer.availability}</span>
                 </div>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(trainer.status)}`}>
-                {trainer.status}
-              </span>
-            </div>
 
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400 text-sm">Branch:</span>
-                <span className="text-white font-medium text-sm">{trainer.branch}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400 text-sm">Experience:</span>
-                <span className="text-white font-medium text-sm">{trainer.experience}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400 text-sm">Assigned Members:</span>
-                <span className="text-white font-medium text-sm">{trainer.assignedMembers}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400 text-sm">Availability:</span>
-                <span className="text-white font-medium text-sm">{trainer.availability}</span>
+              <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+                <div className="flex items-center space-x-2">
+                  <button 
+                    onClick={() => openTrainerModal(trainer)}
+                    className="p-2 text-gray-400 hover:text-[#7BC843] hover:bg-[#23292F] rounded-lg transition-colors duration-200"
+                    title="View Details"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={() => openEditModal(trainer)}
+                    className="p-2 text-gray-400 hover:text-[#7BC843] hover:bg-[#23292F] rounded-lg transition-colors duration-200" 
+                    title="Edit"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={() => openDeleteTrainerModal(trainer)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-[#23292F] rounded-lg transition-colors duration-200" 
+                    title="Delete"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+                <button className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm">
+                  View Schedule
+                </button>
               </div>
             </div>
-
-            <div className="flex items-center justify-between pt-4 border-t border-gray-700">
-              <div className="flex items-center space-x-2">
-                <button 
-                  onClick={() => openTrainerModal(trainer)}
-                  className="p-2 text-gray-400 hover:text-[#7BC843] hover:bg-[#23292F] rounded-lg transition-colors duration-200"
-                  title="View Details"
-                >
-                  <Eye className="h-4 w-4" />
-                </button>
-                <button 
-                  onClick={() => openEditModal(trainer)}
-                  className="p-2 text-gray-400 hover:text-[#7BC843] hover:bg-[#23292F] rounded-lg transition-colors duration-200" 
-                  title="Edit"
-                >
-                  <Edit className="h-4 w-4" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-[#23292F] rounded-lg transition-colors duration-200" title="Delete">
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-              <button className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm">
-                View Schedule
-              </button>
-            </div>
-          </div>
-        ))}
+          ))}
         </div>
       )}
       
@@ -606,8 +677,8 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
           {filteredStaff.map((staffMember) => (
             <div key={staffMember.id} className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6 hover:bg-[#353c44] transition-colors duration-200">
               <div className="flex items-center space-x-4 mb-4">
-                <div className="w-16 h-16 bg-[#7BC843] rounded-full flex items-center justify-center">
-                  <span className="text-black font-bold text-xl">{staffMember.avatar}</span>
+                <div className="w-16 h-16 bg-[#1E5AB3] rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">{staffMember.avatar}</span>
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-white">{staffMember.name}</h3>
@@ -624,16 +695,16 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                   <span className="text-white font-medium text-sm">{staffMember.branch}</span>
                 </div>
                 <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Experience:</span>
+                  <span className="text-white font-medium text-sm">{staffMember.experience}</span>
+                </div>
+                <div className="flex items-center justify-between">
                   <span className="text-gray-400 text-sm">Email:</span>
                   <span className="text-white font-medium text-sm">{staffMember.email}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-400 text-sm">Phone:</span>
-                  <span className="text-white font-medium text-sm">{staffMember.phone}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400 text-sm">Join Date:</span>
-                  <span className="text-white font-medium text-sm">{staffMember.joinDate}</span>
+                  <span className="text-gray-400 text-sm">Availability:</span>
+                  <span className="text-white font-medium text-sm">{staffMember.availability}</span>
                 </div>
               </div>
 
@@ -653,12 +724,16 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                   >
                     <Edit className="h-4 w-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-[#23292F] rounded-lg transition-colors duration-200" title="Delete">
+                  <button 
+                    onClick={() => openDeleteStaffModal(staffMember)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-[#23292F] rounded-lg transition-colors duration-200" 
+                    title="Delete"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-                <button className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm">
-                  View Details
+                <button className="text-[#1E5AB3] hover:text-[#1A4A93] font-medium text-sm">
+                  View Schedule
                 </button>
               </div>
             </div>
@@ -1325,6 +1400,19 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                     </div>
                     
                     <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Experience *</label>
+                      <input
+                        type="text"
+                        name="experience"
+                        value={newStaff.experience}
+                        onChange={handleStaffInputChange}
+                        placeholder="E.g. 3 years"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
                       <label className="text-gray-400 text-sm mb-1">Availability *</label>
                       <input
                         type="text"
@@ -1335,6 +1423,20 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                         className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                         required
                       />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Status</label>
+                      <select
+                        name="status"
+                        value={newStaff.status}
+                        onChange={handleStaffInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="On Leave">On Leave</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -1349,7 +1451,7 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                 </button>
                 <button 
                   onClick={handleAddStaff}
-                  className="px-6 py-3 bg-[#7BC843] hover:bg-[6AB732] text-black rounded-lg transition-colors duration-200 font-medium"
+                  className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium"
                 >
                   Add Staff
                 </button>
@@ -1366,8 +1468,8 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
             <div className="p-6 border-b border-gray-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="w-20 h-20 bg-[#7BC843] rounded-full flex items-center justify-center">
-                    <span className="text-black font-bold text-2xl">{selectedStaff.avatar}</span>
+                  <div className="w-20 h-20 bg-[#1E5AB3] rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-2xl">{selectedStaff.avatar}</span>
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-white">{selectedStaff.name}</h2>
@@ -1393,7 +1495,7 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                 {/* Personal Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <User className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    <User className="h-5 w-5 mr-2 text-[#1E5AB3]" />
                     Personal Information
                   </h3>
                   <div className="space-y-4">
@@ -1413,13 +1515,17 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                       <Calendar className="h-4 w-4 text-gray-400" />
                       <span className="text-white">Joined: {selectedStaff.joinDate}</span>
                     </div>
+                    <div className="flex items-center space-x-3">
+                      <Clock className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-200">Experience: {selectedStaff.experience}</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Professional Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <Award className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    <Award className="h-5 w-5 mr-2 text-[#1E5AB3]" />
                     Professional Details
                   </h3>
                   <div className="space-y-4">
@@ -1428,13 +1534,43 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                       <p className="text-white font-medium">{selectedStaff.role}</p>
                     </div>
                     <div>
+                      <span className="text-gray-400 text-sm">Gender:</span>
+                      <p className="text-white font-medium">{selectedStaff.gender}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-sm">Date of Birth:</span>
+                      <p className="text-white font-medium">{selectedStaff.dob}</p>
+                    </div>
+                    <div>
                       <span className="text-gray-400 text-sm">Availability:</span>
                       <p className="text-white font-medium">{selectedStaff.availability}</p>
                     </div>
-                    <div>
-                      <span className="text-gray-400 text-sm">Status:</span>
-                      <p className="text-white font-medium">{selectedStaff.status}</p>
-                    </div>
+                  </div>
+                </div>
+
+                {/* Weekly Schedule */}
+                <div className="lg:col-span-2">
+                  <h3 className="text-lg font-semibold text-white mb-4">Weekly Schedule</h3>
+                  <div className="grid grid-cols-7 gap-2">
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => (
+                      <div key={day} className="text-center">
+                        <div className="font-medium text-white mb-2">{day}</div>
+                        <div className="space-y-1">
+                          {index < 5 ? (
+                            <>
+                              <div className="bg-[#1E5AB3] text-white text-xs p-1 rounded">9-11 AM</div>
+                              <div className="bg-[#1E5AB3] text-white text-xs p-1 rounded">1-3 PM</div>
+                            </>
+                          ) : index === 5 ? (
+                            <>
+                              <div className="bg-[#1E5AB3] text-white text-xs p-1 rounded">10-12 PM</div>
+                            </>
+                          ) : (
+                            <div className="bg-[#23292F] text-gray-400 text-xs p-1 rounded">Off</div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -1449,9 +1585,6 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                 >
                   Edit Staff
                 </button>
-                <button className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium">
-                  View Schedule
-                </button>
               </div>
             </div>
           </div>
@@ -1464,7 +1597,7 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
           <div className="bg-[#2A3037] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-700">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Edit Staff Member</h2>
+                <h2 className="text-2xl font-bold text-white">Edit Staff</h2>
                 <button 
                   onClick={() => setShowEditStaffModal(false)}
                   className="text-gray-400 hover:text-gray-300 text-2xl"
@@ -1479,7 +1612,7 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                 {/* Personal Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <User className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    <User className="h-5 w-5 mr-2 text-[#1E5AB3]" />
                     Personal Information
                   </h3>
                   <div className="space-y-4">
@@ -1517,6 +1650,29 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                     </div>
                     
                     <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Date of Birth</label>
+                      <input
+                        type="date"
+                        value={editStaff.dob || ''}
+                        onChange={(e) => setEditStaff({...editStaff, dob: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Gender</label>
+                      <select
+                        value={editStaff.gender || 'Male'}
+                        onChange={(e) => setEditStaff({...editStaff, gender: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex flex-col">
                       <label className="text-gray-400 text-sm mb-1">Branch *</label>
                       <select
                         value={editStaff.branch}
@@ -1535,7 +1691,7 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                 {/* Professional Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <Award className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    <Award className="h-5 w-5 mr-2 text-[#1E5AB3]" />
                     Professional Details
                   </h3>
                   <div className="space-y-4">
@@ -1551,6 +1707,17 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                         <option value="Admin">Admin</option>
                         <option value="Manager">Manager</option>
                       </select>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Experience *</label>
+                      <input
+                        type="text"
+                        value={editStaff.experience}
+                        onChange={(e) => setEditStaff({...editStaff, experience: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
                     </div>
                     
                     <div className="flex flex-col">
@@ -1589,11 +1756,73 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                 </button>
                 <button 
                   onClick={handleEditStaff}
-                  className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium"
+                  className="px-6 py-3 bg-[#1E5AB3] hover:bg-[#1A4A93] text-white rounded-lg transition-colors duration-200 font-medium"
                 >
                   Save Changes
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Staff Confirmation Modal */}
+      {showDeleteStaffModal && staffToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#2A3037] rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-red-500" />
+              </div>
+            </div>
+            <h2 className="text-xl font-bold text-white text-center mb-2">Delete Staff Member</h2>
+            <p className="text-gray-300 text-center mb-6">
+              Are you sure you want to delete <span className="font-medium text-white">{staffToDelete.name}</span>? This action cannot be undone.
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button 
+                onClick={() => setShowDeleteStaffModal(false)}
+                className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteStaff}
+                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Trainer Confirmation Modal */}
+      {showDeleteTrainerModal && trainerToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#2A3037] rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-red-500" />
+              </div>
+            </div>
+            <h2 className="text-xl font-bold text-white text-center mb-2">Delete Trainer</h2>
+            <p className="text-gray-300 text-center mb-6">
+              Are you sure you want to delete <span className="font-medium text-white">{trainerToDelete.name}</span>? This action cannot be undone.
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button 
+                onClick={() => setShowDeleteTrainerModal(false)}
+                className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteTrainer}
+                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
