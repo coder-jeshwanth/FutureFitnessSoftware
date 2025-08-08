@@ -1,5 +1,18 @@
-import React, { useState } from 'react';
-import { Send, Bell, Mail, MessageSquare, Users, Calendar, CreditCard, Plus, Edit, Trash2, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Send, Bell, Mail, MessageSquare, Users, Calendar, CreditCard, Plus, Edit, Trash2, Search, Save } from 'lucide-react';
+
+// Drafts array to store saved drafts
+const drafts = [
+  {
+    id: 1,
+    title: 'Monthly Newsletter Draft',
+    subject: 'FutureFitness Monthly Update',
+    message: 'This is a draft of our monthly newsletter with updates...',
+    recipients: 'All Members',
+    channel: 'email',
+    lastSaved: '2025-08-07'
+  }
+];
 
 const notifications = [
   {
@@ -76,10 +89,30 @@ const templates = [
 ];
 
 const Notifications: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'sent' | 'compose' | 'templates'>('sent');
+  const [activeTab, setActiveTab] = useState<'sent' | 'compose' | 'templates' | 'drafts'>('sent');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showComposeModal, setShowComposeModal] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [messageType, setMessageType] = useState('Payment Reminder');
+  const [messageRecipients, setMessageRecipients] = useState('All Members');
+  const [messageChannel, setMessageChannel] = useState('email');
+  const [messageSubject, setMessageSubject] = useState('');
+  const [messageContent, setMessageContent] = useState('');
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
+  const [draftsList, setDraftsList] = useState(drafts);
+  const [selectedDraft, setSelectedDraft] = useState<number | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
+
+  // Update preview when message content changes
+  const resetComposeForm = () => {
+    setMessageType('Payment Reminder');
+    setMessageRecipients('All Members');
+    setMessageChannel('email');
+    setMessageSubject('');
+    setMessageContent('');
+    setScheduleDate('');
+    setScheduleTime('');
+    setSelectedDraft(null);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -120,7 +153,10 @@ const Notifications: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <button 
-          onClick={() => setShowComposeModal(true)}
+          onClick={() => {
+            setActiveTab('compose');
+            resetComposeForm();
+          }}
           className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
         >
           <Plus className="h-5 w-5" />
@@ -131,7 +167,7 @@ const Notifications: React.FC = () => {
       {/* Tabs */}
       <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700">
         <div className="border-b border-gray-600">
-          <nav className="flex space-x-8 px-6">
+          <nav className="flex space-x-8 px-6 overflow-x-auto">
             <button
               onClick={() => setActiveTab('sent')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center space-x-2 ${
@@ -164,6 +200,17 @@ const Notifications: React.FC = () => {
             >
               <MessageSquare className="h-4 w-4" />
               <span>Templates ({templates.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('drafts')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center space-x-2 ${
+                activeTab === 'drafts'
+                  ? 'border-[#7BC843] text-[#7BC843]'
+                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
+              }`}
+            >
+              <Save className="h-4 w-4" />
+              <span>Drafts ({draftsList.length})</span>
             </button>
           </nav>
         </div>
@@ -235,7 +282,11 @@ const Notifications: React.FC = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Message Type</label>
-                      <select className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
+                      <select 
+                        className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        value={messageType}
+                        onChange={(e) => setMessageType(e.target.value)}
+                      >
                         <option>Payment Reminder</option>
                         <option>Class Update</option>
                         <option>General Announcement</option>
@@ -245,7 +296,11 @@ const Notifications: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Recipients</label>
-                      <select className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
+                      <select 
+                        className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        value={messageRecipients}
+                        onChange={(e) => setMessageRecipients(e.target.value)}
+                      >
                         <option>All Members</option>
                         <option>Premium Members</option>
                         <option>Standard Members</option>
@@ -259,15 +314,36 @@ const Notifications: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-300 mb-2">Channel</label>
                       <div className="grid grid-cols-3 gap-3">
                         <label className="flex items-center">
-                          <input type="radio" name="channel" value="email" className="text-[#7BC843] focus:ring-[#7BC843]" />
+                          <input 
+                            type="radio" 
+                            name="channel" 
+                            value="email" 
+                            checked={messageChannel === 'email'}
+                            onChange={() => setMessageChannel('email')}
+                            className="text-[#7BC843] focus:ring-[#7BC843]" 
+                          />
                           <span className="ml-2 text-sm text-gray-200">Email</span>
                         </label>
                         <label className="flex items-center">
-                          <input type="radio" name="channel" value="sms" className="text-[#7BC843] focus:ring-[#7BC843]" />
+                          <input 
+                            type="radio" 
+                            name="channel" 
+                            value="sms" 
+                            checked={messageChannel === 'sms'}
+                            onChange={() => setMessageChannel('sms')}
+                            className="text-[#7BC843] focus:ring-[#7BC843]" 
+                          />
                           <span className="ml-2 text-sm text-gray-200">SMS</span>
                         </label>
                         <label className="flex items-center">
-                          <input type="radio" name="channel" value="both" className="text-[#7BC843] focus:ring-[#7BC843]" />
+                          <input 
+                            type="radio" 
+                            name="channel" 
+                            value="both"
+                            checked={messageChannel === 'both'}
+                            onChange={() => setMessageChannel('both')} 
+                            className="text-[#7BC843] focus:ring-[#7BC843]" 
+                          />
                           <span className="ml-2 text-sm text-gray-200">Both</span>
                         </label>
                       </div>
@@ -276,6 +352,8 @@ const Notifications: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
                       <input
                         type="text"
+                        value={messageSubject}
+                        onChange={(e) => setMessageSubject(e.target.value)}
                         className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                         placeholder="Enter message subject"
                       />
@@ -284,6 +362,8 @@ const Notifications: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-300 mb-2">Message</label>
                       <textarea
                         rows={6}
+                        value={messageContent}
+                        onChange={(e) => setMessageContent(e.target.value)}
                         className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                         placeholder="Type your message here..."
                       />
@@ -293,10 +373,14 @@ const Notifications: React.FC = () => {
                       <div className="grid grid-cols-2 gap-3">
                         <input
                           type="date"
+                          value={scheduleDate}
+                          onChange={(e) => setScheduleDate(e.target.value)}
                           className="px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                         />
                         <input
                           type="time"
+                          value={scheduleTime}
+                          onChange={(e) => setScheduleTime(e.target.value)}
                           className="px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                         />
                       </div>
@@ -309,21 +393,55 @@ const Notifications: React.FC = () => {
                   <div className="bg-[#23292F] rounded-lg p-6 border border-gray-600">
                     <div className="bg-[#2A3037] rounded-lg p-4 shadow-sm">
                       <h4 className="font-semibold text-gray-100 mb-2">Subject Line Preview</h4>
-                      <p className="text-gray-300 mb-4">Your message subject will appear here...</p>
+                      <p className="text-gray-300 mb-4">{messageSubject || 'Your message subject will appear here...'}</p>
                       <div className="border-t border-gray-600 pt-4">
-                        <p className="text-gray-300">Your message content will be displayed here as members will see it.</p>
+                        <p className="text-gray-300">{messageContent || 'Your message content will be displayed here as members will see it.'}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-6 space-y-3">
-                    <button className="w-full bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200">
+                    <button 
+                      onClick={() => {
+                        alert('Message sent successfully!');
+                        resetComposeForm();
+                        setActiveTab('sent');
+                      }}
+                      className="w-full bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+                    >
                       Send Now
                     </button>
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
+                    <button 
+                      onClick={() => {
+                        if (!scheduleDate || !scheduleTime) {
+                          alert('Please select both date and time for scheduling');
+                          return;
+                        }
+                        alert(`Message scheduled for ${scheduleDate} at ${scheduleTime}`);
+                        resetComposeForm();
+                        setActiveTab('sent');
+                      }}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+                    >
                       Schedule Message
                     </button>
-                    <button className="w-full border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-medium hover:bg-[#23292F] transition-colors duration-200">
+                    <button 
+                      onClick={() => {
+                        const newDraft = {
+                          id: draftsList.length + 1,
+                          title: messageSubject || 'Untitled Draft',
+                          subject: messageSubject,
+                          message: messageContent,
+                          recipients: messageRecipients,
+                          channel: messageChannel,
+                          lastSaved: new Date().toISOString().split('T')[0]
+                        };
+                        setDraftsList([...draftsList, newDraft]);
+                        alert('Draft saved successfully!');
+                        setActiveTab('drafts');
+                      }}
+                      className="w-full border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-medium hover:bg-[#23292F] transition-colors duration-200"
+                    >
                       Save as Draft
                     </button>
                   </div>
@@ -362,12 +480,82 @@ const Notifications: React.FC = () => {
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
-                    <button className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm">
+                    <button 
+                      onClick={() => {
+                        setActiveTab('compose');
+                        setMessageType(template.type);
+                        setMessageSubject(template.subject);
+                        setMessageContent(template.content);
+                      }}
+                      className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm"
+                    >
                       Use Template
                     </button>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+        
+        {activeTab === 'drafts' && (
+          <div className="p-6">
+            <div className="space-y-4">
+              {draftsList.length === 0 ? (
+                <div className="text-center p-8 border border-dashed border-gray-600 rounded-lg">
+                  <p className="text-gray-400">No drafts saved yet</p>
+                </div>
+              ) : (
+                draftsList.map((draft) => (
+                  <div key={draft.id} className="border border-gray-700 rounded-lg p-6 bg-[#23292F] hover:bg-[#2D353F] transition-colors duration-200">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start space-x-4 flex-1">
+                        <div className="bg-[#1A2026] p-2 rounded-lg">
+                          <Save className="h-4 w-4 text-blue-400" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h3 className="text-lg font-semibold text-gray-100">{draft.title || "Untitled Draft"}</h3>
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300">
+                              Draft
+                            </span>
+                          </div>
+                          <p className="text-gray-300 mb-3">{draft.message ? (draft.message.length > 100 ? draft.message.substring(0, 100) + '...' : draft.message) : 'No content'}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-400">
+                            <span>To: {draft.recipients}</span>
+                            <span>•</span>
+                            <span>Last saved: {draft.lastSaved}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          onClick={() => {
+                            setActiveTab('compose');
+                            setMessageSubject(draft.subject || '');
+                            setMessageContent(draft.message || '');
+                            setMessageChannel(draft.channel || 'email');
+                            setMessageRecipients(draft.recipients || 'All Members');
+                          }}
+                          className="p-2 text-gray-400 hover:text-blue-400 hover:bg-[#1A2026] rounded-lg transition-colors duration-200"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button 
+                          onClick={() => {
+                            if (confirm('Are you sure you want to delete this draft?')) {
+                              setDraftsList(draftsList.filter(d => d.id !== draft.id));
+                            }
+                          }}
+                          className="p-2 text-gray-400 hover:text-red-400 hover:bg-[#1A2026] rounded-lg transition-colors duration-200"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}

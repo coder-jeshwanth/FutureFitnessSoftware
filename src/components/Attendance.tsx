@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, UserCheck, Search, Filter, Download, CheckCircle, XCircle, ChevronLeft, ChevronRight, History, BarChart, List, ChevronDown, Smartphone, Fingerprint, MapPin, Wifi } from 'lucide-react';
+import { Calendar, Clock, Users, UserCheck, Search, Filter, Download, CheckCircle, XCircle, ChevronLeft, History, BarChart, List, ChevronDown, Smartphone, Fingerprint, MapPin, Wifi } from 'lucide-react';
 import './Attendance.css';
 
 // Custom QR code icon
