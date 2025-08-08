@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BarChart3, TrendingUp, Download, Filter, Calendar, Users, IndianRupee , Activity } from "lucide-react";
+import { BarChart3, TrendingUp, Download, Users, IndianRupee , Activity } from "lucide-react";
 
 const Reports: React.FC = () => {
   const [dateRange, setDateRange] = useState("30days");
