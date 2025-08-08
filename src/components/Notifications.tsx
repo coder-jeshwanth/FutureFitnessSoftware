@@ -83,11 +83,11 @@ const Notifications: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'sent': return 'bg-green-100 text-green-800';
-      case 'scheduled': return 'bg-blue-100 text-blue-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'failed': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'sent': return 'bg-green-800 text-green-100';
+      case 'scheduled': return 'bg-blue-800 text-blue-100';
+      case 'pending': return 'bg-yellow-800 text-yellow-100';
+      case 'failed': return 'bg-red-800 text-red-100';
+      default: return 'bg-gray-800 text-gray-100';
     }
   };
 
@@ -103,10 +103,10 @@ const Notifications: React.FC = () => {
 
   const getChannelColor = (channel: string) => {
     switch (channel) {
-      case 'email': return 'bg-blue-100 text-blue-800';
-      case 'sms': return 'bg-green-100 text-green-800';
-      case 'both': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'email': return 'bg-blue-800 text-blue-100';
+      case 'sms': return 'bg-green-800 text-green-100';
+      case 'both': return 'bg-purple-800 text-purple-100';
+      default: return 'bg-gray-800 text-gray-100';
     }
   };
 
@@ -119,13 +119,9 @@ const Notifications: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Notifications</h2>
-          <p className="text-gray-600">Send messages and alerts to your members</p>
-        </div>
         <button 
           onClick={() => setShowComposeModal(true)}
-          className="bg-[#165D31] hover:bg-[#073418] text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+          className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
         >
           <Plus className="h-5 w-5" />
           <span>Compose Message</span>
@@ -133,15 +129,15 @@ const Notifications: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700">
+        <div className="border-b border-gray-600">
           <nav className="flex space-x-8 px-6">
             <button
               onClick={() => setActiveTab('sent')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center space-x-2 ${
                 activeTab === 'sent'
-                  ? 'border-[#165D31] text-[#165D31]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-[#7BC843] text-[#7BC843]'
+                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
               }`}
             >
               <Mail className="h-4 w-4" />
@@ -151,8 +147,8 @@ const Notifications: React.FC = () => {
               onClick={() => setActiveTab('compose')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center space-x-2 ${
                 activeTab === 'compose'
-                  ? 'border-[#165D31] text-[#165D31]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-[#7BC843] text-[#7BC843]'
+                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
               }`}
             >
               <Send className="h-4 w-4" />
@@ -162,8 +158,8 @@ const Notifications: React.FC = () => {
               onClick={() => setActiveTab('templates')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center space-x-2 ${
                 activeTab === 'templates'
-                  ? 'border-[#165D31] text-[#165D31]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-[#7BC843] text-[#7BC843]'
+                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
               }`}
             >
               <MessageSquare className="h-4 w-4" />
@@ -183,7 +179,7 @@ const Notifications: React.FC = () => {
                   placeholder="Search notifications..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                 />
               </div>
             </div>
@@ -191,15 +187,15 @@ const Notifications: React.FC = () => {
             {/* Notifications List */}
             <div className="space-y-4">
               {filteredNotifications.map((notification) => (
-                <div key={notification.id} className="border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors duration-200">
+                <div key={notification.id} className="border border-gray-700 rounded-lg p-6 bg-[#23292F] hover:bg-[#2D353F] transition-colors duration-200">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4 flex-1">
-                      <div className="bg-[#E7EFEA] p-2 rounded-lg">
+                      <div className="bg-[#1A2026] p-2 rounded-lg">
                         {getTypeIcon(notification.type)}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{notification.title}</h3>
+                          <h3 className="text-lg font-semibold text-gray-100">{notification.title}</h3>
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(notification.status)}`}>
                             {notification.status}
                           </span>
@@ -207,8 +203,8 @@ const Notifications: React.FC = () => {
                             {notification.channel}
                           </span>
                         </div>
-                        <p className="text-gray-600 mb-3">{notification.message}</p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <p className="text-gray-300 mb-3">{notification.message}</p>
+                        <div className="flex items-center space-x-4 text-sm text-gray-400">
                           <span>To: {notification.recipients.join(', ')}</span>
                           <span>•</span>
                           <span>Sent: {notification.sentDate}</span>
@@ -216,10 +212,10 @@ const Notifications: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                      <button className="p-2 text-gray-400 hover:text-blue-400 hover:bg-[#1A2026] rounded-lg transition-colors duration-200">
                         <Edit className="h-4 w-4" />
                       </button>
-                      <button className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200">
+                      <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-[#1A2026] rounded-lg transition-colors duration-200">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -235,11 +231,11 @@ const Notifications: React.FC = () => {
             <div className="max-w-4xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Compose New Message</h3>
+                  <h3 className="text-lg font-semibold text-gray-100 mb-4">Compose New Message</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Message Type</label>
-                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Message Type</label>
+                      <select className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
                         <option>Payment Reminder</option>
                         <option>Class Update</option>
                         <option>General Announcement</option>
@@ -248,8 +244,8 @@ const Notifications: React.FC = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Recipients</label>
-                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Recipients</label>
+                      <select className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
                         <option>All Members</option>
                         <option>Premium Members</option>
                         <option>Standard Members</option>
@@ -260,48 +256,48 @@ const Notifications: React.FC = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Channel</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Channel</label>
                       <div className="grid grid-cols-3 gap-3">
                         <label className="flex items-center">
-                          <input type="radio" name="channel" value="email" className="text-[#165D31] focus:ring-[#165D31]" />
-                          <span className="ml-2 text-sm">Email</span>
+                          <input type="radio" name="channel" value="email" className="text-[#7BC843] focus:ring-[#7BC843]" />
+                          <span className="ml-2 text-sm text-gray-200">Email</span>
                         </label>
                         <label className="flex items-center">
-                          <input type="radio" name="channel" value="sms" className="text-[#165D31] focus:ring-[#165D31]" />
-                          <span className="ml-2 text-sm">SMS</span>
+                          <input type="radio" name="channel" value="sms" className="text-[#7BC843] focus:ring-[#7BC843]" />
+                          <span className="ml-2 text-sm text-gray-200">SMS</span>
                         </label>
                         <label className="flex items-center">
-                          <input type="radio" name="channel" value="both" className="text-[#165D31] focus:ring-[#165D31]" />
-                          <span className="ml-2 text-sm">Both</span>
+                          <input type="radio" name="channel" value="both" className="text-[#7BC843] focus:ring-[#7BC843]" />
+                          <span className="ml-2 text-sm text-gray-200">Both</span>
                         </label>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
                       <input
                         type="text"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                         placeholder="Enter message subject"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Message</label>
                       <textarea
                         rows={6}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                         placeholder="Type your message here..."
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Schedule (Optional)</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Schedule (Optional)</label>
                       <div className="grid grid-cols-2 gap-3">
                         <input
                           type="date"
-                          className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                          className="px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                         />
                         <input
                           type="time"
-                          className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                          className="px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                         />
                       </div>
                     </div>
@@ -309,25 +305,25 @@ const Notifications: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
-                  <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                      <h4 className="font-semibold text-gray-900 mb-2">Subject Line Preview</h4>
-                      <p className="text-gray-600 mb-4">Your message subject will appear here...</p>
-                      <div className="border-t border-gray-200 pt-4">
-                        <p className="text-gray-600">Your message content will be displayed here as members will see it.</p>
+                  <h3 className="text-lg font-semibold text-gray-100 mb-4">Preview</h3>
+                  <div className="bg-[#23292F] rounded-lg p-6 border border-gray-600">
+                    <div className="bg-[#2A3037] rounded-lg p-4 shadow-sm">
+                      <h4 className="font-semibold text-gray-100 mb-2">Subject Line Preview</h4>
+                      <p className="text-gray-300 mb-4">Your message subject will appear here...</p>
+                      <div className="border-t border-gray-600 pt-4">
+                        <p className="text-gray-300">Your message content will be displayed here as members will see it.</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-6 space-y-3">
-                    <button className="w-full bg-[#165D31] hover:bg-[#073418] text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
+                    <button className="w-full bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200">
                       Send Now
                     </button>
                     <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
                       Schedule Message
                     </button>
-                    <button className="w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200">
+                    <button className="w-full border border-gray-600 text-gray-300 px-6 py-3 rounded-lg font-medium hover:bg-[#23292F] transition-colors duration-200">
                       Save as Draft
                     </button>
                   </div>
@@ -341,11 +337,11 @@ const Notifications: React.FC = () => {
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {templates.map((template) => (
-                <div key={template.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
+                <div key={template.id} className="border border-gray-600 bg-[#23292F] rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{template.name}</h3>
-                      <p className="text-sm text-gray-600">Subject: {template.subject}</p>
+                      <h3 className="text-lg font-semibold text-gray-100 mb-1">{template.name}</h3>
+                      <p className="text-sm text-gray-300">Subject: {template.subject}</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       template.type === 'payment' ? 'bg-red-100 text-red-800' :
@@ -356,17 +352,17 @@ const Notifications: React.FC = () => {
                       {template.type}
                     </span>
                   </div>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{template.content}</p>
+                  <p className="text-gray-300 text-sm mb-4 line-clamp-3">{template.content}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                      <button className="p-2 text-gray-400 hover:text-blue-400 hover:bg-[#1A2026] rounded-lg transition-colors duration-200">
                         <Edit className="h-4 w-4" />
                       </button>
-                      <button className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200">
+                      <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-[#1A2026] rounded-lg transition-colors duration-200">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
-                    <button className="text-[#165D31] hover:text-[#073418] font-medium text-sm">
+                    <button className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm">
                       Use Template
                     </button>
                   </div>
