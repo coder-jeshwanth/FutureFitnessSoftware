@@ -1,0 +1,54 @@
+@keyframes scanning {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(256px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes scanning-slow {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(192px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-scanning {
+  animation: scanning 3s linear infinite;
+}
+
+.animate-scanning-slow {
+  animation: scanning-slow 4s linear infinite;
+}
+
+.animate-pulse {
+  animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.circle-map {
+  background: radial-gradient(circle, rgba(123, 200, 67, 0.2) 0%, rgba(123, 200, 67, 0.1) 70%, transparent 100%);
+  border: 2px dashed #7BC843;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
