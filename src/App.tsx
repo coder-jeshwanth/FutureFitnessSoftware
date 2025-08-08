@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { FiSidebar } from "react-icons/fi";
 import logoImage from './components/Images/logo.png';
+import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import GymUsers from './components/GymUsers';
 import Trainers from './components/Trainers';
@@ -77,6 +78,8 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true); // Start with sidebar open
   const [selectedBranch, setSelectedBranch] = useState('All Branches');
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{email: string; name: string} | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   // Close the dropdown when clicking outside
@@ -92,6 +95,34 @@ function App() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Check for saved authentication state on component mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      setCurrentUser(JSON.parse(savedUser));
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (email: string, password: string) => {
+    // Simple authentication check (in a real app, this would be an API call)
+    if (email === 'admin@futurefitness.com' && password === 'admin123') {
+      const user = { email, name: 'Admin User' };
+      setCurrentUser(user);
+      setIsAuthenticated(true);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    } else {
+      alert('Invalid credentials. Use admin@futurefitness.com / admin123');
+    }
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('currentUser');
+    setActiveMenu('dashboard');
+  };
 
   const renderContent = () => {
     switch (activeMenu) {
@@ -111,7 +142,11 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex">
+    <>
+      {!isAuthenticated ? (
+        <Login onLogin={handleLogin} />
+      ) : (
+        <div className="min-h-screen bg-black flex">
       {/* Sidebar Overlay (only for mobile screens) */}
       <div 
         className={`fixed inset-0 bg-black transition-opacity duration-300 lg:hidden ${sidebarOpen ? 'opacity-50 z-40' : 'opacity-0 -z-10'}`}
@@ -180,6 +215,7 @@ function App() {
          {/* Logout button placed at bottom of sidebar with proper margin */}
          <div className={`${sidebarOpen ? 'px-4' : 'px-0'} py-4 mt-auto border-t border-gray-700`}>
            <button 
+             onClick={handleLogout}
              className={`w-full ${sidebarOpen ? 'flex items-center space-x-3 px-4 py-3 text-left' : 'flex justify-center py-3'} text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-colors duration-200`}
              title={!sidebarOpen ? "Logout" : ""}
            >
@@ -249,9 +285,9 @@ function App() {
             
             <div className="hidden md:flex items-center space-x-2 text-sm text-gray-300">
               <div className="w-8 h-8 bg-[#7BC843] rounded-full flex items-center justify-center">
-                <span className="text-black font-medium">A</span>
+                <span className="text-black font-medium">{currentUser?.name.charAt(0) || 'A'}</span>
               </div>
-              <span className="text-2xl text-white">Admin User</span>
+              <span className="text-2xl text-white">{currentUser?.name || 'Admin User'}</span>
             </div>
           </div>
         </header>
@@ -261,7 +297,9 @@ function App() {
           {renderContent()}
         </main>
       </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 }
 
