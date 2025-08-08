@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   LayoutDashboard, 
   Users, 
@@ -12,11 +12,11 @@ import {
   Bell, 
   Settings, 
   LogOut,
-  Menu,
   X,
   MapPin,
   ChevronDown
 } from 'lucide-react';
+import { FiSidebar } from "react-icons/fi";
 import logoImage from './components/Images/logo.png';
 import Dashboard from './components/Dashboard';
 import GymUsers from './components/GymUsers';
@@ -48,7 +48,7 @@ const menuItems = [
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { id: 'users', label: 'Gym Users', icon: Users },
-      { id: 'trainers', label: 'Trainers/Staff', icon: UserCheck },
+      { id: 'trainers', label: 'Trainers / Staff', icon: UserCheck },
       { id: 'workouts', label: 'Workout Plans', icon: Dumbbell },
       { id: 'classes', label: 'Class Schedule', icon: Calendar },
       { id: 'attendance', label: 'Attendance', icon: ClipboardCheck },
@@ -74,7 +74,7 @@ const menuItems = [
 
 function App() {
   const [activeMenu, setActiveMenu] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Start with sidebar open
   const [selectedBranch, setSelectedBranch] = useState('All Branches');
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -95,7 +95,7 @@ function App() {
 
   const renderContent = () => {
     switch (activeMenu) {
-      case 'dashboard': return <Dashboard />;
+      case 'dashboard': return <Dashboard selectedBranch={selectedBranch} />;
       case 'users': return <GymUsers selectedBranch={selectedBranch} />;
       case 'trainers': return <Trainers />;
       case 'workouts': return <WorkoutPlans />;
@@ -106,13 +106,13 @@ function App() {
       case 'reports': return <Reports />;
       case 'notifications': return <Notifications />;
       case 'settings': return <AppSettings />;
-      default: return <Dashboard />;
+      default: return <Dashboard selectedBranch={selectedBranch} />;
     }
   };
 
   return (
     <div className="min-h-screen bg-black flex">
-      {/* Mobile Sidebar Overlay */}
+      {/* Sidebar Overlay (only for mobile screens) */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
@@ -122,8 +122,8 @@ function App() {
 
       {/* Sidebar */}
       <div className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-72 bg-[#2A3037] text-white transform transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        fixed inset-y-0 left-0 z-50 w-72 bg-[#2A3037] text-white transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:-translate-x-full'}
       `}>
         <div className="flex items-center justify-between h-56 px-6 border-b ">
           <div className="flex-1 flex justify-center">
@@ -131,7 +131,7 @@ function App() {
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-[#E7EFEA] hover:text-white"
+            className="text-[#E7EFEA] hover:text-white lg:hidden"
           >
             <X className="h-6 w-6" />
           </button>
@@ -150,7 +150,7 @@ function App() {
             key={item.id}
             onClick={() => {
               setActiveMenu(item.id);
-              setSidebarOpen(false);
+              // Don't close sidebar when clicking menu items
             }}
             className={`w-full flex items-center space-x-3 px-4 py-3 mb-2 rounded-lg text-left transition-colors duration-200
               ${activeMenu === item.id
@@ -177,23 +177,26 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-black">
+      <div className={`flex-1 flex flex-col overflow-hidden bg-black transition-all duration-300 ease-in-out ${sidebarOpen ? 'lg:ml-72' : 'ml-0'}`}>
         {/* Header */}
         <header className="bg-black shadow-sm h-20 flex items-center justify-between px-6">
           <div className="flex items-center space-x-4">
+            {/* Sidebar Toggle Button (visible on all screens) */}
             <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-300 hover:text-white"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-gray-300 hover:text-white flex items-center justify-center p-2 rounded-lg hover:bg-[#2A3037] transition-colors"
+              aria-label="Toggle Sidebar"
+              title="Toggle Sidebar"
             >
-              <Menu className="h-6 w-6 text-white" />
+              <FiSidebar className="h-6 w-6 text-white" />
             </button>
             <h2 className="text-3xl font-bold text-white capitalize">
               {menuItems.flatMap(section => section.items).find(item => item.id === activeMenu)?.label || 'Dashboard'}
             </h2>
           </div>
           <div className="flex items-center space-x-4">
-            {/* Branch Dropdown - Only show on Gym Users page */}
-            {activeMenu === 'users' && (
+            {/* Branch Dropdown - Show on Dashboard and Gym Users pages */}
+            {(activeMenu === 'users' || activeMenu === 'dashboard') && (
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setShowBranchDropdown(!showBranchDropdown)}

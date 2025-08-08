@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Package, DollarSign, Users, Percent } from 'lucide-react';
+import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Package, IndianRupee , Users, Percent } from 'lucide-react';
 
 const subscriptionPlans = [
   {
@@ -140,7 +140,7 @@ const Subscriptions: React.FC = () => {
               <p className="text-gray-400 text-sm">Monthly Revenue</p>
               <p className="text-2xl font-bold text-[#7BC843]">₹{Math.round(stats.monthlyRevenue).toLocaleString()}</p>
             </div>
-            <DollarSign className="h-8 w-8 text-[#7BC843]" />
+            <IndianRupee  className="h-8 w-8 text-[#7BC843]" />
           </div>
         </div>
       </div>

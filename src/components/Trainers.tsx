@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, Eye, User, Phone, Mail, Calendar, Star, Clock, Award } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, User, Phone, Mail, Calendar, Star, Clock, Award, MapPin } from 'lucide-react';
+const branches = [
+  'Stonehousepet',
+  'Harinathpuram',
+  'Vanamthopu Center',
+  'Current Office Center',
+  'Vedayapalem',
+  'BV Nagar',
+  'Dhanalakshmi Puram'
+];
 
 const trainers = [
   {
@@ -15,7 +24,8 @@ const trainers = [
     rating: 4.8,
     availability: 'Mon-Fri: 6AM-2PM',
     joinDate: '2022-03-15',
-    avatar: 'VK'
+    avatar: 'VK',
+    branch: 'Stonehousepet'
   },
   {
     id: 2,
@@ -30,7 +40,8 @@ const trainers = [
     rating: 4.9,
     availability: 'Mon-Sat: 7AM-3PM',
     joinDate: '2022-08-20',
-    avatar: 'SR'
+    avatar: 'SR',
+    branch: 'Harinathpuram'
   },
   {
     id: 3,
@@ -45,7 +56,8 @@ const trainers = [
     rating: 4.7,
     availability: 'Tue-Sun: 5AM-1PM',
     joinDate: '2021-11-10',
-    avatar: 'RS'
+    avatar: 'RS',
+    branch: 'Vanamthopu Center'
   },
   {
     id: 4,
@@ -60,7 +72,8 @@ const trainers = [
     rating: 4.6,
     availability: 'Mon-Fri: 9AM-5PM',
     joinDate: '2023-01-25',
-    avatar: 'PS'
+    avatar: 'PS',
+    branch: 'Current Office Center'
   }
 ];
 
@@ -68,6 +81,50 @@ const Trainers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTrainer, setSelectedTrainer] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editTrainer, setEditTrainer] = useState<any>(null);
+  const [showAddStaffModal, setShowAddStaffModal] = useState(false);
+  const [newStaff, setNewStaff] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    role: 'Receptionist',
+    experience: '',
+    dob: '',
+    gender: 'Male',
+    availability: '',
+    status: 'Active',
+    branch: 'Stonehousepet',
+    joinDate: new Date().toISOString().split('T')[0]
+  });
+
+  const handleStaffInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewStaff({
+      ...newStaff,
+      [name]: value
+    });
+  };
+
+  const handleAddStaff = () => {
+    // Logic to add new staff would go here
+    console.log('New staff data:', newStaff);
+    setShowAddStaffModal(false);
+    // Reset form
+    setNewStaff({
+      name: '',
+      email: '',
+      phone: '',
+      role: 'Receptionist',
+      experience: '',
+      dob: '',
+      gender: 'Male',
+      availability: '',
+      status: 'Active',
+      branch: 'Stonehousepet',
+      joinDate: new Date().toISOString().split('T')[0]
+    });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -88,16 +145,83 @@ const Trainers: React.FC = () => {
     setSelectedTrainer(trainer);
     setShowModal(true);
   };
+  
+  const openEditModal = (trainer: any) => {
+    setEditTrainer({...trainer});
+    setShowEditModal(true);
+  };
+  
+  const handleEditTrainer = () => {
+    // Logic to update trainer would go here in a real app
+    console.log('Updated trainer data:', editTrainer);
+    setShowEditModal(false);
+    setEditTrainer(null);
+  };
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTrainer, setNewTrainer] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    specialty: 'Strength Training',
+    experience: '',
+    dob: '',
+    gender: 'Male',
+    certifications: [],
+    availability: '',
+    status: 'Active',
+    branch: 'Stonehousepet'
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewTrainer({
+      ...newTrainer,
+      [name]: value
+    });
+  };
+
+  const handleAddTrainer = () => {
+    // Logic to add new trainer would go here
+    console.log('New trainer data:', newTrainer);
+    setShowAddModal(false);
+    // Reset form
+    setNewTrainer({
+      name: '',
+      email: '',
+      phone: '',
+      specialty: 'Strength Training',
+      experience: '',
+      dob: '',
+      gender: 'Male',
+      certifications: [],
+      availability: '',
+      status: 'Active',
+      branch: 'Stonehousepet'
+    });
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-
-        <button className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2">
-          <Plus className="h-5 w-5" />
-          <span>Add New Trainer</span>
-        </button>
+        <h2 className="text-2xl font-bold text-white">Trainers & Staff</h2>
+        <div className="flex space-x-4">
+          <button 
+            onClick={() => setShowAddStaffModal(true)}
+            className="bg-[#2A3037] hover:bg-[#3A4049] border border-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Add Staff</span>
+          </button>
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Add Trainer</span>
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -154,6 +278,10 @@ const Trainers: React.FC = () => {
 
             <div className="space-y-3 mb-6">
               <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-sm">Branch:</span>
+                <span className="text-white font-medium text-sm">{trainer.branch}</span>
+              </div>
+              <div className="flex items-center justify-between">
                 <span className="text-gray-400 text-sm">Experience:</span>
                 <span className="text-white font-medium text-sm">{trainer.experience}</span>
               </div>
@@ -176,7 +304,11 @@ const Trainers: React.FC = () => {
                 >
                   <Eye className="h-4 w-4" />
                 </button>
-                <button className="p-2 text-gray-400 hover:text-[#7BC843] hover:bg-[#23292F] rounded-lg transition-colors duration-200" title="Edit">
+                <button 
+                  onClick={() => openEditModal(trainer)}
+                  className="p-2 text-gray-400 hover:text-[#7BC843] hover:bg-[#23292F] rounded-lg transition-colors duration-200" 
+                  title="Edit"
+                >
                   <Edit className="h-4 w-4" />
                 </button>
                 <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-[#23292F] rounded-lg transition-colors duration-200" title="Delete">
@@ -190,6 +322,209 @@ const Trainers: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Add New Trainer Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#2A3037] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-700">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Add New Trainer</h2>
+                <button 
+                  onClick={() => setShowAddModal(false)}
+                  className="text-gray-400 hover:text-gray-300 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Personal Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    <User className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    Personal Information
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Full Name *</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={newTrainer.name}
+                        onChange={handleInputChange}
+                        placeholder="Enter full name"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Email Address *</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={newTrainer.email}
+                        onChange={handleInputChange}
+                        placeholder="Enter email address"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Phone Number *</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={newTrainer.phone}
+                        onChange={handleInputChange}
+                        placeholder="Enter phone number"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Date of Birth *</label>
+                      <input
+                        type="date"
+                        name="dob"
+                        value={newTrainer.dob}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Gender *</label>
+                      <select
+                        name="gender"
+                        value={newTrainer.gender}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Branch *</label>
+                      <select
+                        name="branch"
+                        value={newTrainer.branch}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      >
+                        {branches.map((branch) => (
+                          <option key={branch} value={branch}>{branch}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Professional Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    <Award className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    Professional Details
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Specialty *</label>
+                      <select
+                        name="specialty"
+                        value={newTrainer.specialty}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      >
+                        <option value="Strength Training">Strength Training</option>
+                        <option value="Yoga & Pilates">Yoga & Pilates</option>
+                        <option value="CrossFit & HIIT">CrossFit & HIIT</option>
+                        <option value="Cardio & Dance">Cardio & Dance</option>
+                        <option value="Nutrition">Nutrition</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Experience *</label>
+                      <input
+                        type="text"
+                        name="experience"
+                        value={newTrainer.experience}
+                        onChange={handleInputChange}
+                        placeholder="E.g. 3 years"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Certifications</label>
+                      <input
+                        type="text"
+                        placeholder="Enter certifications (comma separated)"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Availability *</label>
+                      <input
+                        type="text"
+                        name="availability"
+                        value={newTrainer.availability}
+                        onChange={handleInputChange}
+                        placeholder="E.g. Mon-Fri: 6AM-2PM"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Status</label>
+                      <select
+                        name="status"
+                        value={newTrainer.status}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="On Leave">On Leave</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-end space-x-4">
+                <button 
+                  onClick={() => setShowAddModal(false)}
+                  className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleAddTrainer}
+                  className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium"
+                >
+                  Add Trainer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Trainer Detail Modal */}
       {showModal && selectedTrainer && (
@@ -238,6 +573,10 @@ const Trainers: React.FC = () => {
                     <div className="flex items-center space-x-3">
                       <Mail className="h-4 w-4 text-gray-400" />
                       <span className="text-white">{selectedTrainer.email}</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <span className="text-white">Branch: {selectedTrainer.branch}</span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <Calendar className="h-4 w-4 text-gray-400" />
@@ -317,6 +656,386 @@ const Trainers: React.FC = () => {
                 </button>
                 <button className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium">
                   Assign Members
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Edit Trainer Modal */}
+      {showEditModal && editTrainer && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#2A3037] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-700">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Edit Trainer</h2>
+                <button 
+                  onClick={() => setShowEditModal(false)}
+                  className="text-gray-400 hover:text-gray-300 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Personal Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    <User className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    Personal Information
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Full Name *</label>
+                      <input
+                        type="text"
+                        value={editTrainer.name}
+                        onChange={(e) => setEditTrainer({...editTrainer, name: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Email Address *</label>
+                      <input
+                        type="email"
+                        value={editTrainer.email}
+                        onChange={(e) => setEditTrainer({...editTrainer, email: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Phone Number *</label>
+                      <input
+                        type="tel"
+                        value={editTrainer.phone}
+                        onChange={(e) => setEditTrainer({...editTrainer, phone: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Date of Birth</label>
+                      <input
+                        type="date"
+                        value={editTrainer.dob || ''}
+                        onChange={(e) => setEditTrainer({...editTrainer, dob: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Gender</label>
+                      <select
+                        value={editTrainer.gender || 'Male'}
+                        onChange={(e) => setEditTrainer({...editTrainer, gender: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Branch *</label>
+                      <select
+                        value={editTrainer.branch}
+                        onChange={(e) => setEditTrainer({...editTrainer, branch: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      >
+                        {branches.map((branch) => (
+                          <option key={branch} value={branch}>{branch}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Professional Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    <Award className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    Professional Details
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Specialty *</label>
+                      <select
+                        value={editTrainer.specialty}
+                        onChange={(e) => setEditTrainer({...editTrainer, specialty: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      >
+                        <option value="Strength Training">Strength Training</option>
+                        <option value="Yoga & Pilates">Yoga & Pilates</option>
+                        <option value="CrossFit & HIIT">CrossFit & HIIT</option>
+                        <option value="Cardio & Dance">Cardio & Dance</option>
+                        <option value="Nutrition">Nutrition</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Experience *</label>
+                      <input
+                        type="text"
+                        value={editTrainer.experience}
+                        onChange={(e) => setEditTrainer({...editTrainer, experience: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Certifications</label>
+                      <input
+                        type="text"
+                        value={editTrainer.certifications ? editTrainer.certifications.join(', ') : ''}
+                        onChange={(e) => setEditTrainer({...editTrainer, certifications: e.target.value.split(', ')})}
+                        placeholder="Enter certifications (comma separated)"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Availability *</label>
+                      <input
+                        type="text"
+                        value={editTrainer.availability}
+                        onChange={(e) => setEditTrainer({...editTrainer, availability: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Status</label>
+                      <select
+                        value={editTrainer.status}
+                        onChange={(e) => setEditTrainer({...editTrainer, status: e.target.value})}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="On Leave">On Leave</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-end space-x-4">
+                <button 
+                  onClick={() => setShowEditModal(false)}
+                  className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleEditTrainer}
+                  className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Staff Modal */}
+      {showAddStaffModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#2A3037] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-700">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Add New Staff</h2>
+                <button 
+                  onClick={() => setShowAddStaffModal(false)}
+                  className="text-gray-400 hover:text-gray-300 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Personal Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    <User className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    Personal Information
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Full Name *</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={newStaff.name}
+                        onChange={handleStaffInputChange}
+                        placeholder="Enter full name"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Email Address *</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={newStaff.email}
+                        onChange={handleStaffInputChange}
+                        placeholder="Enter email address"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Phone Number *</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={newStaff.phone}
+                        onChange={handleStaffInputChange}
+                        placeholder="Enter phone number"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Date of Birth *</label>
+                      <input
+                        type="date"
+                        name="dob"
+                        value={newStaff.dob}
+                        onChange={handleStaffInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Gender *</label>
+                      <select
+                        name="gender"
+                        value={newStaff.gender}
+                        onChange={handleStaffInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Branch *</label>
+                      <select
+                        name="branch"
+                        value={newStaff.branch}
+                        onChange={handleStaffInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      >
+                        {branches.map((branch) => (
+                          <option key={branch} value={branch}>{branch}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Professional Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    <Award className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    Professional Details
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Role *</label>
+                      <select
+                        name="role"
+                        value={newStaff.role}
+                        onChange={handleStaffInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      >
+                        <option value="Receptionist">Receptionist</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Manager">Manager</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Experience *</label>
+                      <input
+                        type="text"
+                        name="experience"
+                        value={newStaff.experience}
+                        onChange={handleStaffInputChange}
+                        placeholder="E.g. 3 years"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Availability *</label>
+                      <input
+                        type="text"
+                        name="availability"
+                        value={newStaff.availability}
+                        onChange={handleStaffInputChange}
+                        placeholder="E.g. Mon-Fri: 9AM-5PM"
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <label className="text-gray-400 text-sm mb-1">Status</label>
+                      <select
+                        name="status"
+                        value={newStaff.status}
+                        onChange={handleStaffInputChange}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="On Leave">On Leave</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-end space-x-4">
+                <button 
+                  onClick={() => setShowAddStaffModal(false)}
+                  className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleAddStaff}
+                  className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium"
+                >
+                  Add Staff
                 </button>
               </div>
             </div>

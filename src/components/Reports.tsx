@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BarChart3, TrendingUp, Download, Filter, Calendar, Users, DollarSign, Activity } from "lucide-react";
+import { BarChart3, TrendingUp, Download, Filter, Calendar, Users, IndianRupee , Activity } from "lucide-react";
 
 const Reports: React.FC = () => {
   const [dateRange, setDateRange] = useState("30days");
@@ -74,7 +74,7 @@ const Reports: React.FC = () => {
               <p className="text-2xl font-bold text-[#7BC843]">₹{stats.totalRevenue.toLocaleString()}</p>
               <p className="text-sm text-green-400 mt-1">+12.5% from last period</p>
             </div>
-            <DollarSign className="h-8 w-8 text-[#7BC843]" />
+            <IndianRupee  className="h-8 w-8 text-[#7BC843]" />
           </div>
         </div>
         <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
@@ -115,7 +115,7 @@ const Reports: React.FC = () => {
           <nav className="flex space-x-8 px-6">
             {[
               { id: "overview", label: "Overview", icon: BarChart3 },
-              { id: "revenue", label: "Revenue Analysis", icon: DollarSign },
+              { id: "revenue", label: "Revenue Analysis", icon: IndianRupee  },
               { id: "membership", label: "Membership Trends", icon: Users },
               { id: "attendance", label: "Attendance Patterns", icon: Activity }
             ].map((tab) => {

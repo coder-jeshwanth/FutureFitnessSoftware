@@ -1,5 +1,9 @@
 import React from 'react';
-import { Users, UserCheck, DollarSign, Calendar, AlertTriangle, TrendingUp, Activity, Clock } from 'lucide-react';
+import { Users, UserCheck, IndianRupee , Calendar, AlertTriangle, TrendingUp, Activity, Clock } from 'lucide-react';
+
+interface DashboardProps {
+  selectedBranch: string;
+}
 
 const statsCards = [
   {
@@ -23,7 +27,7 @@ const statsCards = [
     value: '₹2,45,680',
     change: '+15%',
     trend: 'up',
-    icon: DollarSign,
+    icon: IndianRupee ,
     color: 'bg-green-600'
   },
   {
@@ -57,9 +61,16 @@ const quickActions = [
   { label: 'Create Class', color: 'bg-purple-600 hover:bg-purple-700', icon: Calendar }
 ];
 
-const Dashboard: React.FC = () => {
+const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
   return (
     <div className="space-y-6 bg-black p-6 rounded-lg">
+      {/* Branch Title */}
+      <div className="mb-4">
+        <h3 className="text-xl text-gray-300 font-medium">
+          {selectedBranch !== 'All Branches' ? `${selectedBranch} Branch` : 'All Branches'}
+        </h3>
+      </div>
+      
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {statsCards.map((card, index) => {
