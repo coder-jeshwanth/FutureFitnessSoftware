@@ -122,10 +122,10 @@ function App() {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-72 bg-[#2A3037] text-white transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-50 w-72 bg-[#2A3037] text-white transform transition-transform duration-300 ease-in-out flex flex-col
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between h-56 px-6 border-b ">
+        <div className="flex items-center justify-between h-56 px-6 border-b border-gray-700">
           <div className="flex-1 flex justify-center">
             <img src={logoImage} alt="Future Fitness Logo" className="h-[100px] w-[120px] p-0 " />
           </div>
@@ -137,43 +137,45 @@ function App() {
           </button>
         </div>
         
-       <nav className="mt-8 px-4 text-sm">
-  {menuItems.map((group, index) => (
-    <div key={index} className="mb-10">
-      <h4 className="text-gray-400 font-semibold mb-3 uppercase text-xs tracking-wide px-1">
-        {group.section}
-      </h4>
-      {group.items.map((item) => {
-        const Icon = item.icon;
-        return (
-          <button
-            key={item.id}
-            onClick={() => {
-              setActiveMenu(item.id);
-              // Don't close sidebar when clicking menu items
-            }}
-            className={`w-full flex items-center space-x-3 px-4 py-3 mb-2 rounded-lg text-left transition-colors duration-200
-              ${activeMenu === item.id
-                ? 'bg-[#7BC843] text-[black] shadow-lg'
-                : 'text-gray-300 hover:bg-[#7BC843] hover:text-[black]'}
-            `}
-          >
-            <Icon className="h-5 w-5" />
-            <span className="font-medium">{item.label}</span>
-          </button>
-        );
-      })}
-    </div>
-  ))}
-</nav>
+       <div className="flex flex-col h-[calc(100%-14rem)]"> {/* Create a flex container to manage the content and logout button */}
+         <nav className="mt-8 px-4 text-sm flex-grow overflow-y-auto">
+           {menuItems.map((group, index) => (
+             <div key={index} className="mb-10">
+               <h4 className="text-gray-400 font-semibold mb-3 uppercase text-xs tracking-wide px-1">
+                 {group.section}
+               </h4>
+               {group.items.map((item) => {
+                 const Icon = item.icon;
+                 return (
+                   <button
+                     key={item.id}
+                     onClick={() => {
+                       setActiveMenu(item.id);
+                       // Don't close sidebar when clicking menu items
+                     }}
+                     className={`w-full flex items-center space-x-3 px-4 py-3 mb-2 rounded-lg text-left transition-colors duration-200
+                       ${activeMenu === item.id
+                         ? 'bg-[#7BC843] text-[black] shadow-lg'
+                         : 'text-gray-300 hover:bg-[#7BC843] hover:text-[black]'}
+                     `}
+                   >
+                     <Icon className="h-5 w-5" />
+                     <span className="font-medium">{item.label}</span>
+                   </button>
+                 );
+               })}
+             </div>
+           ))}
+         </nav>
 
-
-        <div className="absolute bottom-4 left-4 right-4">
-          <button className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-colors duration-200">
-            <LogOut className="h-5 w-5" />
-            <span className="font-medium">Logout</span>
-          </button>
-        </div>
+         {/* Logout button placed at bottom of sidebar with proper margin */}
+         <div className="px-4 py-4 mt-auto border-t border-gray-700">
+           <button className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-colors duration-200">
+             <LogOut className="h-5 w-5" />
+             <span className="font-medium">Logout</span>
+           </button>
+         </div>
+       </div>
       </div>
 
       {/* Main Content */}
