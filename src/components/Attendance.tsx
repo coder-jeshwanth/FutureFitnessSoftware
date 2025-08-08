@@ -56,6 +56,83 @@ const attendanceData = [
     date: '2025-01-15',
     status: 'Present',
     avatar: 'AS'
+  },
+  {
+    id: 6,
+    name: 'Neha Gupta',
+    membershipId: 'M006',
+    checkIn: '-',
+    checkOut: '-',
+    duration: '-',
+    date: '2025-01-15',
+    status: 'On Leave',
+    avatar: 'NG'
+  },
+  {
+    id: 7,
+    name: 'Rahul Verma',
+    membershipId: 'M007',
+    checkIn: '06:15 AM',
+    checkOut: '07:30 AM',
+    duration: '1h 15m',
+    date: '2025-01-15',
+    status: 'Present',
+    avatar: 'RV'
+  },
+  {
+    id: 8,
+    name: 'Deepika Sharma',
+    membershipId: 'M008',
+    checkIn: '-',
+    checkOut: '-',
+    duration: '-',
+    date: '2025-01-15',
+    status: 'Absent',
+    avatar: 'DS'
+  },
+  {
+    id: 9,
+    name: 'Vikrant Massey',
+    membershipId: 'M009',
+    checkIn: '05:30 AM',
+    checkOut: 'Active',
+    duration: 'In Progress',
+    date: '2025-01-15',
+    status: 'Present',
+    avatar: 'VM'
+  },
+  {
+    id: 10,
+    name: 'Kiran Rao',
+    membershipId: 'M010',
+    checkIn: '-',
+    checkOut: '-',
+    duration: '-',
+    date: '2025-01-15',
+    status: 'On Leave',
+    avatar: 'KR'
+  },
+  {
+    id: 11,
+    name: 'Sunil Chhetri',
+    membershipId: 'M011',
+    checkIn: '07:45 AM',
+    checkOut: '09:30 AM',
+    duration: '1h 45m',
+    date: '2025-01-15',
+    status: 'Present',
+    avatar: 'SC'
+  },
+  {
+    id: 12,
+    name: 'Ananya Pandey',
+    membershipId: 'M012',
+    checkIn: '-',
+    checkOut: '-',
+    duration: '-',
+    date: '2025-01-15',
+    status: 'Absent',
+    avatar: 'AP'
   }
 ];
 
@@ -66,6 +143,7 @@ const trainerAttendance = [
     role: 'Strength Trainer',
     checkIn: '05:30 AM',
     checkOut: '02:00 PM',
+    duration: '8h 30m',
     status: 'Present',
     avatar: 'VK'
   },
@@ -75,6 +153,7 @@ const trainerAttendance = [
     role: 'Yoga Instructor',
     checkIn: '06:45 AM',
     checkOut: 'Active',
+    duration: 'In Progress',
     status: 'Present',
     avatar: 'SR'
   },
@@ -84,6 +163,7 @@ const trainerAttendance = [
     role: 'HIIT Trainer',
     checkIn: '04:45 AM',
     checkOut: '01:00 PM',
+    duration: '8h 15m',
     status: 'Present',
     avatar: 'RS'
   },
@@ -93,16 +173,131 @@ const trainerAttendance = [
     role: 'Dance Instructor',
     checkIn: '-',
     checkOut: '-',
+    duration: '-',
     status: 'On Leave',
     avatar: 'PS'
+  },
+  {
+    id: 5,
+    name: 'Ankit Tiwari',
+    role: 'Pilates Instructor',
+    checkIn: '07:30 AM',
+    checkOut: '03:45 PM',
+    duration: '8h 15m',
+    status: 'Present',
+    avatar: 'AT'
+  },
+  {
+    id: 6,
+    name: 'Deepak Kumar',
+    role: 'Nutrition Expert',
+    checkIn: '-',
+    checkOut: '-',
+    duration: '-',
+    status: 'Absent',
+    avatar: 'DK'
+  },
+  {
+    id: 7,
+    name: 'Meera Joshi',
+    role: 'Zumba Instructor',
+    checkIn: '09:00 AM',
+    checkOut: 'Active',
+    duration: 'In Progress',
+    status: 'Present',
+    avatar: 'MJ'
+  },
+  {
+    id: 8,
+    name: 'Rahul Mehta',
+    role: 'Boxing Coach',
+    checkIn: '-',
+    checkOut: '-',
+    duration: '-',
+    status: 'On Leave',
+    avatar: 'RM'
+  }
+];
+
+const staffAttendance = [
+  {
+    id: 1,
+    name: 'Sanjay Patel',
+    role: 'Receptionist',
+    checkIn: '08:00 AM',
+    checkOut: '05:00 PM',
+    duration: '9h 00m',
+    status: 'Present',
+    avatar: 'SP'
+  },
+  {
+    id: 2,
+    name: 'Neha Malhotra',
+    role: 'Gym Manager',
+    checkIn: '07:30 AM',
+    checkOut: '06:15 PM',
+    duration: '10h 45m',
+    status: 'Present',
+    avatar: 'NM'
+  },
+  {
+    id: 3,
+    name: 'Ravi Desai',
+    role: 'Maintenance',
+    checkIn: '06:00 AM',
+    checkOut: '02:00 PM',
+    duration: '8h 00m',
+    status: 'Present',
+    avatar: 'RD'
+  },
+  {
+    id: 4,
+    name: 'Aarti Gupta',
+    role: 'Cleaning Staff',
+    checkIn: '05:30 AM',
+    checkOut: '01:30 PM',
+    duration: '8h 00m',
+    status: 'Present',
+    avatar: 'AG'
+  },
+  {
+    id: 5,
+    name: 'Kiran Shah',
+    role: 'Security Guard',
+    checkIn: '-',
+    checkOut: '-',
+    duration: '-',
+    status: 'Absent',
+    avatar: 'KS'
+  },
+  {
+    id: 6,
+    name: 'Vivek Sharma',
+    role: 'Membership Coordinator',
+    checkIn: '09:00 AM',
+    checkOut: 'Active',
+    duration: 'In Progress',
+    status: 'Present',
+    avatar: 'VS'
+  },
+  {
+    id: 7,
+    name: 'Preeti Verma',
+    role: 'Accountant',
+    checkIn: '-',
+    checkOut: '-',
+    duration: '-',
+    status: 'On Leave',
+    avatar: 'PV'
   }
 ];
 
 const Attendance: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'members' | 'trainers'>('members');
+  const [activeTab, setActiveTab] = useState<'members' | 'trainers' | 'staff'>('members');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [sortBy, setSortBy] = useState<'all' | 'present' | 'absent' | 'onLeave'>('all');
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -113,26 +308,82 @@ const Attendance: React.FC = () => {
     }
   };
 
-  const filteredAttendance = attendanceData.filter(record =>
-    record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.membershipId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredTrainerAttendance = trainerAttendance.filter(record =>
-    record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.role.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const getTodayStats = () => {
-    const present = attendanceData.filter(record => record.status === 'Present').length;
-    const absent = attendanceData.filter(record => record.status === 'Absent').length;
-    const total = attendanceData.length;
-    const percentage = Math.round((present / total) * 100);
-
-    return { present, absent, total, percentage };
+  // Define a type for attendance records
+  type AttendanceRecord = {
+    id: number;
+    name: string;
+    status: string;
+    checkIn: string;
+    checkOut: string;
+    duration: string;
+    avatar: string;
+    membershipId?: string;
+    role?: string;
+  };
+  
+  // Get filtered data based on active tab, search term, and sort criteria
+  const getFilteredData = (): AttendanceRecord[] => {
+    let dataSource: AttendanceRecord[] = [];
+    
+    // Select the appropriate data source based on active tab
+    switch (activeTab) {
+      case 'members':
+        dataSource = attendanceData.filter(record =>
+          record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          record.membershipId.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        break;
+      case 'trainers':
+        dataSource = trainerAttendance.filter(record =>
+          record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          record.role.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        break;
+      case 'staff':
+        dataSource = staffAttendance.filter(record =>
+          record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          record.role.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        break;
+    }
+    
+    // Apply sorting based on status if needed
+    if (sortBy !== 'all') {
+      const statusMap: Record<string, string> = {
+        'present': 'Present',
+        'absent': 'Absent',
+        'onLeave': 'On Leave'
+      };
+      dataSource = dataSource.filter(record => record.status === statusMap[sortBy]);
+    }
+    
+    return dataSource;
   };
 
-  const stats = getTodayStats();
+  const filteredData = getFilteredData();
+
+  const getTodayStats = () => {
+    // Select the appropriate data array based on the active tab
+    const currentData = activeTab === 'members' ? attendanceData : 
+                        activeTab === 'trainers' ? trainerAttendance : 
+                        staffAttendance;
+    
+    const present = currentData.filter(record => record.status === 'Present').length;
+    const absent = currentData.filter(record => record.status === 'Absent').length;
+    const onLeave = currentData.filter(record => record.status === 'On Leave').length;
+    const total = currentData.length;
+    const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+
+    return { present, absent, onLeave, total, percentage };
+  };
+
+  // Recalculate stats when active tab changes
+  const [stats, setStats] = useState(getTodayStats());
+  
+  // Update stats when activeTab changes
+  React.useEffect(() => {
+    setStats(getTodayStats());
+  }, [activeTab]);
 
   return (
     <div className="space-y-6">
@@ -154,34 +405,82 @@ const Attendance: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div 
+          className={`bg-[#2A3037] rounded-xl shadow-sm border ${sortBy === 'present' ? 'border-green-500' : 'border-gray-700'} p-6 cursor-pointer hover:bg-[#353c44] transition-colors duration-200`}
+          onClick={() => setSortBy(sortBy === 'present' ? 'all' : 'present')}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Present</p>
+              <p className="text-gray-400 text-sm">{activeTab === 'members' ? 'Members Present' : activeTab === 'trainers' ? 'Trainers Present' : 'Staff Present'}</p>
               <p className="text-2xl font-bold text-green-400">{stats.present}</p>
             </div>
-            <CheckCircle className="h-8 w-8 text-green-400" />
+            <CheckCircle className={`h-8 w-8 ${sortBy === 'present' ? 'text-green-500' : 'text-green-400'}`} />
           </div>
+          {sortBy === 'present' && (
+            <div className="mt-2 text-xs text-green-400">
+              Showing present members only
+            </div>
+          )}
         </div>
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+
+        <div 
+          className={`bg-[#2A3037] rounded-xl shadow-sm border ${sortBy === 'absent' ? 'border-red-500' : 'border-gray-700'} p-6 cursor-pointer hover:bg-[#353c44] transition-colors duration-200`}
+          onClick={() => setSortBy(sortBy === 'absent' ? 'all' : 'absent')}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Absent</p>
+              <p className="text-gray-400 text-sm">{activeTab === 'members' ? 'Members Absent' : activeTab === 'trainers' ? 'Trainers Absent' : 'Staff Absent'}</p>
               <p className="text-2xl font-bold text-red-400">{stats.absent}</p>
             </div>
-            <XCircle className="h-8 w-8 text-red-400" />
+            <XCircle className={`h-8 w-8 ${sortBy === 'absent' ? 'text-red-500' : 'text-red-400'}`} />
           </div>
+          {sortBy === 'absent' && (
+            <div className="mt-2 text-xs text-red-400">
+              Showing absent members only
+            </div>
+          )}
         </div>
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+        
+        <div 
+          className={`bg-[#2A3037] rounded-xl shadow-sm border ${sortBy === 'onLeave' ? 'border-yellow-500' : 'border-gray-700'} p-6 cursor-pointer hover:bg-[#353c44] transition-colors duration-200`}
+          onClick={() => setSortBy(sortBy === 'onLeave' ? 'all' : 'onLeave')}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Members</p>
+              <p className="text-gray-400 text-sm">{activeTab === 'members' ? 'Members on Leave' : activeTab === 'trainers' ? 'Trainers on Leave' : 'Staff on Leave'}</p>
+              <p className="text-2xl font-bold text-yellow-400">{stats.onLeave}</p>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`h-8 w-8 ${sortBy === 'onLeave' ? 'text-yellow-500' : 'text-yellow-400'}`}>
+              <path d="M9 14V7h4l-2 3h3l-6 7.5"></path>
+              <circle cx="9" cy="9" r="7"></circle>
+            </svg>
+          </div>
+          {sortBy === 'onLeave' && (
+            <div className="mt-2 text-xs text-yellow-400">
+              Showing on-leave members only
+            </div>
+          )}
+        </div>
+
+        <div 
+          className={`bg-[#2A3037] rounded-xl shadow-sm border ${sortBy === 'all' ? 'border-blue-500' : 'border-gray-700'} p-6 cursor-pointer hover:bg-[#353c44] transition-colors duration-200`}
+          onClick={() => setSortBy('all')}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Total {activeTab === 'members' ? 'Members' : activeTab === 'trainers' ? 'Trainers' : 'Staff'}</p>
               <p className="text-2xl font-bold text-white">{stats.total}</p>
             </div>
-            <Users className="h-8 w-8 text-gray-400" />
+            <Users className={`h-8 w-8 ${sortBy === 'all' ? 'text-blue-400' : 'text-gray-400'}`} />
           </div>
+          {sortBy === 'all' && (
+            <div className="mt-2 text-xs text-blue-400">
+              Showing all members
+            </div>
+          )}
         </div>
+
         <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -228,7 +527,10 @@ const Attendance: React.FC = () => {
         <div className="border-b border-gray-700">
           <nav className="flex space-x-8 px-6">
             <button
-              onClick={() => setActiveTab('members')}
+              onClick={() => {
+                setActiveTab('members');
+                setSortBy('all'); // Reset sorting when changing tabs
+              }}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                 activeTab === 'members'
                   ? 'border-[#7BC843] text-[#7BC843]'
@@ -238,7 +540,10 @@ const Attendance: React.FC = () => {
               Member Attendance ({attendanceData.length})
             </button>
             <button
-              onClick={() => setActiveTab('trainers')}
+              onClick={() => {
+                setActiveTab('trainers');
+                setSortBy('all'); // Reset sorting when changing tabs
+              }}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                 activeTab === 'trainers'
                   ? 'border-[#7BC843] text-[#7BC843]'
@@ -247,21 +552,60 @@ const Attendance: React.FC = () => {
             >
               Trainer Attendance ({trainerAttendance.length})
             </button>
+            <button
+              onClick={() => {
+                setActiveTab('staff');
+                setSortBy('all'); // Reset sorting when changing tabs
+              }}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                activeTab === 'staff'
+                  ? 'border-[#7BC843] text-[#7BC843]'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600'
+              }`}
+            >
+              Staff Attendance ({staffAttendance.length})
+            </button>
           </nav>
         </div>
 
         {/* Attendance Table */}
         <div className="overflow-x-auto">
+          {sortBy !== 'all' && (
+            <div className="p-3 bg-[#23292F] border-b border-gray-700">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="font-medium text-white">
+                    {sortBy === 'present' && `Showing Present ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Only`}
+                    {sortBy === 'absent' && `Showing Absent ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Only`}
+                    {sortBy === 'onLeave' && `Showing On-Leave ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Only`}
+                  </span>
+                  <span className="text-sm text-gray-400">
+                    ({filteredData.length} records)
+                  </span>
+                </div>
+                <button 
+                  onClick={() => setSortBy('all')}
+                  className="text-sm text-blue-400 hover:text-blue-300 flex items-center space-x-1"
+                >
+                  <span>Clear Filter</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
           <table className="w-full">
             <thead className="bg-[#23292F] border-b border-gray-700">
               <tr>
                 <th className="text-left py-4 px-6 font-semibold text-white">
-                  {activeTab === 'members' ? 'Member' : 'Trainer'}
+                  {activeTab === 'members' ? 'Member' : activeTab === 'trainers' ? 'Trainer' : 'Staff'}
                 </th>
                 {activeTab === 'members' && (
                   <th className="text-left py-4 px-6 font-semibold text-white">Membership ID</th>
                 )}
-                {activeTab === 'trainers' && (
+                {(activeTab === 'trainers' || activeTab === 'staff') && (
                   <th className="text-left py-4 px-6 font-semibold text-white">Role</th>
                 )}
                 <th className="text-left py-4 px-6 font-semibold text-white">Check In</th>
@@ -272,7 +616,7 @@ const Attendance: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {(activeTab === 'members' ? filteredAttendance : filteredTrainerAttendance).map((record) => (
+              {filteredData.map((record) => (
                 <tr key={record.id} className="hover:bg-[#353c44] transition-colors duration-200">
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-3">
@@ -286,9 +630,9 @@ const Attendance: React.FC = () => {
                   </td>
                   <td className="py-4 px-6">
                     {activeTab === 'members' ? (
-                      <span className="text-gray-400">{(record as any).membershipId}</span>
+                      <span className="text-gray-400">{record.membershipId}</span>
                     ) : (
-                      <span className="text-gray-400">{(record as any).role}</span>
+                      <span className="text-gray-400">{record.role}</span>
                     )}
                   </td>
                   <td className="py-4 px-6">
@@ -305,7 +649,7 @@ const Attendance: React.FC = () => {
                   </td>
                   <td className="py-4 px-6">
                     <span className="text-white">
-                      {activeTab === 'members' ? (record as any).duration : '-'}
+                      {record.duration || '-'}
                     </span>
                   </td>
                   <td className="py-4 px-6">
@@ -353,13 +697,27 @@ const Attendance: React.FC = () => {
             <div className="p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Member/Trainer</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Person Type</label>
+                  <select className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
+                    <option value="">Select type</option>
+                    <option value="members" selected={activeTab === 'members'}>Member</option>
+                    <option value="trainers" selected={activeTab === 'trainers'}>Trainer</option>
+                    <option value="staff" selected={activeTab === 'staff'}>Staff</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Person</label>
                   <select className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
                     <option>Select person</option>
-                    <option>Arjun Sharma (Member)</option>
-                    <option>Priya Patel (Member)</option>
-                    <option>Vikash Kumar (Trainer)</option>
-                    <option>Sneha Reddy (Trainer)</option>
+                    {activeTab === 'members' && attendanceData.map((member) => (
+                      <option key={member.id} value={member.id}>{member.name} (Member)</option>
+                    ))}
+                    {activeTab === 'trainers' && trainerAttendance.map((trainer) => (
+                      <option key={trainer.id} value={trainer.id}>{trainer.name} (Trainer)</option>
+                    ))}
+                    {activeTab === 'staff' && staffAttendance.map((staff) => (
+                      <option key={staff.id} value={staff.id}>{staff.name} (Staff)</option>
+                    ))}
                   </select>
                 </div>
                 <div>

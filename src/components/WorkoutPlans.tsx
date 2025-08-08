@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, Eye, Dumbbell, Clock, Target, ChevronRight, Play } from 'lucide-react';
+import { Search, Edit, Trash2, Eye, Dumbbell, Clock, Target, Play } from 'lucide-react';
 
 const workoutPlans = [
   {
