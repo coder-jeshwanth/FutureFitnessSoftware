@@ -113,37 +113,45 @@ function App() {
   return (
     <div className="min-h-screen bg-black flex">
       {/* Sidebar Overlay (only for mobile screens) */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <div 
+        className={`fixed inset-0 bg-black transition-opacity duration-300 lg:hidden ${sidebarOpen ? 'opacity-50 z-40' : 'opacity-0 -z-10'}`}
+        onClick={() => setSidebarOpen(false)}
+      />
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-72 bg-[#2A3037] text-white transform transition-transform duration-300 ease-in-out flex flex-col
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:-translate-x-full'}
+        fixed inset-y-0 left-0 z-50 bg-[#2A3037] text-white transform transition-all duration-300 ease-in-out flex flex-col
+        ${sidebarOpen ? 'w-72' : 'w-16'}
       `}>
-        <div className="flex items-center justify-between h-56 px-6 border-b border-gray-700">
-          <div className="flex-1 flex justify-center">
-            <img src={logoImage} alt="Future Fitness Logo" className="h-[100px] w-[120px] p-0 " />
-          </div>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="text-[#E7EFEA] hover:text-white lg:hidden"
-          >
-            <X className="h-6 w-6" />
-          </button>
+        <div className={`flex items-center ${sidebarOpen ? 'justify-between h-56 px-6' : 'justify-center h-20 px-0'} border-b border-gray-700`}>
+          {sidebarOpen ? (
+            <>
+              <div className="flex-1 flex justify-center">
+                <img src={logoImage} alt="Future Fitness Logo" className="h-[100px] w-[120px] p-0" />
+              </div>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="text-[#E7EFEA] hover:text-white lg:hidden"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center">
+              <img src={logoImage} alt="Future Fitness Logo" className="h-[40px] w-[48px]" />
+            </div>
+          )}
         </div>
         
        <div className="flex flex-col h-[calc(100%-14rem)]"> {/* Create a flex container to manage the content and logout button */}
-         <nav className="mt-8 px-4 text-sm flex-grow overflow-y-auto">
+         <nav className={`${sidebarOpen ? 'mt-8 px-4' : 'mt-6'} text-sm flex-grow ${sidebarOpen ? 'overflow-y-auto' : 'overflow-visible'}`}>
            {menuItems.map((group, index) => (
-             <div key={index} className="mb-10">
-               <h4 className="text-gray-400 font-semibold mb-3 uppercase text-xs tracking-wide px-1">
-                 {group.section}
-               </h4>
+             <div key={index} className={`${sidebarOpen ? 'mb-10' : 'mb-4'}`}>
+               {sidebarOpen && (
+                 <h4 className="text-gray-400 font-semibold mb-3 uppercase text-xs tracking-wide px-1">
+                   {group.section}
+                 </h4>
+               )}
                {group.items.map((item) => {
                  const Icon = item.icon;
                  return (
@@ -153,14 +161,15 @@ function App() {
                        setActiveMenu(item.id);
                        // Don't close sidebar when clicking menu items
                      }}
-                     className={`w-full flex items-center space-x-3 px-4 py-3 mb-2 rounded-lg text-left transition-colors duration-200
+                     className={`w-full ${sidebarOpen ? 'flex items-center space-x-3 px-4 py-3 text-left' : 'flex justify-center py-3'} mb-2 rounded-lg transition-colors duration-200
                        ${activeMenu === item.id
                          ? 'bg-[#7BC843] text-[black] shadow-lg'
                          : 'text-gray-300 hover:bg-[#7BC843] hover:text-[black]'}
                      `}
+                     title={!sidebarOpen ? item.label : ""}
                    >
-                     <Icon className="h-5 w-5" />
-                     <span className="font-medium">{item.label}</span>
+                     <Icon className={`${sidebarOpen ? 'h-5 w-5' : 'h-6 w-6'}`} />
+                     {sidebarOpen && <span className="font-medium">{item.label}</span>}
                    </button>
                  );
                })}
@@ -169,17 +178,20 @@ function App() {
          </nav>
 
          {/* Logout button placed at bottom of sidebar with proper margin */}
-         <div className="px-4 py-4 mt-auto border-t border-gray-700">
-           <button className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-colors duration-200">
-             <LogOut className="h-5 w-5" />
-             <span className="font-medium">Logout</span>
+         <div className={`${sidebarOpen ? 'px-4' : 'px-0'} py-4 mt-auto border-t border-gray-700`}>
+           <button 
+             className={`w-full ${sidebarOpen ? 'flex items-center space-x-3 px-4 py-3 text-left' : 'flex justify-center py-3'} text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-colors duration-200`}
+             title={!sidebarOpen ? "Logout" : ""}
+           >
+             <LogOut className={`${sidebarOpen ? 'h-5 w-5' : 'h-6 w-6'}`} />
+             {sidebarOpen && <span className="font-medium">Logout</span>}
            </button>
          </div>
        </div>
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col overflow-hidden bg-black transition-all duration-300 ease-in-out ${sidebarOpen ? 'lg:ml-72' : 'ml-0'}`}>
+      <div className={`flex-1 flex flex-col overflow-hidden bg-black transition-all duration-300 ease-in-out ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-16'}`}>
         {/* Header */}
         <header className="bg-black shadow-sm h-20 flex items-center justify-between px-6">
           <div className="flex items-center space-x-4">
@@ -188,7 +200,7 @@ function App() {
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="text-gray-300 hover:text-white flex items-center justify-center p-2 rounded-lg hover:bg-[#2A3037] transition-colors"
               aria-label="Toggle Sidebar"
-              title="Toggle Sidebar"
+              title={sidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
             >
               <FiSidebar className="h-6 w-6 text-white" />
             </button>

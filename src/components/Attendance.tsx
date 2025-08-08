@@ -338,7 +338,7 @@ const Attendance: React.FC = () => {
   const [scanningQR, setScanningQR] = useState(false);
   const [biometricStatus, setBiometricStatus] = useState<'waiting' | 'scanning' | 'success' | 'failed'>('waiting');
   const [biometricMethod, setBiometricMethod] = useState<'fingerprint' | 'face'>('fingerprint');
-  const [mobileDevices, setMobileDevices] = useState<{id: string; name: string; status: string}[]>([
+  const [mobileDevices] = useState<{id: string; name: string; status: string}[]>([
     { id: '1', name: "Arjun's iPhone", status: 'connected' },
     { id: '2', name: "Priya's Android", status: 'connected' },
     { id: '3', name: "Rohit's iPhone", status: 'offline' },
@@ -502,7 +502,7 @@ const Attendance: React.FC = () => {
   };
 
   // Historical data for trends
-  const [historicalData] = useState(() => generateHistoricalData(30));
+  const [] = useState(() => generateHistoricalData(30));
   
   // Recalculate stats when active tab changes
   const [stats, setStats] = useState(getTodayStats());
