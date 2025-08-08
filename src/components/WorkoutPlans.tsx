@@ -1,0 +1,438 @@
+import React, { useState } from 'react';
+import { Search, Plus, Edit, Trash2, Eye, Dumbbell, Clock, Target, ChevronRight, Play } from 'lucide-react';
+
+const workoutPlans = [
+  {
+    id: 1,
+    name: 'Beginner Strength Training',
+    description: 'Perfect for those new to weight training',
+    duration: '45 minutes',
+    difficulty: 'Beginner',
+    category: 'Strength',
+    exercises: 8,
+    trainer: 'Vikash Kumar',
+    assignedMembers: 15,
+    createdDate: '2024-01-15'
+  },
+  {
+    id: 2,
+    name: 'Advanced HIIT Workout',
+    description: 'High-intensity interval training for fat loss',
+    duration: '30 minutes',
+    difficulty: 'Advanced',
+    category: 'Cardio',
+    exercises: 12,
+    trainer: 'Raj Singh',
+    assignedMembers: 22,
+    createdDate: '2024-02-08'
+  },
+  {
+    id: 3,
+    name: 'Yoga Flow for Flexibility',
+    description: 'Improve flexibility and mindfulness',
+    duration: '60 minutes',
+    difficulty: 'Intermediate',
+    category: 'Flexibility',
+    exercises: 20,
+    trainer: 'Sneha Reddy',
+    assignedMembers: 28,
+    createdDate: '2024-01-22'
+  },
+  {
+    id: 4,
+    name: 'Full Body Circuit',
+    description: 'Complete body workout in circuit format',
+    duration: '50 minutes',
+    difficulty: 'Intermediate',
+    category: 'Circuit',
+    exercises: 15,
+    trainer: 'Priya Sharma',
+    assignedMembers: 18,
+    createdDate: '2024-03-01'
+  }
+];
+
+const exerciseLibrary = [
+  { id: 1, name: 'Push-ups', category: 'Chest', icon: '💪' },
+  { id: 2, name: 'Squats', category: 'Legs', icon: '🦵' },
+  { id: 3, name: 'Bench Press', category: 'Chest', icon: '🏋️' },
+  { id: 4, name: 'Deadlift', category: 'Back', icon: '⬆️' },
+  { id: 5, name: 'Mountain Climbers', category: 'Cardio', icon: '🏔️' },
+  { id: 6, name: 'Plank', category: 'Core', icon: '📏' },
+  { id: 7, name: 'Burpees', category: 'Full Body', icon: '🤸' },
+  { id: 8, name: 'Lunges', category: 'Legs', icon: '👣' }
+];
+
+const WorkoutPlans: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showBuilder, setShowBuilder] = useState(false);
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Beginner': return 'bg-green-100 text-green-800';
+      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
+      case 'Advanced': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'Strength': return 'bg-blue-100 text-blue-800';
+      case 'Cardio': return 'bg-red-100 text-red-800';
+      case 'Flexibility': return 'bg-purple-100 text-purple-800';
+      case 'Circuit': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const filteredPlans = workoutPlans.filter(plan =>
+    plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    plan.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    plan.trainer.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const openPlanModal = (plan: any) => {
+    setSelectedPlan(plan);
+    setShowModal(true);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Workout Plans</h2>
+          <p className="text-gray-600">Create and manage workout plans for your members</p>
+        </div>
+        <div className="flex space-x-3">
+          <button 
+            onClick={() => setShowBuilder(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+          >
+            <Dumbbell className="h-5 w-5" />
+            <span>Workout Builder</span>
+          </button>
+          <button className="bg-[#165D31] hover:bg-[#073418] text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2">
+            <Plus className="h-5 w-5" />
+            <span>Create Plan</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Search workout plans..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+            />
+          </div>
+          <div className="flex space-x-3">
+            <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
+              <option>All Categories</option>
+              <option>Strength</option>
+              <option>Cardio</option>
+              <option>Flexibility</option>
+              <option>Circuit</option>
+            </select>
+            <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
+              <option>All Difficulty</option>
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Workout Plans Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredPlans.map((plan) => (
+          <div key={plan.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{plan.name}</h3>
+                <p className="text-gray-600 text-sm mb-3">{plan.description}</p>
+                <div className="flex items-center space-x-2 mb-3">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(plan.category)}`}>
+                    {plan.category}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(plan.difficulty)}`}>
+                    {plan.difficulty}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-1">
+                  <Clock className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600">Duration:</span>
+                </div>
+                <span className="text-gray-900 font-medium">{plan.duration}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-1">
+                  <Target className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600">Exercises:</span>
+                </div>
+                <span className="text-gray-900 font-medium">{plan.exercises}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Trainer:</span>
+                <span className="text-gray-900 font-medium">{plan.trainer}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Assigned to:</span>
+                <span className="text-gray-900 font-medium">{plan.assignedMembers} members</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+              <div className="flex items-center space-x-2">
+                <button 
+                  onClick={() => openPlanModal(plan)}
+                  className="p-2 text-gray-600 hover:text-[#165D31] hover:bg-[#E7EFEA] rounded-lg transition-colors duration-200"
+                  title="View Details"
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
+                <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200" title="Edit">
+                  <Edit className="h-4 w-4" />
+                </button>
+                <button className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200" title="Delete">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+              <button className="text-[#165D31] hover:text-[#073418] font-medium text-sm flex items-center space-x-1">
+                <Play className="h-4 w-4" />
+                <span>Preview</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Workout Plan Detail Modal */}
+      {showModal && selectedPlan && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedPlan.name}</h2>
+                  <p className="text-gray-600 mt-1">{selectedPlan.description}</p>
+                  <div className="flex items-center space-x-3 mt-3">
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(selectedPlan.category)}`}>
+                      {selectedPlan.category}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(selectedPlan.difficulty)}`}>
+                      {selectedPlan.difficulty}
+                    </span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Exercise List</h3>
+                  <div className="space-y-4">
+                    {[
+                      { name: 'Warm-up: Light Cardio', sets: '-', reps: '5 minutes', rest: '-' },
+                      { name: 'Push-ups', sets: '3', reps: '12-15', rest: '60s' },
+                      { name: 'Squats', sets: '3', reps: '15-20', rest: '60s' },
+                      { name: 'Plank', sets: '3', reps: '30-45s', rest: '45s' },
+                      { name: 'Lunges', sets: '3', reps: '12 each leg', rest: '60s' },
+                      { name: 'Mountain Climbers', sets: '3', reps: '20', rest: '45s' },
+                      { name: 'Cool-down: Stretching', sets: '-', reps: '5 minutes', rest: '-' }
+                    ].map((exercise, index) => (
+                      <div key={index} className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-gray-900">{exercise.name}</h4>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span>Sets: {exercise.sets}</span>
+                            <span>Reps: {exercise.reps}</span>
+                            <span>Rest: {exercise.rest}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Plan Details</h3>
+                  <div className="space-y-4">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-600">Duration:</span>
+                        <span className="text-gray-900 font-medium">{selectedPlan.duration}</span>
+                      </div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-600">Exercises:</span>
+                        <span className="text-gray-900 font-medium">{selectedPlan.exercises}</span>
+                      </div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-600">Created by:</span>
+                        <span className="text-gray-900 font-medium">{selectedPlan.trainer}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Assigned to:</span>
+                        <span className="text-gray-900 font-medium">{selectedPlan.assignedMembers} members</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 mb-3">Equipment Needed</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {['Dumbbells', 'Mat', 'Resistance Bands'].map((equipment, index) => (
+                          <span key={index} className="px-2 py-1 bg-white rounded-full text-sm text-gray-700">
+                            {equipment}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 mb-3">Target Muscles</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {['Chest', 'Legs', 'Core', 'Arms'].map((muscle, index) => (
+                          <span key={index} className="px-2 py-1 bg-[#E7EFEA] text-[#073418] rounded-full text-sm">
+                            {muscle}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-end space-x-4">
+                <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                  Duplicate Plan
+                </button>
+                <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+                  Edit Plan
+                </button>
+                <button className="px-6 py-3 bg-[#165D31] hover:bg-[#073418] text-white rounded-lg transition-colors duration-200">
+                  Assign to Members
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Workout Builder Modal */}
+      {showBuilder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">Workout Plan Builder</h2>
+                <button 
+                  onClick={() => setShowBuilder(false)}
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Exercise Library */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Exercise Library</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {exerciseLibrary.map((exercise) => (
+                      <div 
+                        key={exercise.id} 
+                        className="bg-gray-50 hover:bg-[#E7EFEA] rounded-lg p-4 cursor-pointer transition-colors duration-200 border-2 border-transparent hover:border-[#165D31]"
+                        draggable
+                      >
+                        <div className="text-2xl mb-2">{exercise.icon}</div>
+                        <h4 className="font-medium text-gray-900 text-sm">{exercise.name}</h4>
+                        <p className="text-xs text-gray-600">{exercise.category}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Workout Builder */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Workout Plan</h3>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 min-h-[400px]">
+                    <div className="text-center text-gray-500">
+                      <Dumbbell className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <p>Drag exercises here to build your workout plan</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 space-y-4">
+                    <input
+                      type="text"
+                      placeholder="Workout plan name"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                    />
+                    <textarea
+                      placeholder="Description"
+                      rows={3}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
+                        <option>Select Category</option>
+                        <option>Strength</option>
+                        <option>Cardio</option>
+                        <option>Flexibility</option>
+                        <option>Circuit</option>
+                      </select>
+                      <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
+                        <option>Select Difficulty</option>
+                        <option>Beginner</option>
+                        <option>Intermediate</option>
+                        <option>Advanced</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-end space-x-4">
+                <button 
+                  onClick={() => setShowBuilder(false)}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button className="px-6 py-3 bg-[#165D31] hover:bg-[#073418] text-white rounded-lg transition-colors duration-200">
+                  Save Workout Plan
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default WorkoutPlans;
