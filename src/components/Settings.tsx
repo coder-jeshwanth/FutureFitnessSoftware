@@ -16,12 +16,8 @@ const AppSettings: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-          <p className="text-gray-600">Configure your gym management system</p>
-        </div>
-        <button className="bg-[#165D31] hover:bg-[#073418] text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center space-y-4 sm:space-y-0">
+        <button className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2">
           <Save className="h-5 w-5" />
           <span>Save Changes</span>
         </button>
@@ -29,7 +25,7 @@ const AppSettings: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-4">
           <nav className="space-y-2">
             {sections.map((section) => {
               const Icon = section.icon;
@@ -39,8 +35,8 @@ const AppSettings: React.FC = () => {
                   onClick={() => setActiveSection(section.id)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors duration-200 ${
                     activeSection === section.id
-                      ? 'bg-[#E7EFEA] text-[#165D31] font-medium'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-[#1A2026] text-[#7BC843] font-medium'
+                      : 'text-gray-300 hover:bg-[#23292F] hover:text-gray-100'
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -52,39 +48,39 @@ const AppSettings: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="lg:col-span-3 bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
           {activeSection === 'general' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900">General Settings</h3>
+              <h3 className="text-xl font-semibold text-gray-100">General Settings</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Gym Name</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Gym Name</label>
                   <input
                     type="text"
-                    defaultValue="FitPro Gym"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                    defaultValue="Future Fitness"
+                    className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Contact Email</label>
                   <input
                     type="email"
                     defaultValue="contact@fitprogym.com"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
                   <input
                     type="tel"
                     defaultValue="+91 98765 43210"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Time Zone</label>
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Time Zone</label>
+                  <select className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
                     <option>Asia/Kolkata (IST)</option>
                     <option>America/New_York (EST)</option>
                     <option>Europe/London (GMT)</option>
@@ -93,21 +89,21 @@ const AppSettings: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Address</label>
                 <textarea
                   rows={3}
                   defaultValue="123 Fitness Street, Mumbai, Maharashtra 400001"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Logo</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Logo</label>
                 <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-[#165D31] rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-xl">FP</span>
+                  <div className="w-16 h-16 bg-[#7BC843] rounded-lg flex items-center justify-center">
+                    <span className="text-black font-bold text-xl">FP</span>
                   </div>
-                  <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+                  <button className="bg-[#23292F] hover:bg-[#1A2026] text-gray-300 px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2">
                     <Upload className="h-4 w-4" />
                     <span>Upload New Logo</span>
                   </button>
@@ -118,7 +114,7 @@ const AppSettings: React.FC = () => {
 
           {activeSection === 'permissions' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900">User Permissions</h3>
+              <h3 className="text-xl font-semibold text-gray-100">User Permissions</h3>
               
               <div className="space-y-6">
                 {[
@@ -127,11 +123,11 @@ const AppSettings: React.FC = () => {
                   { role: 'Trainer', description: 'Access to assigned members and workout plans' },
                   { role: 'Receptionist', description: 'Basic access to member check-in and information' }
                 ].map((role) => (
-                  <div key={role.role} className="border border-gray-200 rounded-lg p-6">
+                  <div key={role.role} className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900">{role.role}</h4>
-                        <p className="text-gray-600 text-sm">{role.description}</p>
+                        <h4 className="text-lg font-semibold text-gray-100">{role.role}</h4>
+                        <p className="text-gray-400 text-sm">{role.description}</p>
                       </div>
                       <Users className="h-6 w-6 text-gray-400" />
                     </div>
@@ -150,10 +146,10 @@ const AppSettings: React.FC = () => {
                         <label key={permission} className="flex items-center">
                           <input
                             type="checkbox"
-                            className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]"
+                            className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
                             defaultChecked={role.role === 'Admin' || (role.role === 'Manager' && !permission.includes('Settings'))}
                           />
-                          <span className="ml-2 text-sm text-gray-700">{permission}</span>
+                          <span className="ml-2 text-sm text-gray-300">{permission}</span>
                         </label>
                       ))}
                     </div>
@@ -165,83 +161,83 @@ const AppSettings: React.FC = () => {
 
           {activeSection === 'payments' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900">Payment Gateway Settings</h3>
+              <h3 className="text-xl font-semibold text-gray-100">Payment Gateway Settings</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border border-gray-200 rounded-lg p-6">
+                <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-gray-900">Razorpay</h4>
+                    <h4 className="text-lg font-semibold text-gray-100">Razorpay</h4>
                     <div className="flex items-center">
-                      <input type="checkbox" className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]" defaultChecked />
-                      <span className="ml-2 text-sm text-gray-600">Enabled</span>
+                      <input type="checkbox" className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]" defaultChecked />
+                      <span className="ml-2 text-sm text-gray-400">Enabled</span>
                     </div>
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">API Key</label>
                       <input
                         type="password"
                         placeholder="Enter Razorpay API Key"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Secret Key</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Secret Key</label>
                       <input
                         type="password"
                         placeholder="Enter Razorpay Secret Key"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="border border-gray-200 rounded-lg p-6">
+                <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-gray-900">Stripe</h4>
+                    <h4 className="text-lg font-semibold text-gray-100">Stripe</h4>
                     <div className="flex items-center">
-                      <input type="checkbox" className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]" />
-                      <span className="ml-2 text-sm text-gray-600">Disabled</span>
+                      <input type="checkbox" className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]" />
+                      <span className="ml-2 text-sm text-gray-400">Disabled</span>
                     </div>
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Publishable Key</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Publishable Key</label>
                       <input
                         type="text"
                         placeholder="Enter Stripe Publishable Key"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Secret Key</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Secret Key</label>
                       <input
                         type="password"
                         placeholder="Enter Stripe Secret Key"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                       />
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="border border-gray-200 rounded-lg p-6">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Payment Settings</h4>
+              <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
+                <h4 className="text-lg font-semibold text-gray-100 mb-4">Payment Settings</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Default Currency</label>
-                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Default Currency</label>
+                    <select className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
                       <option>INR (₹)</option>
                       <option>USD ($)</option>
                       <option>EUR (€)</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Late Payment Fee</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Late Payment Fee</label>
                     <input
                       type="number"
                       defaultValue="100"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                      className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -251,11 +247,11 @@ const AppSettings: React.FC = () => {
 
           {activeSection === 'notifications' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900">Notification Settings</h3>
+              <h3 className="text-xl font-semibold text-gray-100">Notification Settings</h3>
               
               <div className="space-y-6">
-                <div className="border border-gray-200 rounded-lg p-6">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Email Notifications</h4>
+                <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
+                  <h4 className="text-lg font-semibold text-gray-100 mb-4">Email Notifications</h4>
                   <div className="space-y-4">
                     {[
                       'Payment reminders',
@@ -265,10 +261,10 @@ const AppSettings: React.FC = () => {
                       'Trainer assignment notifications'
                     ].map((notification) => (
                       <label key={notification} className="flex items-center justify-between">
-                        <span className="text-gray-700">{notification}</span>
+                        <span className="text-gray-300">{notification}</span>
                         <input
                           type="checkbox"
-                          className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]"
+                          className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
                           defaultChecked
                         />
                       </label>
@@ -276,8 +272,8 @@ const AppSettings: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="border border-gray-200 rounded-lg p-6">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4">SMS Notifications</h4>
+                <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
+                  <h4 className="text-lg font-semibold text-gray-100 mb-4">SMS Notifications</h4>
                   <div className="space-y-4">
                     {[
                       'Payment due reminders',
@@ -286,10 +282,10 @@ const AppSettings: React.FC = () => {
                       'Membership expiry warnings'
                     ].map((notification) => (
                       <label key={notification} className="flex items-center justify-between">
-                        <span className="text-gray-700">{notification}</span>
+                        <span className="text-gray-300">{notification}</span>
                         <input
                           type="checkbox"
-                          className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]"
+                          className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
                           defaultChecked
                         />
                       </label>
@@ -302,21 +298,21 @@ const AppSettings: React.FC = () => {
 
           {activeSection === 'integrations' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900">Third-Party Integrations</h3>
+              <h3 className="text-xl font-semibold text-gray-100">Third-Party Integrations</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border border-gray-200 rounded-lg p-6">
+                <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <Smartphone className="h-8 w-8 text-green-600" />
+                      <Smartphone className="h-8 w-8 text-green-500" />
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900">WhatsApp Business</h4>
-                        <p className="text-sm text-gray-600">Send notifications via WhatsApp</p>
+                        <h4 className="text-lg font-semibold text-gray-100">WhatsApp Business</h4>
+                        <p className="text-sm text-gray-400">Send notifications via WhatsApp</p>
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <input type="checkbox" className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]" />
-                      <span className="ml-2 text-sm text-gray-600">Disabled</span>
+                      <input type="checkbox" className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]" />
+                      <span className="ml-2 text-sm text-gray-400">Disabled</span>
                     </div>
                   </div>
                   <button className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
@@ -324,25 +320,25 @@ const AppSettings: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="border border-gray-200 rounded-lg p-6">
+                <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <Key className="h-8 w-8 text-blue-600" />
+                      <Key className="h-8 w-8 text-blue-500" />
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900">Biometric System</h4>
-                        <p className="text-sm text-gray-600">Fingerprint check-in integration</p>
+                        <h4 className="text-lg font-semibold text-gray-100">Biometric System</h4>
+                        <p className="text-sm text-gray-400">Fingerprint check-in integration</p>
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <input type="checkbox" className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]" defaultChecked />
-                      <span className="ml-2 text-sm text-gray-600">Enabled</span>
+                      <input type="checkbox" className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]" defaultChecked />
+                      <span className="ml-2 text-sm text-gray-400">Enabled</span>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <input
                       type="text"
                       placeholder="Device IP Address"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent"
+                      className="w-full px-4 py-2 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                     />
                     <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
                       Test Connection
@@ -350,21 +346,21 @@ const AppSettings: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="border border-gray-200 rounded-lg p-6">
+                <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <Globe className="h-8 w-8 text-purple-600" />
+                      <Globe className="h-8 w-8 text-purple-500" />
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-900">CRM Integration</h4>
-                        <p className="text-sm text-gray-600">Sync with external CRM systems</p>
+                        <h4 className="text-lg font-semibold text-gray-100">CRM Integration</h4>
+                        <p className="text-sm text-gray-400">Sync with external CRM systems</p>
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <input type="checkbox" className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]" />
-                      <span className="ml-2 text-sm text-gray-600">Disabled</span>
+                      <input type="checkbox" className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]" />
+                      <span className="ml-2 text-sm text-gray-400">Disabled</span>
                     </div>
                   </div>
-                  <select className="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
+                  <select className="w-full mb-3 px-4 py-2 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
                     <option>Select CRM Platform</option>
                     <option>Salesforce</option>
                     <option>HubSpot</option>
@@ -380,12 +376,12 @@ const AppSettings: React.FC = () => {
 
           {activeSection === 'branches' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900">Multi-Branch Management</h3>
+              <h3 className="text-xl font-semibold text-gray-100">Multi-Branch Management</h3>
               
-              <div className="border border-gray-200 rounded-lg p-6 mb-6">
+              <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6 mb-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold text-gray-900">Current Branches</h4>
-                  <button className="bg-[#165D31] hover:bg-[#073418] text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                  <h4 className="text-lg font-semibold text-gray-100">Current Branches</h4>
+                  <button className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-4 py-2 rounded-lg transition-colors duration-200">
                     Add Branch
                   </button>
                 </div>
@@ -396,19 +392,19 @@ const AppSettings: React.FC = () => {
                     { name: 'Branch 2 - Pune', address: '456 Health Avenue, Pune', status: 'Active', members: 189 },
                     { name: 'Branch 3 - Delhi', address: '789 Wellness Road, Delhi', status: 'Inactive', members: 0 }
                   ].map((branch, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-4 bg-[#1A2026] rounded-lg">
                       <div>
-                        <h5 className="font-semibold text-gray-900">{branch.name}</h5>
-                        <p className="text-sm text-gray-600">{branch.address}</p>
-                        <p className="text-sm text-gray-500">Members: {branch.members}</p>
+                        <h5 className="font-semibold text-gray-100">{branch.name}</h5>
+                        <p className="text-sm text-gray-400">{branch.address}</p>
+                        <p className="text-sm text-gray-400">Members: {branch.members}</p>
                       </div>
                       <div className="flex items-center space-x-3">
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          branch.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          branch.status === 'Active' ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'
                         }`}>
                           {branch.status}
                         </span>
-                        <button className="text-[#165D31] hover:text-[#073418] font-medium text-sm">
+                        <button className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm">
                           Edit
                         </button>
                       </div>
@@ -417,38 +413,38 @@ const AppSettings: React.FC = () => {
                 </div>
               </div>
 
-              <div className="border border-gray-200 rounded-lg p-6">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Branch Settings</h4>
+              <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
+                <h4 className="text-lg font-semibold text-gray-100 mb-4">Branch Settings</h4>
                 <div className="space-y-4">
                   <label className="flex items-center justify-between">
-                    <span className="text-gray-700">Allow cross-branch membership access</span>
+                    <span className="text-gray-300">Allow cross-branch membership access</span>
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]"
+                      className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
                       defaultChecked
                     />
                   </label>
                   <label className="flex items-center justify-between">
-                    <span className="text-gray-700">Centralized payment processing</span>
+                    <span className="text-gray-300">Centralized payment processing</span>
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]"
+                      className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
                       defaultChecked
                     />
                   </label>
                   <label className="flex items-center justify-between">
-                    <span className="text-gray-700">Unified reporting across branches</span>
+                    <span className="text-gray-300">Unified reporting across branches</span>
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]"
+                      className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
                       defaultChecked
                     />
                   </label>
                   <label className="flex items-center justify-between">
-                    <span className="text-gray-700">Branch-specific trainer assignments</span>
+                    <span className="text-gray-300">Branch-specific trainer assignments</span>
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 text-[#165D31] focus:ring-[#165D31]"
+                      className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
                     />
                   </label>
                 </div>
