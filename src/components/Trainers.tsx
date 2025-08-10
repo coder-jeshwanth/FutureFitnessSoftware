@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, Eye, User, Phone, Mail, Calendar, Star, Clock, Award, MapPin, UserCheck, Settings } from 'lucide-react';
+import { Search, Plus, Edit, Eye, User, Phone, Mail, Calendar, Star, Clock, Award, MapPin, UserCheck, Settings, Filter, ToggleLeft, ToggleRight } from 'lucide-react';
 const branches = [
   'Stonehousepet',
   'Harinathpuram',
@@ -184,6 +184,10 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
   const [selectedRole, setSelectedRole] = useState('All Roles');
   const [selectedStatus, setSelectedStatus] = useState('All Status');
   const [selectedBranch, setSelectedBranch] = useState('All Branches');
+  const [selectedExperienceRange, setSelectedExperienceRange] = useState('All Experience');
+  const [selectedAvailabilityDays, setSelectedAvailabilityDays] = useState('All Days');
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [newStaff, setNewStaff] = useState({
     name: '',
     email: '',
@@ -191,7 +195,15 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
     role: 'Receptionist',
     dob: '',
     gender: 'Male',
-    availability: '',
+    availability: {
+      monday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      tuesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      wednesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      thursday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      friday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      saturday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      sunday: { selected: false, startTime: '09:00', endTime: '17:00' }
+    },
     status: 'Active',
     branch: 'Stonehousepet',
     joinDate: new Date().toISOString().split('T')[0]
@@ -206,7 +218,15 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
     dob: '',
     gender: 'Male',
     certifications: [],
-    availability: '',
+    availability: {
+      monday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      tuesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      wednesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      thursday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      friday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      saturday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      sunday: { selected: false, startTime: '09:00', endTime: '17:00' }
+    },
     status: 'Active',
     branch: 'Stonehousepet'
   });
@@ -218,11 +238,146 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
       [name]: value
     });
   };
+  
+  type AvailabilityDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+  type AvailabilityField = 'selected' | 'startTime' | 'endTime';
+  type AvailabilityObject = {
+    [key in AvailabilityDay]: {
+      selected: boolean;
+      startTime: string;
+      endTime: string;
+    }
+  };
+  
+  // Convert string availability to object format
+  const parseAvailability = (availabilityString: string): AvailabilityObject => {
+    const defaultAvailability: AvailabilityObject = {
+      monday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      tuesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      wednesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      thursday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      friday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      saturday: { selected: false, startTime: '09:00', endTime: '17:00' },
+      sunday: { selected: false, startTime: '09:00', endTime: '17:00' }
+    };
+    
+    if (!availabilityString) return defaultAvailability;
+    
+    const dayMap: Record<string, AvailabilityDay> = {
+      'Mon': 'monday',
+      'Tue': 'tuesday',
+      'Wed': 'wednesday',
+      'Thu': 'thursday',
+      'Fri': 'friday',
+      'Sat': 'saturday',
+      'Sun': 'sunday'
+    };
+    
+    // Process entries like "Mon-Fri: 9AM-5PM", "Sat-Sun: 10AM-4PM"
+    const entries = availabilityString.split(', ');
+    entries.forEach(entry => {
+      const [daysPart, timePart] = entry.split(': ');
+      if (!daysPart || !timePart) return;
+      
+      let days: AvailabilityDay[] = [];
+      
+      // Handle ranges like "Mon-Fri" or single days
+      if (daysPart.includes('-')) {
+        const [startDay, endDay] = daysPart.split('-');
+        const startIndex = Object.keys(dayMap).indexOf(startDay);
+        const endIndex = Object.keys(dayMap).indexOf(endDay);
+        
+        if (startIndex >= 0 && endIndex >= 0) {
+          const dayKeys = Object.keys(dayMap);
+          for (let i = startIndex; i <= endIndex; i++) {
+            const day = dayMap[dayKeys[i]];
+            if (day) days.push(day);
+          }
+        }
+      } else {
+        const day = dayMap[daysPart];
+        if (day) days.push(day);
+      }
+      
+      // Parse time range like "9AM-5PM"
+      let startTime = '09:00';
+      let endTime = '17:00';
+      
+      if (timePart.includes('-')) {
+        const [startPart, endPart] = timePart.split('-');
+        
+        // Convert 12h to 24h format
+        const convertTime = (timeStr: string): string => {
+          let hour = parseInt(timeStr.replace(/[^0-9]/g, ''));
+          const isPM = timeStr.toUpperCase().includes('PM');
+          
+          if (isPM && hour !== 12) hour += 12;
+          if (!isPM && hour === 12) hour = 0;
+          
+          return `${hour.toString().padStart(2, '0')}:00`;
+        };
+        
+        startTime = convertTime(startPart);
+        endTime = convertTime(endPart);
+      }
+      
+      // Update days in result
+      days.forEach(day => {
+        defaultAvailability[day] = {
+          selected: true,
+          startTime,
+          endTime
+        };
+      });
+    });
+    
+    return defaultAvailability;
+  };
+  
+  // Format object availability to string
+  const formatAvailability = (availabilityObj: AvailabilityObject): string => {
+    return Object.entries(availabilityObj)
+      .filter(([_, value]) => value.selected)
+      .map(([day, value]) => {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1, 3);
+        return `${dayName}: ${value.startTime}-${value.endTime}`;
+      })
+      .join(', ');
+  };
+  
+  const handleAvailabilityChange = (day: string, field: AvailabilityField, value: boolean | string) => {
+    setNewStaff({
+      ...newStaff,
+      availability: {
+        ...newStaff.availability,
+        [day]: {
+          ...newStaff.availability[day as keyof typeof newStaff.availability],
+          [field]: value
+        }
+      }
+    });
+  };
 
   const handleAddStaff = () => {
+    // Format availability string from the selected days and times
+    const formattedAvailability = Object.entries(newStaff.availability)
+      .filter(([_, value]) => value.selected)
+      .map(([day, value]) => {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1, 3);
+        return `${dayName}: ${value.startTime}-${value.endTime}`;
+      })
+      .join(', ');
+    
+    // Create a copy with formatted availability for sending to backend
+    const staffData = {
+      ...newStaff,
+      availability: formattedAvailability
+    };
+    
     // Logic to add new staff would go here
-    console.log('New staff data:', newStaff);
+    console.log('New staff data:', staffData);
     setShowAddStaffModal(false);
+    
     // Reset form
     setNewStaff({
       name: '',
@@ -231,7 +386,15 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
       role: 'Receptionist',
       dob: '',
       gender: 'Male',
-      availability: '',
+      availability: {
+        monday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        tuesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        wednesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        thursday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        friday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        saturday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        sunday: { selected: false, startTime: '09:00', endTime: '17:00' }
+      },
       status: 'Active',
       branch: 'Stonehousepet',
       joinDate: new Date().toISOString().split('T')[0]
@@ -258,7 +421,35 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
     const effectiveBranch = navbarSelectedBranch !== 'All Branches' ? navbarSelectedBranch : selectedBranch;
     const matchesBranch = effectiveBranch === 'All Branches' || trainer.branch === effectiveBranch;
     
-    return matchesSearch && matchesSpecialty && matchesStatus && matchesBranch;
+    // Experience range filter
+    const matchesExperience = selectedExperienceRange === 'All Experience' || (() => {
+      const years = parseInt(trainer.experience);
+      if (selectedExperienceRange === '0-2 years') {
+        return years >= 0 && years <= 2;
+      } else if (selectedExperienceRange === '3-5 years') {
+        return years >= 3 && years <= 5;
+      } else if (selectedExperienceRange === '6+ years') {
+        return years >= 6;
+      }
+      return true;
+    })();
+    
+    // Availability days filter
+    const matchesAvailability = selectedAvailabilityDays === 'All Days' || (() => {
+      if (selectedAvailabilityDays === 'Mon-Fri' && trainer.availability.toLowerCase().includes('mon') && trainer.availability.toLowerCase().includes('fri')) {
+        return true;
+      } else if (selectedAvailabilityDays === 'Sat-Sun' && (trainer.availability.toLowerCase().includes('sat') || trainer.availability.toLowerCase().includes('sun'))) {
+        return true;
+      } else if (selectedAvailabilityDays === 'Weekends Only' && trainer.availability.toLowerCase().includes('sat') && trainer.availability.toLowerCase().includes('sun') && 
+        !trainer.availability.toLowerCase().includes('mon') && !trainer.availability.toLowerCase().includes('tue') && 
+        !trainer.availability.toLowerCase().includes('wed') && !trainer.availability.toLowerCase().includes('thu') && 
+        !trainer.availability.toLowerCase().includes('fri')) {
+        return true;
+      }
+      return false;
+    })();
+    
+    return matchesSearch && matchesSpecialty && matchesStatus && matchesBranch && matchesExperience && matchesAvailability;
   });
   
   const filteredStaff = staff.filter(staffMember => {
@@ -272,7 +463,22 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
     const effectiveBranch = navbarSelectedBranch !== 'All Branches' ? navbarSelectedBranch : selectedBranch;
     const matchesBranch = effectiveBranch === 'All Branches' || staffMember.branch === effectiveBranch;
     
-    return matchesSearch && matchesRole && matchesStatus && matchesBranch;
+    // Availability days filter - also apply to staff
+    const matchesAvailability = selectedAvailabilityDays === 'All Days' || (() => {
+      if (selectedAvailabilityDays === 'Mon-Fri' && staffMember.availability.toLowerCase().includes('mon') && staffMember.availability.toLowerCase().includes('fri')) {
+        return true;
+      } else if (selectedAvailabilityDays === 'Sat-Sun' && (staffMember.availability.toLowerCase().includes('sat') || staffMember.availability.toLowerCase().includes('sun'))) {
+        return true;
+      } else if (selectedAvailabilityDays === 'Weekends Only' && staffMember.availability.toLowerCase().includes('sat') && staffMember.availability.toLowerCase().includes('sun') && 
+        !staffMember.availability.toLowerCase().includes('mon') && !staffMember.availability.toLowerCase().includes('tue') && 
+        !staffMember.availability.toLowerCase().includes('wed') && !staffMember.availability.toLowerCase().includes('thu') && 
+        !staffMember.availability.toLowerCase().includes('fri')) {
+        return true;
+      }
+      return false;
+    })();
+    
+    return matchesSearch && matchesRole && matchesStatus && matchesBranch && matchesAvailability;
   });
 
   const openTrainerModal = (trainer: any) => {
@@ -281,7 +487,9 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
   };
   
   const openEditModal = (trainer: any) => {
-    setEditTrainer({...trainer});
+    // Parse the availability string into our object format for the UI
+    const availabilityObj = parseAvailability(trainer.availability);
+    setEditTrainer({...trainer, availabilityObj});
     setShowEditModal(true);
   };
   
@@ -291,22 +499,75 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
   };
   
   const openEditStaffModal = (staff: any) => {
-    setEditStaff({...staff});
+    // Parse the availability string into our object format for the UI
+    const availabilityObj = parseAvailability(staff.availability);
+    setEditStaff({...staff, availabilityObj});
     setShowEditStaffModal(true);
   };
   
   const handleEditTrainer = () => {
+    // Format availability for the backend
+    const formattedTrainer = {
+      ...editTrainer,
+      availability: editTrainer.availability,
+      // Remove the UI-only availabilityObj field
+      availabilityObj: undefined
+    };
+    
     // Logic to update trainer would go here in a real app
-    console.log('Updated trainer data:', editTrainer);
+    console.log('Updated trainer data:', formattedTrainer);
     setShowEditModal(false);
     setEditTrainer(null);
   };
 
   const handleEditStaff = () => {
+    // Format availability for the backend
+    const formattedStaff = {
+      ...editStaff,
+      availability: editStaff.availability,
+      // Remove the UI-only availabilityObj field
+      availabilityObj: undefined
+    };
+    
     // Logic to update staff would go here in a real app
-    console.log('Updated staff data:', editStaff);
+    console.log('Updated staff data:', formattedStaff);
     setShowEditStaffModal(false);
     setEditStaff(null);
+  };
+  
+  // Function to update status via toggle button
+  const handleStatusChange = (id: number, currentStatus: string, itemType: 'trainer' | 'staff') => {
+    // Rotate through statuses: Active -> On Leave -> Inactive -> Active
+    let newStatus = 'Active';
+    
+    if (currentStatus === 'Active') {
+      newStatus = 'On Leave';
+    } else if (currentStatus === 'On Leave') {
+      newStatus = 'Inactive';
+    }
+    
+    // In a real app, you would call an API to update the status
+    console.log(`Updating ${itemType} ID: ${id} status from ${currentStatus} to ${newStatus}`);
+    
+    // For demo purposes, update the local state
+    if (itemType === 'trainer') {
+      // Find and update trainer status
+      // Note: In a production app, this would be handled by a proper state update
+      const trainerIndex = trainers.findIndex(t => t.id === id);
+      if (trainerIndex !== -1) {
+        trainers[trainerIndex].status = newStatus;
+        // Force re-render
+        setSearchTerm(searchTerm);
+      }
+    } else {
+      // Find and update staff status
+      const staffIndex = staff.findIndex(s => s.id === id);
+      if (staffIndex !== -1) {
+        staff[staffIndex].status = newStatus;
+        // Force re-render
+        setSearchTerm(searchTerm);
+      }
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -316,10 +577,38 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
       [name]: value
     });
   };
+  
+  const handleTrainerAvailabilityChange = (day: string, field: 'selected' | 'startTime' | 'endTime', value: boolean | string) => {
+    setNewTrainer({
+      ...newTrainer,
+      availability: {
+        ...newTrainer.availability,
+        [day]: {
+          ...newTrainer.availability[day as keyof typeof newTrainer.availability],
+          [field]: value
+        }
+      }
+    });
+  };
 
   const handleAddTrainer = () => {
+    // Format availability string from the selected days and times
+    const formattedAvailability = Object.entries(newTrainer.availability)
+      .filter(([_, value]) => value.selected)
+      .map(([day, value]) => {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1, 3);
+        return `${dayName}: ${value.startTime}-${value.endTime}`;
+      })
+      .join(', ');
+    
+    // Create a copy with formatted availability for sending to backend
+    const trainerData = {
+      ...newTrainer,
+      availability: formattedAvailability
+    };
+    
     // Logic to add new trainer would go here
-    console.log('New trainer data:', newTrainer);
+    console.log('New trainer data:', trainerData);
     setShowAddModal(false);
     // Reset form
     setNewTrainer({
@@ -331,7 +620,15 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
       dob: '',
       gender: 'Male',
       certifications: [],
-      availability: '',
+      availability: {
+        monday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        tuesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        wednesday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        thursday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        friday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        saturday: { selected: false, startTime: '09:00', endTime: '17:00' },
+        sunday: { selected: false, startTime: '09:00', endTime: '17:00' }
+      },
       status: 'Active',
       branch: 'Stonehousepet'
     });
@@ -348,7 +645,13 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
       
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+        <button 
+          onClick={() => {
+            setActiveTab('trainers');
+            setSelectedRole('All Roles');
+          }}
+          className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6 transition-all hover:shadow-lg hover:border-[#7BC843] w-full text-left"
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm font-medium">Total Trainers</p>
@@ -358,9 +661,15 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
               <UserCheck className="h-6 w-6 text-[#7BC843]" />
             </div>
           </div>
-        </div>
+        </button>
         
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+        <button 
+          onClick={() => {
+            setActiveTab('staff');
+            setSelectedRole('Admin');
+          }}
+          className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6 transition-all hover:shadow-lg hover:border-blue-500 w-full text-left"
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm font-medium">Total Admins</p>
@@ -370,9 +679,15 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
               <Settings className="h-6 w-6 text-blue-500" />
             </div>
           </div>
-        </div>
+        </button>
         
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+        <button 
+          onClick={() => {
+            setActiveTab('staff');
+            setSelectedRole('Manager');
+          }}
+          className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6 transition-all hover:shadow-lg hover:border-purple-500 w-full text-left"
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm font-medium">Total Managers</p>
@@ -382,9 +697,15 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
               <Award className="h-6 w-6 text-purple-500" />
             </div>
           </div>
-        </div>
+        </button>
         
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+        <button 
+          onClick={() => {
+            setActiveTab('staff');
+            setSelectedRole('Receptionist');
+          }}
+          className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6 transition-all hover:shadow-lg hover:border-orange-500 w-full text-left"
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm font-medium">Total Receptionists</p>
@@ -394,7 +715,7 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
               <User className="h-6 w-6 text-orange-500" />
             </div>
           </div>
-        </div>
+        </button>
       </div>
       
       {/* Tabs and Buttons */}
@@ -476,59 +797,242 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
             />
           </div>
           <div className="flex space-x-3">
-            {activeTab === 'trainers' ? (
-              <select 
-                value={selectedSpecialty}
-                onChange={(e) => setSelectedSpecialty(e.target.value)}
-                className="px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
-              >
-                <option>All Specialties</option>
-                <option>Strength Training</option>
-                <option>Yoga & Pilates</option>
-                <option>CrossFit & HIIT</option>
-                <option>Cardio & Dance</option>
-              </select>
-            ) : (
-              <select 
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                className="px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
-              >
-                <option>All Roles</option>
-                <option>Admin</option>
-                <option>Manager</option>
-                <option>Receptionist</option>
-              </select>
-            )}
-            <select 
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
+            <button 
+              onClick={() => setShowFilterModal(true)}
+              className={`px-5 py-3 bg-gradient-to-r from-[#23292F] to-[#2a3138] text-white border border-gray-700 rounded-lg hover:from-[#2a3138] hover:to-[#343C44] focus:ring-2 focus:ring-[#7BC843] flex items-center space-x-2 transition-all duration-200 shadow-md ${
+                (selectedSpecialty !== 'All Specialties' || 
+                 selectedRole !== 'All Roles' || 
+                 selectedStatus !== 'All Status' || 
+                 selectedBranch !== 'All Branches' ||
+                 selectedExperienceRange !== 'All Experience' || 
+                 selectedAvailabilityDays !== 'All Days') ? 'border-[#7BC843]' : ''
+              }`}
             >
-              <option>All Status</option>
-              <option>Active</option>
-              <option>On Leave</option>
-              <option>Inactive</option>
-            </select>
-            <select 
-              value={navbarSelectedBranch !== 'All Branches' ? navbarSelectedBranch : selectedBranch}
-              onChange={(e) => {
-                // Only update local selectedBranch if navbar is set to "All Branches"
-                if (navbarSelectedBranch === 'All Branches') {
-                  setSelectedBranch(e.target.value);
-                }
-              }}
-              className="px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
-              disabled={navbarSelectedBranch !== 'All Branches'}
-            >
-              <option>All Branches</option>
-              {branches.map((branch) => (
-                <option key={branch}>{branch}</option>
-              ))}
-            </select>
+              <Filter className="h-5 w-5 text-[#7BC843]" />
+              <span>Filters</span>
+              {(selectedSpecialty !== 'All Specialties' || 
+                selectedRole !== 'All Roles' || 
+                selectedStatus !== 'All Status' || 
+                selectedBranch !== 'All Branches' ||
+                selectedExperienceRange !== 'All Experience' || 
+                selectedAvailabilityDays !== 'All Days') && (
+                <span className="flex h-6 w-6 items-center justify-center bg-gradient-to-r from-[#7BC843] to-[#5EA932] text-white text-xs font-bold rounded-full shadow-lg ml-1">
+                  {[
+                    selectedSpecialty !== 'All Specialties', 
+                    selectedRole !== 'All Roles', 
+                    selectedStatus !== 'All Status',
+                    selectedBranch !== 'All Branches',
+                    selectedExperienceRange !== 'All Experience',
+                    selectedAvailabilityDays !== 'All Days'
+                  ].filter(Boolean).length}
+                </span>
+              )}
+            </button>
           </div>
         </div>
       </div>
+      
+      {/* Filter Modal */}
+      {showFilterModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-[#2A3037] to-[#23292F] rounded-xl shadow-xl border border-gray-700 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-gray-700 p-6">
+              <div className="flex items-center">
+                <Filter className="h-5 w-5 text-[#7BC843] mr-2" />
+                <h3 className="text-xl font-bold text-white">Filter Options</h3>
+              </div>
+              <button 
+                onClick={() => setShowFilterModal(false)}
+                className="text-gray-400 hover:text-white rounded-full hover:bg-gray-700 p-1 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Status Filter */}
+                <div>
+                  <h4 className="text-white font-medium mb-3 flex items-center">
+                    <span className="w-3 h-3 rounded-full mr-2 bg-gradient-to-r from-green-400 via-yellow-400 to-red-400"></span>
+                    Status
+                  </h4>
+                  <div className="relative">
+                    <select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none"
+                    >
+                      <option value="All Status">All Status</option>
+                      <option value="Active">Active</option>
+                      <option value="On Leave">On Leave</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Branch Filter (if not selected in navbar) */}
+                {navbarSelectedBranch === 'All Branches' && (
+                  <div>
+                    <h4 className="text-white font-medium mb-3 flex items-center">
+                      <span className="w-3 h-3 rounded-full mr-2 bg-[#7BC843]"></span>
+                      Branch
+                    </h4>
+                    <div className="relative">
+                      <select
+                        value={selectedBranch}
+                        onChange={(e) => setSelectedBranch(e.target.value)}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none"
+                      >
+                        <option value="All Branches">All Branches</option>
+                        {branches.map((branch) => (
+                          <option key={branch} value={branch}>{branch}</option>
+                        ))}
+                      </select>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Role Filter (for Staff tab) */}
+                {activeTab === 'staff' && (
+                  <div>
+                    <h4 className="text-white font-medium mb-3">Role</h4>
+                    <div className="space-y-2">
+                      {['All Roles', 'Admin', 'Manager', 'Receptionist'].map((role) => (
+                        <label key={role} className="flex items-center space-x-2 text-gray-300 hover:text-white cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={selectedRole === role}
+                            onChange={() => setSelectedRole(role)}
+                            className="rounded text-[#7BC843] h-4 w-4 focus:ring-[#7BC843] focus:ring-offset-gray-800"
+                          />
+                          <span>{role}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Specialty Filter (for Trainers tab) */}
+                {activeTab === 'trainers' && (
+                  <div className="mt-5">
+                    <h4 className="text-white font-medium mb-3 flex items-center">
+                      <span className="w-3 h-3 rounded-full mr-2 bg-[#7BC843]"></span>
+                      Specialty
+                    </h4>
+                    <div className="relative">
+                      <select
+                        value={selectedSpecialty}
+                        onChange={(e) => setSelectedSpecialty(e.target.value)}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none"
+                      >
+                        {['All Specialties', 'Strength Training', 'Yoga & Pilates', 'CrossFit & HIIT', 'Cardio & Dance'].map((specialty) => (
+                          <option key={specialty} value={specialty}>{specialty}</option>
+                        ))}
+                      </select>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Experience Range Filter (for Trainers tab) */}
+                {activeTab === 'trainers' && (
+                  <div className="mt-5">
+                    <h4 className="text-white font-medium mb-3 flex items-center">
+                      <span className="w-3 h-3 rounded-full mr-2 bg-[#7BC843]"></span>
+                      Experience Range
+                    </h4>
+                    <div className="relative">
+                      <select
+                        value={selectedExperienceRange}
+                        onChange={(e) => setSelectedExperienceRange(e.target.value)}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none"
+                      >
+                        {['All Experience', '0-2 years', '3-5 years', '6+ years'].map((range) => (
+                          <option key={range} value={range}>{range}</option>
+                        ))}
+                      </select>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Availability Days Filter */}
+                <div className="mt-5">
+                  <h4 className="text-white font-medium mb-3 flex items-center">
+                    <span className="w-3 h-3 rounded-full mr-2 bg-[#7BC843]"></span>
+                    Availability Days
+                  </h4>
+                  <div className="relative">
+                    <select
+                      value={selectedAvailabilityDays}
+                      onChange={(e) => setSelectedAvailabilityDays(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none"
+                    >
+                      {['All Days', 'Mon-Fri', 'Sat-Sun', 'Weekends Only'].map((days) => (
+                        <option key={days} value={days}>{days}</option>
+                      ))}
+                    </select>
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-8 flex justify-end space-x-4 border-t border-gray-700 pt-6">
+                <button
+                  onClick={() => {
+                    setSelectedSpecialty('All Specialties');
+                    setSelectedRole('All Roles');
+                    setSelectedStatus('All Status');
+                    setSelectedBranch('All Branches');
+                    setSelectedExperienceRange('All Experience');
+                    setSelectedAvailabilityDays('All Days');
+                  }}
+                  className="px-6 py-2.5 bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-md flex items-center justify-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Reset All
+                </button>
+                <button
+                  onClick={() => setShowFilterModal(false)}
+                  className="px-8 py-2.5 bg-gradient-to-r from-[#7BC843] to-[#5EA932] text-white font-medium rounded-lg hover:from-[#8BD952] hover:to-[#6BB536] transition-all duration-200 shadow-md flex items-center justify-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Apply Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Trainers Grid */}
       {activeTab === 'trainers' && (
@@ -587,11 +1091,31 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                 >
                   <Edit className="h-4 w-4" />
                 </button>
-                <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-[#23292F] rounded-lg transition-colors duration-200" title="Delete">
-                  <Trash2 className="h-4 w-4" />
+                <button 
+                  className={`p-2 hover:bg-[#23292F] rounded-lg transition-colors duration-200 ${
+                    trainer.status === 'Active' ? 'text-green-500' : 
+                    trainer.status === 'On Leave' ? 'text-yellow-500' : 'text-red-500'
+                  }`}
+                  title={`Status: ${trainer.status} (Click to change)`}
+                  onClick={() => handleStatusChange(trainer.id, trainer.status, 'trainer')}
+                >
+                  {trainer.status === 'Active' ? (
+                    <ToggleRight className="h-4 w-4" />
+                  ) : trainer.status === 'On Leave' ? (
+                    <ToggleLeft className="h-4 w-4 rotate-0" />
+                  ) : (
+                    <ToggleLeft className="h-4 w-4 rotate-180" />
+                  )}
                 </button>
               </div>
-              <button className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm">
+              <button 
+                onClick={() => {
+                  setSelectedTrainer(trainer);
+                  setShowScheduleModal(true);
+                }}
+                className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm flex items-center"
+              >
+                <Calendar className="h-4 w-4 mr-1" />
                 View Schedule
               </button>
             </div>
@@ -653,8 +1177,21 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                   >
                     <Edit className="h-4 w-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-[#23292F] rounded-lg transition-colors duration-200" title="Delete">
-                    <Trash2 className="h-4 w-4" />
+                  <button 
+                    className={`p-2 hover:bg-[#23292F] rounded-lg transition-colors duration-200 ${
+                      staffMember.status === 'Active' ? 'text-green-500' : 
+                      staffMember.status === 'On Leave' ? 'text-yellow-500' : 'text-red-500'
+                    }`}
+                    title={`Status: ${staffMember.status} (Click to change)`}
+                    onClick={() => handleStatusChange(staffMember.id, staffMember.status, 'staff')}
+                  >
+                    {staffMember.status === 'Active' ? (
+                      <ToggleRight className="h-4 w-4" />
+                    ) : staffMember.status === 'On Leave' ? (
+                      <ToggleLeft className="h-4 w-4 rotate-0" />
+                    ) : (
+                      <ToggleLeft className="h-4 w-4 rotate-180" />
+                    )}
                   </button>
                 </div>
                 <button className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm">
@@ -821,16 +1358,54 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                     </div>
                     
                     <div className="flex flex-col">
-                      <label className="text-gray-400 text-sm mb-1">Availability *</label>
-                      <input
-                        type="text"
-                        name="availability"
-                        value={newTrainer.availability}
-                        onChange={handleInputChange}
-                        placeholder="E.g. Mon-Fri: 6AM-2PM"
-                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
-                        required
-                      />
+                      <label className="text-gray-400 text-sm mb-3">Availability *</label>
+                      <div className="bg-[#23292F] border border-gray-700 rounded-lg p-4">
+                        <div className="space-y-3">
+                          {Object.entries(newTrainer.availability).map(([day, dayValue]) => (
+                            <div key={day} className="flex flex-wrap items-center gap-3">
+                              <label className="flex items-center w-[120px] cursor-pointer text-gray-300 hover:text-white">
+                                <input
+                                  type="checkbox"
+                                  checked={dayValue.selected}
+                                  onChange={(e) => handleTrainerAvailabilityChange(day, 'selected', e.target.checked)}
+                                  className="rounded text-[#7BC843] h-4 w-4 focus:ring-[#7BC843] focus:ring-offset-gray-800 mr-2"
+                                />
+                                {day.charAt(0).toUpperCase() + day.slice(1)}
+                              </label>
+                              {dayValue.selected && (
+                                <div className="flex items-center space-x-2">
+                                  <select
+                                    value={dayValue.startTime}
+                                    onChange={(e) => handleTrainerAvailabilityChange(day, 'startTime', e.target.value)}
+                                    className="px-3 py-1.5 bg-[#2A3037] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-sm"
+                                  >
+                                    {Array.from({ length: 24 }).map((_, i) => (
+                                      <option key={`start-${i}`} value={`${i.toString().padStart(2, '0')}:00`}>
+                                        {`${i.toString().padStart(2, '0')}:00`}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <span className="text-gray-400">to</span>
+                                  <select
+                                    value={dayValue.endTime}
+                                    onChange={(e) => handleTrainerAvailabilityChange(day, 'endTime', e.target.value)}
+                                    className="px-3 py-1.5 bg-[#2A3037] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-sm"
+                                  >
+                                    {Array.from({ length: 24 }).map((_, i) => (
+                                      <option key={`end-${i}`} value={`${i.toString().padStart(2, '0')}:00`}>
+                                        {`${i.toString().padStart(2, '0')}:00`}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-3 text-xs text-gray-400">
+                          Select days and set working hours for trainer availability
+                        </div>
+                      </div>
                     </div>
                     
                     <div className="flex flex-col">
@@ -959,7 +1534,15 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                     </div>
                     <div>
                       <span className="text-gray-400 text-sm">Availability:</span>
-                      <p className="text-white font-medium">{selectedTrainer.availability}</p>
+                      <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {selectedTrainer.availability.split(', ').map((timeSlot: string, index: number) => (
+                          <div key={index} className="flex items-center space-x-2 bg-[#23292F] px-3 py-2 rounded-lg border border-gray-700">
+                            <span className="text-[#7BC843] font-medium">{timeSlot.split(': ')[0]}</span>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-white">{timeSlot.split(': ')[1]}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1149,14 +1732,93 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                     </div>
                     
                     <div className="flex flex-col">
-                      <label className="text-gray-400 text-sm mb-1">Availability *</label>
-                      <input
-                        type="text"
-                        value={editTrainer.availability}
-                        onChange={(e) => setEditTrainer({...editTrainer, availability: e.target.value})}
-                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
-                        required
-                      />
+                      <label className="text-gray-400 text-sm mb-3">Availability *</label>
+                      <div className="bg-[#23292F] border border-gray-700 rounded-lg p-4">
+                        <div className="space-y-3">
+                          {Object.entries(editTrainer.availabilityObj || parseAvailability(editTrainer.availability as string)).map(([day, dayValue]: [string, any]) => (
+                            <div key={day} className="flex flex-wrap items-center gap-3">
+                              <label className="flex items-center w-[120px] cursor-pointer text-gray-300 hover:text-white">
+                                <input
+                                  type="checkbox"
+                                  checked={dayValue.selected}
+                                  onChange={(e) => {
+                                    const updatedAvailability = {
+                                      ...editTrainer.availabilityObj || parseAvailability(editTrainer.availability),
+                                      [day]: {
+                                        ...(editTrainer.availabilityObj || parseAvailability(editTrainer.availability))[day as keyof AvailabilityObject],
+                                        selected: e.target.checked
+                                      }
+                                    };
+                                    setEditTrainer({
+                                      ...editTrainer, 
+                                      availabilityObj: updatedAvailability,
+                                      availability: formatAvailability(updatedAvailability)
+                                    });
+                                  }}
+                                  className="rounded text-[#7BC843] h-4 w-4 focus:ring-[#7BC843] focus:ring-offset-gray-800 mr-2"
+                                />
+                                {day.charAt(0).toUpperCase() + day.slice(1)}
+                              </label>
+                              {dayValue.selected && (
+                                <div className="flex items-center space-x-2">
+                                  <select
+                                    value={dayValue.startTime}
+                                    onChange={(e) => {
+                                      const updatedAvailability = {
+                                        ...editTrainer.availabilityObj || parseAvailability(editTrainer.availability),
+                                        [day]: {
+                                          ...(editTrainer.availabilityObj || parseAvailability(editTrainer.availability))[day as keyof AvailabilityObject],
+                                          startTime: e.target.value
+                                        }
+                                      };
+                                      setEditTrainer({
+                                        ...editTrainer, 
+                                        availabilityObj: updatedAvailability,
+                                        availability: formatAvailability(updatedAvailability)
+                                      });
+                                    }}
+                                    className="px-3 py-1.5 bg-[#2A3037] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-sm"
+                                  >
+                                    {Array.from({ length: 24 }).map((_, i) => (
+                                      <option key={`start-${i}`} value={`${i.toString().padStart(2, '0')}:00`}>
+                                        {`${i.toString().padStart(2, '0')}:00`}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <span className="text-gray-400">to</span>
+                                  <select
+                                    value={dayValue.endTime}
+                                    onChange={(e) => {
+                                      const updatedAvailability = {
+                                        ...editTrainer.availabilityObj || parseAvailability(editTrainer.availability),
+                                        [day]: {
+                                          ...(editTrainer.availabilityObj || parseAvailability(editTrainer.availability))[day as keyof AvailabilityObject],
+                                          endTime: e.target.value
+                                        }
+                                      };
+                                      setEditTrainer({
+                                        ...editTrainer, 
+                                        availabilityObj: updatedAvailability,
+                                        availability: formatAvailability(updatedAvailability)
+                                      });
+                                    }}
+                                    className="px-3 py-1.5 bg-[#2A3037] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-sm"
+                                  >
+                                    {Array.from({ length: 24 }).map((_, i) => (
+                                      <option key={`end-${i}`} value={`${i.toString().padStart(2, '0')}:00`}>
+                                        {`${i.toString().padStart(2, '0')}:00`}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-3 text-xs text-gray-400">
+                          Select days and set working hours for trainer availability
+                        </div>
+                      </div>
                     </div>
                     
                     <div className="flex flex-col">
@@ -1325,16 +1987,54 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                     </div>
                     
                     <div className="flex flex-col">
-                      <label className="text-gray-400 text-sm mb-1">Availability *</label>
-                      <input
-                        type="text"
-                        name="availability"
-                        value={newStaff.availability}
-                        onChange={handleStaffInputChange}
-                        placeholder="E.g. Mon-Fri: 9AM-5PM"
-                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
-                        required
-                      />
+                      <label className="text-gray-400 text-sm mb-3">Availability *</label>
+                      <div className="bg-[#23292F] border border-gray-700 rounded-lg p-4">
+                        <div className="space-y-3">
+                          {Object.entries(newStaff.availability).map(([day, dayValue]) => (
+                            <div key={day} className="flex flex-wrap items-center gap-3">
+                              <label className="flex items-center w-[120px] cursor-pointer text-gray-300 hover:text-white">
+                                <input
+                                  type="checkbox"
+                                  checked={dayValue.selected}
+                                  onChange={(e) => handleAvailabilityChange(day, 'selected', e.target.checked)}
+                                  className="rounded text-[#7BC843] h-4 w-4 focus:ring-[#7BC843] focus:ring-offset-gray-800 mr-2"
+                                />
+                                {day.charAt(0).toUpperCase() + day.slice(1)}
+                              </label>
+                              {dayValue.selected && (
+                                <div className="flex items-center space-x-2">
+                                  <select
+                                    value={dayValue.startTime}
+                                    onChange={(e) => handleAvailabilityChange(day, 'startTime', e.target.value)}
+                                    className="px-3 py-1.5 bg-[#2A3037] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-sm"
+                                  >
+                                    {Array.from({ length: 24 }).map((_, i) => (
+                                      <option key={`start-${i}`} value={`${i.toString().padStart(2, '0')}:00`}>
+                                        {`${i.toString().padStart(2, '0')}:00`}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <span className="text-gray-400">to</span>
+                                  <select
+                                    value={dayValue.endTime}
+                                    onChange={(e) => handleAvailabilityChange(day, 'endTime', e.target.value)}
+                                    className="px-3 py-1.5 bg-[#2A3037] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-sm"
+                                  >
+                                    {Array.from({ length: 24 }).map((_, i) => (
+                                      <option key={`end-${i}`} value={`${i.toString().padStart(2, '0')}:00`}>
+                                        {`${i.toString().padStart(2, '0')}:00`}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-3 text-xs text-gray-400">
+                          Select days and set working hours for staff availability
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1429,7 +2129,15 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                     </div>
                     <div>
                       <span className="text-gray-400 text-sm">Availability:</span>
-                      <p className="text-white font-medium">{selectedStaff.availability}</p>
+                      <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {selectedStaff.availability.split(', ').map((timeSlot: string, index: number) => (
+                          <div key={index} className="flex items-center space-x-2 bg-[#23292F] px-3 py-2 rounded-lg border border-gray-700">
+                            <span className="text-[#7BC843] font-medium">{timeSlot.split(': ')[0]}</span>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-white">{timeSlot.split(': ')[1]}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                     <div>
                       <span className="text-gray-400 text-sm">Status:</span>
@@ -1448,9 +2156,6 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                   className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors duration-200"
                 >
                   Edit Staff
-                </button>
-                <button className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium">
-                  View Schedule
                 </button>
               </div>
             </div>
@@ -1554,14 +2259,93 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                     </div>
                     
                     <div className="flex flex-col">
-                      <label className="text-gray-400 text-sm mb-1">Availability *</label>
-                      <input
-                        type="text"
-                        value={editStaff.availability}
-                        onChange={(e) => setEditStaff({...editStaff, availability: e.target.value})}
-                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
-                        required
-                      />
+                      <label className="text-gray-400 text-sm mb-3">Availability *</label>
+                      <div className="bg-[#23292F] border border-gray-700 rounded-lg p-4">
+                        <div className="space-y-3">
+                          {Object.entries(editStaff.availabilityObj || parseAvailability(editStaff.availability as string)).map(([day, dayValue]: [string, any]) => (
+                            <div key={day} className="flex flex-wrap items-center gap-3">
+                              <label className="flex items-center w-[120px] cursor-pointer text-gray-300 hover:text-white">
+                                <input
+                                  type="checkbox"
+                                  checked={dayValue.selected}
+                                  onChange={(e) => {
+                                    const updatedAvailability = {
+                                      ...editStaff.availabilityObj || parseAvailability(editStaff.availability as string),
+                                      [day]: {
+                                        ...(editStaff.availabilityObj || parseAvailability(editStaff.availability as string))[day as keyof AvailabilityObject],
+                                        selected: e.target.checked
+                                      }
+                                    };
+                                    setEditStaff({
+                                      ...editStaff, 
+                                      availabilityObj: updatedAvailability,
+                                      availability: formatAvailability(updatedAvailability)
+                                    });
+                                  }}
+                                  className="rounded text-[#7BC843] h-4 w-4 focus:ring-[#7BC843] focus:ring-offset-gray-800 mr-2"
+                                />
+                                {day.charAt(0).toUpperCase() + day.slice(1)}
+                              </label>
+                              {dayValue.selected && (
+                                <div className="flex items-center space-x-2">
+                                  <select
+                                    value={dayValue.startTime}
+                                    onChange={(e) => {
+                                      const updatedAvailability = {
+                                        ...editStaff.availabilityObj || parseAvailability(editStaff.availability as string),
+                                        [day]: {
+                                          ...(editStaff.availabilityObj || parseAvailability(editStaff.availability as string))[day as keyof AvailabilityObject],
+                                          startTime: e.target.value
+                                        }
+                                      };
+                                      setEditStaff({
+                                        ...editStaff, 
+                                        availabilityObj: updatedAvailability,
+                                        availability: formatAvailability(updatedAvailability)
+                                      });
+                                    }}
+                                    className="px-3 py-1.5 bg-[#2A3037] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-sm"
+                                  >
+                                    {Array.from({ length: 24 }).map((_, i) => (
+                                      <option key={`start-${i}`} value={`${i.toString().padStart(2, '0')}:00`}>
+                                        {`${i.toString().padStart(2, '0')}:00`}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <span className="text-gray-400">to</span>
+                                  <select
+                                    value={dayValue.endTime}
+                                    onChange={(e) => {
+                                      const updatedAvailability = {
+                                        ...editStaff.availabilityObj || parseAvailability(editStaff.availability as string),
+                                        [day]: {
+                                          ...(editStaff.availabilityObj || parseAvailability(editStaff.availability as string))[day as keyof AvailabilityObject],
+                                          endTime: e.target.value
+                                        }
+                                      };
+                                      setEditStaff({
+                                        ...editStaff, 
+                                        availabilityObj: updatedAvailability,
+                                        availability: formatAvailability(updatedAvailability)
+                                      });
+                                    }}
+                                    className="px-3 py-1.5 bg-[#2A3037] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-sm"
+                                  >
+                                    {Array.from({ length: 24 }).map((_, i) => (
+                                      <option key={`end-${i}`} value={`${i.toString().padStart(2, '0')}:00`}>
+                                        {`${i.toString().padStart(2, '0')}:00`}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-3 text-xs text-gray-400">
+                          Select days and set working hours for staff availability
+                        </div>
+                      </div>
                     </div>
                     
                     <div className="flex flex-col">
@@ -1592,6 +2376,106 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                   className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium"
                 >
                   Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Trainer Schedule Modal */}
+      {showScheduleModal && selectedTrainer && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#2A3037] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-700 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-white flex items-center">
+                <Calendar className="h-5 w-5 mr-2 text-[#7BC843]" />
+                {selectedTrainer.name}'s Schedule
+              </h2>
+              <button 
+                onClick={() => setShowScheduleModal(false)}
+                className="text-gray-400 hover:text-white transition-colors duration-200"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <div className="bg-gradient-to-br from-[#23292F] to-[#1d2126] p-5 rounded-lg border border-gray-800 shadow-lg mb-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-[#7BC843] rounded-full flex items-center justify-center mr-4">
+                    <User className="h-6 w-6 text-black" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-white">{selectedTrainer.name}</h3>
+                    <p className="text-gray-400">{selectedTrainer.specialty}</p>
+                  </div>
+                  <div className="ml-auto">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      selectedTrainer.status === 'Active' ? 'bg-green-900 text-green-300' :
+                      selectedTrainer.status === 'On Leave' ? 'bg-yellow-900 text-yellow-300' :
+                      'bg-red-900 text-red-300'
+                    }`}>
+                      {selectedTrainer.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-lg font-medium text-white mb-4 flex items-center">
+                <Clock className="h-5 w-5 mr-2 text-[#7BC843]" />
+                Weekly Schedule
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
+                  const dayLower = day.toLowerCase() as AvailabilityDay;
+                  const availability = parseAvailability(selectedTrainer.availability);
+                  const isAvailable = availability[dayLower].selected;
+                  
+                  return (
+                    <div key={day} className={`p-4 rounded-lg border ${isAvailable ? 'border-[#7BC843] bg-[#2a3830]' : 'border-gray-700 bg-[#23292F]'}`}>
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-medium text-white">{day}</h4>
+                        {isAvailable ? (
+                          <span className="text-[#7BC843] text-sm flex items-center">
+                            <Clock className="h-4 w-4 mr-1" />
+                            {availability[dayLower].startTime} - {availability[dayLower].endTime}
+                          </span>
+                        ) : (
+                          <span className="text-gray-500 text-sm">Not Available</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-8 border-t border-gray-700 pt-6">
+                <h3 className="text-lg font-medium text-white mb-4 flex items-center">
+                  <User className="h-5 w-5 mr-2 text-[#7BC843]" />
+                  Contact Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-3 p-3 bg-[#23292F] rounded-lg">
+                    <Phone className="h-5 w-5 text-[#7BC843]" />
+                    <span className="text-gray-300">{selectedTrainer.phone}</span>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-[#23292F] rounded-lg">
+                    <Mail className="h-5 w-5 text-[#7BC843]" />
+                    <span className="text-gray-300">{selectedTrainer.email}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-end">
+                <button 
+                  onClick={() => setShowScheduleModal(false)}
+                  className="px-8 py-2.5 bg-gradient-to-r from-[#7BC843] to-[#5EA932] text-white font-medium rounded-lg hover:from-[#8BD952] hover:to-[#6BB536] transition-all duration-200 shadow-md flex items-center justify-center"
+                >
+                  Close
                 </button>
               </div>
             </div>
