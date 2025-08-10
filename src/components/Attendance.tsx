@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, UserCheck, Search, Filter, Download, CheckCircle, XCircle, ChevronLeft, History, BarChart, List, ChevronDown, Smartphone, Fingerprint, MapPin, Wifi } from 'lucide-react';
+import { Calendar, Clock, Users, UserCheck, Search, Filter, Download, XCircle, ChevronLeft, BarChart, List, ChevronDown, Smartphone, Fingerprint, MapPin, AlertTriangle, UserX, Coffee, LogOut, Eye } from 'lucide-react';
 import './Attendance.css';
 
 // Custom QR code icon
@@ -34,7 +34,10 @@ const attendanceData = [
     duration: '1h 45m',
     date: '2025-01-15',
     status: 'Present',
-    avatar: 'AS'
+    avatar: 'AS',
+    isLate: false,
+    absenceReason: null,
+    profileImage: null
   },
   {
     id: 2,
@@ -45,7 +48,10 @@ const attendanceData = [
     duration: '1h 45m',
     date: '2025-01-15',
     status: 'Present',
-    avatar: 'PP'
+    avatar: 'PP',
+    isLate: false,
+    absenceReason: null,
+    profileImage: null
   },
   {
     id: 3,
@@ -56,7 +62,10 @@ const attendanceData = [
     duration: '-',
     date: '2025-01-15',
     status: 'Absent',
-    avatar: 'RK'
+    avatar: 'RK',
+    isLate: false,
+    absenceReason: 'Personal emergency',
+    profileImage: null
   },
   {
     id: 4,
@@ -67,7 +76,10 @@ const attendanceData = [
     duration: 'In Progress',
     date: '2025-01-15',
     status: 'Present',
-    avatar: 'SR'
+    avatar: 'SR',
+    isLate: false,
+    absenceReason: null,
+    profileImage: null
   },
   {
     id: 5,
@@ -78,7 +90,10 @@ const attendanceData = [
     duration: '1h 45m',
     date: '2025-01-15',
     status: 'Present',
-    avatar: 'AS'
+    avatar: 'AS',
+    isLate: true,
+    absenceReason: null,
+    profileImage: null
   },
   {
     id: 6,
@@ -89,7 +104,10 @@ const attendanceData = [
     duration: '-',
     date: '2025-01-15',
     status: 'On Leave',
-    avatar: 'NG'
+    avatar: 'NG',
+    isLate: false,
+    absenceReason: 'Medical appointment',
+    profileImage: null
   },
   {
     id: 7,
@@ -100,7 +118,10 @@ const attendanceData = [
     duration: '1h 15m',
     date: '2025-01-15',
     status: 'Present',
-    avatar: 'RV'
+    avatar: 'RV',
+    isLate: false,
+    absenceReason: null,
+    profileImage: null
   },
   {
     id: 8,
@@ -111,7 +132,10 @@ const attendanceData = [
     duration: '-',
     date: '2025-01-15',
     status: 'Absent',
-    avatar: 'DS'
+    avatar: 'DS',
+    isLate: false,
+    absenceReason: 'Travel',
+    profileImage: null
   },
   {
     id: 9,
@@ -122,7 +146,10 @@ const attendanceData = [
     duration: 'In Progress',
     date: '2025-01-15',
     status: 'Present',
-    avatar: 'VM'
+    avatar: 'VM',
+    isLate: false,
+    absenceReason: null,
+    profileImage: null
   },
   {
     id: 10,
@@ -133,7 +160,10 @@ const attendanceData = [
     duration: '-',
     date: '2025-01-15',
     status: 'On Leave',
-    avatar: 'KR'
+    avatar: 'KR',
+    isLate: false,
+    absenceReason: 'Vacation',
+    profileImage: null
   },
   {
     id: 11,
@@ -144,7 +174,10 @@ const attendanceData = [
     duration: '1h 45m',
     date: '2025-01-15',
     status: 'Present',
-    avatar: 'SC'
+    avatar: 'SC',
+    isLate: true,
+    absenceReason: null,
+    profileImage: null
   },
   {
     id: 12,
@@ -155,7 +188,10 @@ const attendanceData = [
     duration: '-',
     date: '2025-01-15',
     status: 'Absent',
-    avatar: 'AP'
+    avatar: 'AP',
+    isLate: false,
+    absenceReason: 'Illness',
+    profileImage: null
   }
 ];
 
@@ -328,13 +364,106 @@ const Attendance: React.FC = () => {
   const [dateRange, setDateRange] = useState('Today');
   const [showDatePicker, setShowDatePicker] = useState(false);
   
-  // New state variables for check-in enhancements
+  // New state variables for enhanced features
+  const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent' | 'leave'>('all');
+  const [showExportOptions, setShowExportOptions] = useState(false);
+  const [exportRange, setExportRange] = useState('today');
+  const [memberActions, setMemberActions] = useState<{[key: number]: 'present' | 'leave' | 'absent'}>({});
+  const [hoveredMember, setHoveredMember] = useState<number | null>(null);
+  
+  // Existing check-in enhancement states
   const [showCheckInOptions, setShowCheckInOptions] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [showBiometricModal, setShowBiometricModal] = useState(false);
   const [showMobileCheckInModal, setShowMobileCheckInModal] = useState(false);
   const [showGeofencingModal, setShowGeofencingModal] = useState(false);
-  const [qrCodeValue, setQrCodeValue] = useState('');
+
+  // Helper functions for enhanced features
+  const getFilteredAttendance = () => {
+    let filtered = attendanceData;
+    
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(member => {
+        if (statusFilter === 'present') return member.status === 'Present';
+        if (statusFilter === 'absent') return member.status === 'Absent';
+        if (statusFilter === 'leave') return member.status === 'On Leave';
+        return true;
+      });
+    }
+    
+    if (searchTerm) {
+      filtered = filtered.filter(member =>
+        member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.membershipId.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  };
+
+  const getStatusCounts = () => {
+    return {
+      present: attendanceData.filter(m => m.status === 'Present').length,
+      absent: attendanceData.filter(m => m.status === 'Absent').length,
+      leave: attendanceData.filter(m => m.status === 'On Leave').length,
+      late: attendanceData.filter(m => m.isLate).length
+    };
+  };
+
+  const getTotalGymHours = () => {
+    const totalMinutes = attendanceData
+      .filter(m => m.status === 'Present' && m.duration !== 'In Progress')
+      .reduce((total, member) => {
+        const duration = member.duration;
+        if (duration.includes('h')) {
+          const [hours, minutes] = duration.split('h ');
+          const h = parseInt(hours);
+          const m = minutes ? parseInt(minutes.replace('m', '')) : 0;
+          return total + (h * 60) + m;
+        }
+        return total;
+      }, 0);
+    
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours}h ${minutes}m`;
+  };
+
+  const handleCheckOutAll = () => {
+    const activeMembers = attendanceData.filter(m => m.checkOut === 'Active');
+    if (activeMembers.length > 0) {
+      // In a real app, this would update the backend
+      console.log('Checking out all active members:', activeMembers);
+      // Show success notification or update UI
+    }
+  };
+
+  const handleExport = () => {
+    const filtered = getFilteredAttendance();
+    const csvContent = [
+      ['Name', 'Membership ID', 'Check In', 'Check Out', 'Duration', 'Status', 'Absence Reason'].join(','),
+      ...filtered.map(member => [
+        member.name,
+        member.membershipId,
+        member.checkIn,
+        member.checkOut,
+        member.duration,
+        member.status,
+        member.absenceReason || ''
+      ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance-${exportRange}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const statusCounts = getStatusCounts();
+  const filteredAttendance = getFilteredAttendance();
   const [scanningQR, setScanningQR] = useState(false);
   const [biometricStatus, setBiometricStatus] = useState<'waiting' | 'scanning' | 'success' | 'failed'>('waiting');
   const [biometricMethod, setBiometricMethod] = useState<'fingerprint' | 'face'>('fingerprint');
@@ -365,6 +494,10 @@ const Attendance: React.FC = () => {
     avatar: string;
     membershipId?: string;
     role?: string;
+    isLate?: boolean;
+    absenceReason?: string | null;
+    profileImage?: string | null;
+    date?: string;
   };
   
   // Get filtered data based on active tab, search term, and sort criteria
@@ -374,10 +507,7 @@ const Attendance: React.FC = () => {
     // Select the appropriate data source based on active tab
     switch (activeTab) {
       case 'members':
-        dataSource = attendanceData.filter(record =>
-          record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          record.membershipId.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        dataSource = filteredAttendance;
         break;
       case 'trainers':
         dataSource = trainerAttendance.filter(record =>
@@ -587,10 +717,23 @@ const Attendance: React.FC = () => {
             )}
           </div>
           
-          <button className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2">
-            <Download className="h-5 w-5" />
-            <span>Export Report</span>
-          </button>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={handleCheckOutAll}
+              className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Check Out All
+            </button>
+            
+            <button
+              onClick={() => setShowExportOptions(!showExportOptions)}
+              className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+            >
+              <Download className="h-5 w-5" />
+              <span>Export Report</span>
+            </button>
+          </div>
         </div>
         
         {/* Date Range Selector */}
@@ -677,60 +820,72 @@ const Attendance: React.FC = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <div 
-          className={`bg-[#2A3037] rounded-xl shadow-sm border ${sortBy === 'present' ? 'border-green-500' : 'border-gray-700'} p-6 cursor-pointer hover:bg-[#353c44] transition-colors duration-200`}
+          className={`bg-green-600 rounded-xl shadow-sm border ${sortBy === 'present' ? 'border-green-400' : 'border-green-500'} p-6 cursor-pointer hover:bg-green-700 transition-colors duration-200 text-white`}
           onClick={() => setSortBy(sortBy === 'present' ? 'all' : 'present')}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">{activeTab === 'members' ? 'Members Present' : activeTab === 'trainers' ? 'Trainers Present' : 'Staff Present'}</p>
-              <p className="text-2xl font-bold text-green-400">{stats.present}</p>
+              <p className="text-green-100 text-sm">{activeTab === 'members' ? 'Members Present' : activeTab === 'trainers' ? 'Trainers Present' : 'Staff Present'}</p>
+              <p className="text-2xl font-bold text-white">{statusCounts.present}</p>
             </div>
-            <CheckCircle className={`h-8 w-8 ${sortBy === 'present' ? 'text-green-500' : 'text-green-400'}`} />
+            <UserCheck className={`h-8 w-8 ${sortBy === 'present' ? 'text-green-200' : 'text-green-100'}`} />
           </div>
           {sortBy === 'present' && (
-            <div className="mt-2 text-xs text-green-400">
+            <div className="mt-2 text-xs text-green-100">
               Showing present members only
             </div>
           )}
         </div>
 
         <div 
-          className={`bg-[#2A3037] rounded-xl shadow-sm border ${sortBy === 'absent' ? 'border-red-500' : 'border-gray-700'} p-6 cursor-pointer hover:bg-[#353c44] transition-colors duration-200`}
+          className={`bg-red-600 rounded-xl shadow-sm border ${sortBy === 'absent' ? 'border-red-400' : 'border-red-500'} p-6 cursor-pointer hover:bg-red-700 transition-colors duration-200 text-white`}
           onClick={() => setSortBy(sortBy === 'absent' ? 'all' : 'absent')}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">{activeTab === 'members' ? 'Members Absent' : activeTab === 'trainers' ? 'Trainers Absent' : 'Staff Absent'}</p>
-              <p className="text-2xl font-bold text-red-400">{stats.absent}</p>
+              <p className="text-red-100 text-sm">{activeTab === 'members' ? 'Members Absent' : activeTab === 'trainers' ? 'Trainers Absent' : 'Staff Absent'}</p>
+              <p className="text-2xl font-bold text-white">{statusCounts.absent}</p>
             </div>
-            <XCircle className={`h-8 w-8 ${sortBy === 'absent' ? 'text-red-500' : 'text-red-400'}`} />
+            <UserX className={`h-8 w-8 ${sortBy === 'absent' ? 'text-red-200' : 'text-red-100'}`} />
           </div>
           {sortBy === 'absent' && (
-            <div className="mt-2 text-xs text-red-400">
+            <div className="mt-2 text-xs text-red-100">
               Showing absent members only
             </div>
           )}
         </div>
         
         <div 
-          className={`bg-[#2A3037] rounded-xl shadow-sm border ${sortBy === 'onLeave' ? 'border-yellow-500' : 'border-gray-700'} p-6 cursor-pointer hover:bg-[#353c44] transition-colors duration-200`}
+          className={`bg-yellow-600 rounded-xl shadow-sm border ${sortBy === 'onLeave' ? 'border-yellow-400' : 'border-yellow-500'} p-6 cursor-pointer hover:bg-yellow-700 transition-colors duration-200 text-white`}
           onClick={() => setSortBy(sortBy === 'onLeave' ? 'all' : 'onLeave')}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">{activeTab === 'members' ? 'Members on Leave' : activeTab === 'trainers' ? 'Trainers on Leave' : 'Staff on Leave'}</p>
-              <p className="text-2xl font-bold text-yellow-400">{stats.onLeave}</p>
+              <p className="text-yellow-100 text-sm">{activeTab === 'members' ? 'Members on Leave' : activeTab === 'trainers' ? 'Trainers on Leave' : 'Staff on Leave'}</p>
+              <p className="text-2xl font-bold text-white">{statusCounts.leave}</p>
             </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`h-8 w-8 ${sortBy === 'onLeave' ? 'text-yellow-500' : 'text-yellow-400'}`}>
-              <path d="M9 14V7h4l-2 3h3l-6 7.5"></path>
-              <circle cx="9" cy="9" r="7"></circle>
-            </svg>
+            <Coffee className={`h-8 w-8 ${sortBy === 'onLeave' ? 'text-yellow-200' : 'text-yellow-100'}`} />
           </div>
           {sortBy === 'onLeave' && (
-            <div className="mt-2 text-xs text-yellow-400">
+            <div className="mt-2 text-xs text-yellow-100">
               Showing on-leave members only
             </div>
           )}
+        </div>
+
+        <div 
+          className={`bg-orange-600 rounded-xl shadow-sm border border-orange-500 p-6 text-white`}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-orange-100 text-sm">Late Check-ins</p>
+              <p className="text-2xl font-bold text-white">{statusCounts.late}</p>
+            </div>
+            <AlertTriangle className="h-8 w-8 text-orange-100" />
+          </div>
+          <div className="mt-2 text-xs text-orange-100">
+            Total gym hours: {getTotalGymHours()}
+          </div>
         </div>
 
         <div 
@@ -762,6 +917,96 @@ const Attendance: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Enhanced Filtering and Search Controls */}
+      <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 space-x-0 md:space-x-4">
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search members, IDs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-64 pl-10 pr-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'present' | 'absent' | 'leave')}
+              className="px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="all">All Status</option>
+              <option value="present">Present Only</option>
+              <option value="absent">Absent Only</option>
+              <option value="leave">On Leave Only</option>
+            </select>
+
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setStatusFilter('all');
+              }}
+              className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Clear
+            </button>
+          </div>
+
+          <div className="flex items-center space-x-3 text-sm text-gray-300">
+            <span>Showing {filteredAttendance.length} of {attendanceData.length} members</span>
+          </div>
+        </div>
+
+        {/* Export Options Dropdown */}
+        {showExportOptions && (
+          <div className="mt-4 p-4 bg-gray-700 rounded-lg border border-gray-600">
+            <h3 className="text-white font-semibold mb-3 flex items-center">
+              <Download className="w-4 h-4 mr-2" />
+              Export Options
+            </h3>
+            <div className="flex items-center space-x-4">
+              <select
+                value={exportRange}
+                onChange={(e) => setExportRange(e.target.value)}
+                className="px-3 py-2 bg-gray-600 text-white rounded border border-gray-500 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="today">Today Only</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="custom">Custom Range</option>
+              </select>
+              
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="includeTrainers"
+                  className="rounded"
+                />
+                <label htmlFor="includeTrainers" className="text-white text-sm">Include Trainers/Staff</label>
+              </div>
+              
+              <button
+                onClick={handleExport}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download CSV
+              </button>
+              
+              <button
+                onClick={() => setShowExportOptions(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* View Mode & Search */}
@@ -985,11 +1230,35 @@ const Attendance: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-700">
                 {filteredData.map((record) => (
-                  <tr key={record.id} className="hover:bg-[#353c44] transition-colors duration-200">
+                  <tr 
+                    key={record.id} 
+                    className="hover:bg-[#353c44] transition-colors duration-200"
+                    onMouseEnter={() => setHoveredMember(record.id)}
+                    onMouseLeave={() => setHoveredMember(null)}
+                  >
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-[#7BC843] rounded-full flex items-center justify-center">
-                          <span className="text-black font-medium text-sm">{record.avatar}</span>
+                        {/* Profile Image/Avatar with late indicator */}
+                        <div className="relative">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            record.profileImage ? 'bg-gray-500' : 'bg-[#7BC843]'
+                          }`}>
+                            {record.profileImage ? (
+                              <img 
+                                src={record.profileImage} 
+                                alt={record.name}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-black font-medium text-sm">{record.avatar}</span>
+                            )}
+                          </div>
+                          {/* Late check-in indicator */}
+                          {record.isLate && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                              <AlertTriangle className="w-3 h-3 text-white" />
+                            </div>
+                          )}
                         </div>
                         <div>
                           <button 
@@ -1000,8 +1269,16 @@ const Attendance: React.FC = () => {
                             }}
                           >
                             {record.name}
-                            <History className="h-4 w-4 ml-2 opacity-70" />
+                            <Eye className="h-4 w-4 ml-2 opacity-70" />
                           </button>
+                          {/* Absence/Leave reason tooltip */}
+                          {record.absenceReason && (
+                            <div className="text-xs text-gray-400 mt-1 flex items-center">
+                              <span className="truncate max-w-32" title={record.absenceReason}>
+                                {record.absenceReason}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -1015,13 +1292,19 @@ const Attendance: React.FC = () => {
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
                         <Clock className="h-4 w-4 text-gray-400" />
-                        <span className="text-white">{record.checkIn}</span>
+                        <span className={`${record.isLate ? 'text-orange-400' : 'text-white'}`}>
+                          {record.checkIn}
+                          {record.isLate && <span className="text-xs ml-1">(Late)</span>}
+                        </span>
                       </div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
                         <Clock className="h-4 w-4 text-gray-400" />
                         <span className="text-white">{record.checkOut}</span>
+                        {record.checkOut === 'Active' && (
+                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        )}
                       </div>
                     </td>
                     <td className="py-4 px-6">
@@ -1030,21 +1313,58 @@ const Attendance: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-4 px-6">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(record.status)}`}>
-                        {record.status}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(record.status)}`}>
+                          {record.status}
+                        </span>
+                        {/* Status indicator icons */}
+                        {record.status === 'Present' && <UserCheck className="w-4 h-4 text-green-400" />}
+                        {record.status === 'Absent' && <UserX className="w-4 h-4 text-red-400" />}
+                        {record.status === 'On Leave' && <Coffee className="w-4 h-4 text-yellow-400" />}
+                      </div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
-                        {record.status === 'Absent' && (
-                          <button className="text-blue-400 hover:text-blue-300 text-sm font-medium">
-                            Mark Present
-                          </button>
-                        )}
-                        {record.checkOut === 'Active' && (
-                          <button className="text-red-400 hover:text-red-300 text-sm font-medium">
-                            Check Out
-                          </button>
+                        {/* Enhanced action buttons with dropdown on hover */}
+                        {hoveredMember === record.id ? (
+                          <div className="flex items-center space-x-1">
+                            {record.status === 'Absent' && (
+                              <button 
+                                className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                                onClick={() => setMemberActions({...memberActions, [record.id]: 'present'})}
+                              >
+                                Mark Present
+                              </button>
+                            )}
+                            {record.checkOut === 'Active' && (
+                              <button 
+                                className="px-2 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors"
+                                onClick={() => setMemberActions({...memberActions, [record.id]: 'absent'})}
+                              >
+                                Check Out
+                              </button>
+                            )}
+                            <button 
+                              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                              onClick={() => {
+                                setSelectedMember(record);
+                                setViewMode('member');
+                              }}
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2 text-gray-400">
+                            <button className="hover:text-white transition-colors">
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            {record.checkOut === 'Active' && (
+                              <button className="hover:text-orange-400 transition-colors">
+                                <LogOut className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
                         )}
                       </div>
                     </td>
@@ -1554,7 +1874,8 @@ const Attendance: React.FC = () => {
                     onClick={() => {
                       // Generate a new QR code in a real implementation
                       const newQRValue = `FF${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
-                      setQrCodeValue(newQRValue);
+                      // In a real app, this would update the QR code display
+                      console.log('New QR Code:', newQRValue);
                     }}
                     className="px-6 py-3 bg-[#23292F] hover:bg-[#1A1F24] text-white rounded-lg transition-colors duration-200 font-medium border border-gray-700 flex items-center justify-center space-x-2"
                   >

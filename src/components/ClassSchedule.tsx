@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { Calendar, Clock, Users, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Filter, Search, List, Copy, Dumbbell, Heart, Zap, Target, Activity } from 'lucide-react';
 
 const classes = [
   // Today's classes
@@ -11,9 +11,16 @@ const classes = [
     duration: 60,
     capacity: 20,
     booked: 15,
-    date: '2025-08-08', // Today
+    date: '2025-08-10', // Today
     type: 'Yoga',
-    room: 'Studio A'
+    room: 'Studio A',
+    members: [
+      { id: 1, name: 'Sarah Johnson', avatar: 'SJ' },
+      { id: 2, name: 'Mike Chen', avatar: 'MC' },
+      { id: 3, name: 'Emma Davis', avatar: 'ED' },
+      { id: 4, name: 'Alex Kumar', avatar: 'AK' },
+      { id: 5, name: 'Lisa Zhang', avatar: 'LZ' }
+    ]
   },
   {
     id: 2,
@@ -23,9 +30,14 @@ const classes = [
     duration: 45,
     capacity: 15,
     booked: 12,
-    date: '2025-08-08', // Today
+    date: '2025-08-10', // Today
     type: 'HIIT',
-    room: 'Gym Floor'
+    room: 'Gym Floor',
+    members: [
+      { id: 6, name: 'John Smith', avatar: 'JS' },
+      { id: 7, name: 'Maria Garcia', avatar: 'MG' },
+      { id: 8, name: 'David Lee', avatar: 'DL' }
+    ]
   },
   {
     id: 3,
@@ -35,9 +47,13 @@ const classes = [
     duration: 75,
     capacity: 12,
     booked: 8,
-    date: '2025-08-08', // Today
+    date: '2025-08-10', // Today
     type: 'Strength',
-    room: 'Weight Room'
+    room: 'Weight Room',
+    members: [
+      { id: 9, name: 'Tom Wilson', avatar: 'TW' },
+      { id: 10, name: 'Amy Rodriguez', avatar: 'AR' }
+    ]
   },
   {
     id: 4,
@@ -46,10 +62,16 @@ const classes = [
     time: '06:00 PM',
     duration: 50,
     capacity: 25,
-    booked: 22,
-    date: '2025-08-08', // Today
+    booked: 24,
+    date: '2025-08-10', // Today
     type: 'Dance',
-    room: 'Studio B'
+    room: 'Studio B',
+    members: [
+      { id: 11, name: 'Grace Kim', avatar: 'GK' },
+      { id: 12, name: 'Carlos Rivera', avatar: 'CR' },
+      { id: 13, name: 'Nina Patel', avatar: 'NP' },
+      { id: 14, name: 'Jake Brown', avatar: 'JB' }
+    ]
   },
   {
     id: 5,
@@ -59,9 +81,13 @@ const classes = [
     duration: 60,
     capacity: 20,
     booked: 18,
-    date: '2025-08-08', // Today
+    date: '2025-08-10', // Today
     type: 'Yoga',
-    room: 'Studio A'
+    room: 'Studio A',
+    members: [
+      { id: 15, name: 'Olivia Turner', avatar: 'OT' },
+      { id: 16, name: 'Ryan Murphy', avatar: 'RM' }
+    ]
   },
   
   // Tomorrow's classes
@@ -73,9 +99,10 @@ const classes = [
     duration: 60,
     capacity: 18,
     booked: 12,
-    date: '2025-08-09', // Tomorrow
+    date: '2025-08-11', // Tomorrow
     type: 'Cardio',
-    room: 'Gym Floor'
+    room: 'Gym Floor',
+    members: []
   },
   {
     id: 7,
@@ -85,9 +112,10 @@ const classes = [
     duration: 60,
     capacity: 15,
     booked: 13,
-    date: '2025-08-09', // Tomorrow
+    date: '2025-08-11', // Tomorrow
     type: 'Yoga',
-    room: 'Studio A'
+    room: 'Studio A',
+    members: []
   },
   {
     id: 8,
@@ -97,9 +125,10 @@ const classes = [
     duration: 45,
     capacity: 12,
     booked: 10,
-    date: '2025-08-09', // Tomorrow
+    date: '2025-08-11', // Tomorrow
     type: 'Martial Arts',
-    room: 'Studio B'
+    room: 'Studio B',
+    members: []
   },
   
   // Day after tomorrow
@@ -111,9 +140,10 @@ const classes = [
     duration: 60,
     capacity: 15,
     booked: 8,
-    date: '2025-08-10', // Day after tomorrow
+    date: '2025-08-12', // Day after tomorrow
     type: 'Pilates',
-    room: 'Studio A'
+    room: 'Studio A',
+    members: []
   },
   {
     id: 10,
@@ -123,9 +153,10 @@ const classes = [
     duration: 60,
     capacity: 12,
     booked: 12,
-    date: '2025-08-10', // Day after tomorrow
+    date: '2025-08-12', // Day after tomorrow
     type: 'CrossFit',
-    room: 'Gym Floor'
+    room: 'Gym Floor',
+    members: []
   },
   
   // Next week's classes
@@ -137,9 +168,10 @@ const classes = [
     duration: 45,
     capacity: 20,
     booked: 15,
-    date: '2025-08-11', // Next week Monday
+    date: '2025-08-13', // Next week Monday
     type: 'Cardio',
-    room: 'Spinning Room'
+    room: 'Spinning Room',
+    members: []
   },
   {
     id: 12,
@@ -149,9 +181,10 @@ const classes = [
     duration: 75,
     capacity: 10,
     booked: 7,
-    date: '2025-08-12', // Next week Tuesday
+    date: '2025-08-14', // Next week Tuesday
     type: 'Yoga',
-    room: 'Studio A'
+    room: 'Studio A',
+    members: []
   }
 ];
 
@@ -162,7 +195,7 @@ const timeSlots = [
 ];
 
 const ClassSchedule: React.FC = () => {
-  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
+  const [viewMode, setViewMode] = useState<'calendar' | 'list' | 'day' | 'month'>('calendar');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -173,6 +206,8 @@ const ClassSchedule: React.FC = () => {
   const [hoveredClass, setHoveredClass] = useState<any>(null);
   const [showClassDetails, setShowClassDetails] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<{ time: string; date: string } | null>(null);
 
   // Track mouse position for tooltip
   useEffect(() => {
@@ -189,19 +224,60 @@ const ClassSchedule: React.FC = () => {
 
   const getClassTypeColor = (type: string) => {
     switch (type) {
-      case 'Yoga': return 'bg-purple-100 text-purple-800';
-      case 'HIIT': return 'bg-red-100 text-red-800';
-      case 'Strength': return 'bg-blue-100 text-blue-800';
-      case 'Dance': return 'bg-pink-100 text-pink-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Yoga': return 'bg-purple-600 text-white border-purple-500';
+      case 'HIIT': return 'bg-red-600 text-white border-red-500';
+      case 'Strength': return 'bg-blue-600 text-white border-blue-500';
+      case 'Dance': return 'bg-pink-600 text-white border-pink-500';
+      case 'Cardio': return 'bg-orange-600 text-white border-orange-500';
+      case 'Martial Arts': return 'bg-yellow-600 text-white border-yellow-500';
+      case 'Pilates': return 'bg-green-600 text-white border-green-500';
+      case 'CrossFit': return 'bg-indigo-600 text-white border-indigo-500';
+      default: return 'bg-gray-600 text-white border-gray-500';
+    }
+  };
+
+  const getClassTypeIcon = (type: string) => {
+    switch (type) {
+      case 'Yoga': return <Heart className="h-4 w-4" />;
+      case 'HIIT': return <Zap className="h-4 w-4" />;
+      case 'Strength': return <Dumbbell className="h-4 w-4" />;
+      case 'Dance': return <Activity className="h-4 w-4" />;
+      case 'Cardio': return <Target className="h-4 w-4" />;
+      case 'Martial Arts': return <Target className="h-4 w-4" />;
+      case 'Pilates': return <Heart className="h-4 w-4" />;
+      case 'CrossFit': return <Dumbbell className="h-4 w-4" />;
+      default: return <Activity className="h-4 w-4" />;
     }
   };
 
   const getCapacityColor = (booked: number, capacity: number) => {
     const percentage = (booked / capacity) * 100;
-    if (percentage >= 90) return 'text-red-600';
-    if (percentage >= 70) return 'text-yellow-600';
-    return 'text-green-600';
+    if (percentage >= 95) return 'text-red-500 font-semibold'; // Full/Almost full
+    if (percentage >= 80) return 'text-orange-500 font-medium'; // Almost full
+    if (percentage >= 60) return 'text-yellow-500 font-medium'; // Getting full
+    return 'text-green-500 font-medium'; // Open slots
+  };
+
+  const getCapacityStatus = (booked: number, capacity: number) => {
+    const percentage = (booked / capacity) * 100;
+    if (percentage >= 95) return { status: 'full', color: 'bg-red-500', text: 'Full' };
+    if (percentage >= 80) return { status: 'almost-full', color: 'bg-orange-500', text: 'Almost Full' };
+    if (percentage >= 60) return { status: 'filling', color: 'bg-yellow-500', text: 'Filling Up' };
+    return { status: 'open', color: 'bg-green-500', text: 'Open' };
+  };
+
+  const getClassCardColor = (type: string) => {
+    switch (type) {
+      case 'Yoga': return 'bg-gradient-to-r from-purple-900/20 to-purple-800/10 border-l-purple-500';
+      case 'HIIT': return 'bg-gradient-to-r from-red-900/20 to-red-800/10 border-l-red-500';
+      case 'Strength': return 'bg-gradient-to-r from-blue-900/20 to-blue-800/10 border-l-blue-500';
+      case 'Dance': return 'bg-gradient-to-r from-pink-900/20 to-pink-800/10 border-l-pink-500';
+      case 'Cardio': return 'bg-gradient-to-r from-orange-900/20 to-orange-800/10 border-l-orange-500';
+      case 'Martial Arts': return 'bg-gradient-to-r from-yellow-900/20 to-yellow-800/10 border-l-yellow-500';
+      case 'Pilates': return 'bg-gradient-to-r from-green-900/20 to-green-800/10 border-l-green-500';
+      case 'CrossFit': return 'bg-gradient-to-r from-indigo-900/20 to-indigo-800/10 border-l-indigo-500';
+      default: return 'bg-gradient-to-r from-gray-800/20 to-gray-700/10 border-l-gray-500';
+    }
   };
 
   const getFilteredClasses = () => {
@@ -209,13 +285,20 @@ const ClassSchedule: React.FC = () => {
       const matchesType = filterType === 'All Types' || cls.type === filterType;
       const matchesTrainer = filterTrainer === 'All Trainers' || cls.trainer === filterTrainer;
       
+      // Search functionality
+      const matchesSearch = searchTerm === '' || 
+        cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        cls.trainer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        cls.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        cls.room.toLowerCase().includes(searchTerm.toLowerCase());
+      
       // Date filtering
       let matchesDate = true;
       if (filterDate) {
         matchesDate = cls.date === filterDate;
       }
       
-      return matchesType && matchesTrainer && matchesDate;
+      return matchesType && matchesTrainer && matchesDate && matchesSearch;
     });
   };
 
@@ -241,43 +324,171 @@ const ClassSchedule: React.FC = () => {
     return week;
   };
 
+  const convertTo24Hour = (time12h: string) => {
+    const [time, modifier] = time12h.split(' ');
+    let [hours, minutes] = time.split(':');
+    if (hours === '12') {
+      hours = '00';
+    }
+    if (modifier === 'PM') {
+      hours = (parseInt(hours, 10) + 12).toString();
+    }
+    return `${hours}:${minutes}`;
+  };
+
   return (
     <div className="space-y-6 bg-[#2A3037] p-6 rounded-lg min-h-screen">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div>
-            <h1 className="text-white">Manage and schedule gym classes</h1>
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="flex bg-[#3a4148] rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('calendar')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                viewMode === 'calendar' 
-                  ? 'bg-[#165D31] text-white shadow-sm' 
-                  : 'text-gray-300 hover:text-white'
-              }`}
+      <div className="flex flex-col space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+          <div>
+            <p className="text-gray-100 mt-1">Manage and schedule gym classes</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            {/* View Mode Selector */}
+            <div className="flex bg-[#3a4148] rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('day')}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  viewMode === 'day' 
+                    ? 'bg-[#7BC843] text-black shadow-sm' 
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Day
+              </button>
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  viewMode === 'calendar' 
+                    ? 'bg-[#7BC843] text-black shadow-sm' 
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Week
+              </button>
+              <button
+                onClick={() => setViewMode('month')}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  viewMode === 'month' 
+                    ? 'bg-[#7BC843] text-black shadow-sm' 
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Month
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  viewMode === 'list' 
+                    ? 'bg-[#7BC843] text-black shadow-sm' 
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                <List className="h-4 w-4" />
+              </button>
+            </div>
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2 shadow-md"
             >
-              Calendar
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                viewMode === 'list' 
-                  ? 'bg-[#165D31] text-white shadow-sm' 
-                  : 'text-gray-300 hover:text-white'
-              }`}
-            >
-              List
+              <Plus className="h-5 w-5" />
+              <span>Add Class</span>
             </button>
           </div>
-          <button 
-            onClick={() => setShowCreateModal(true)}
-            className="bg-[#165D31] hover:bg-[#073418] text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Add Class</span>
-          </button>
+        </div>
+
+        {/* Enhanced Search and Filter Bar */}
+        <div className="bg-[#3a4148] rounded-xl shadow-sm border border-gray-700 p-6">
+          <div className="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-4">
+            {/* Search Bar */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search classes, trainers, or rooms..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-[#2A3037] border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] placeholder-gray-400"
+              />
+            </div>
+            
+            {/* Filter Controls */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative">
+                <select 
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="min-w-[140px] px-4 py-3 bg-[#2A3037] border border-gray-700 text-white rounded-lg 
+                             focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none pr-10
+                             hover:bg-[#3a4148] hover:border-[#7BC843] transition-all duration-200"
+                >
+                  <option>All Types</option>
+                  <option>Yoga</option>
+                  <option>HIIT</option>
+                  <option>Strength</option>
+                  <option>Dance</option>
+                  <option>Cardio</option>
+                  <option>Martial Arts</option>
+                  <option>Pilates</option>
+                  <option>CrossFit</option>
+                </select>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              
+              <div className="relative">
+                <select 
+                  value={filterTrainer}
+                  onChange={(e) => setFilterTrainer(e.target.value)}
+                  className="min-w-[140px] px-4 py-3 bg-[#2A3037] border border-gray-700 text-white rounded-lg 
+                             focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none pr-10
+                             hover:bg-[#3a4148] hover:border-[#7BC843] transition-all duration-200"
+                >
+                  <option>All Trainers</option>
+                  <option>Sneha Reddy</option>
+                  <option>Raj Singh</option>
+                  <option>Vikash Kumar</option>
+                  <option>Priya Sharma</option>
+                </select>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              
+              <button
+                onClick={() => {
+                  setFilterType('All Types');
+                  setFilterTrainer('All Trainers');
+                  setFilterDate('');
+                  setSearchTerm('');
+                }}
+                className="px-4 py-3 bg-[#2A3037] border border-gray-700 text-white rounded-lg hover:bg-[#3a4148] hover:border-[#7BC843] transition-all duration-200"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+          
+          {/* Category Legend */}
+          <div className="mt-4 pt-4 border-t border-gray-700">
+            <div className="flex items-center space-x-1 text-sm text-gray-300 mb-2">
+              <span>Category Legend:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {['Yoga', 'HIIT', 'Strength', 'Dance', 'Cardio', 'Martial Arts', 'Pilates', 'CrossFit'].map((type) => (
+                <div key={type} className="flex items-center space-x-1">
+                  <div className={`w-3 h-3 rounded-full ${getClassTypeColor(type).split(' ')[0]}`}></div>
+                  <span className="text-xs text-gray-300">{type}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -388,7 +599,7 @@ const ClassSchedule: React.FC = () => {
       )}
 
       {viewMode === 'calendar' ? (
-        /* Calendar View */
+        /* Enhanced Calendar View */
         <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 overflow-hidden">
           <div className="grid grid-cols-8 border-b border-gray-700">
             <div className="p-4 font-semibold text-white border-r border-gray-700">Time</div>
@@ -405,7 +616,7 @@ const ClassSchedule: React.FC = () => {
                 {timeSlot}
               </div>
               {getWeekDays().map((day, dayIndex) => {
-                const dayClasses = classes.filter(cls => {
+                const dayClasses = getFilteredClasses().filter(cls => {
                   const classDate = new Date(cls.date);
                   return cls.time === timeSlot && 
                          classDate.getFullYear() === day.getFullYear() &&
@@ -414,33 +625,398 @@ const ClassSchedule: React.FC = () => {
                 });
                 
                 return (
-                  <div key={dayIndex} className="p-2 min-h-[80px] border-r border-gray-700 last:border-r-0 relative bg-[#2A3037]">
-                    {dayClasses.map((cls) => (
-                      <div
-                        key={cls.id}
-                        className="bg-[#3a4148] border-l-4 border-[#165D31] rounded-lg p-2 mb-1 text-xs hover:shadow-lg transition-all duration-200 cursor-pointer hover:bg-[#434c57]"
-                        onMouseEnter={() => setHoveredClass(cls)}
-                        onMouseLeave={() => setHoveredClass(null)}
-                        onClick={() => {
-                          setSelectedClass(cls);
-                          setShowClassDetails(true);
-                        }}
-                      >
-                        <div className="font-medium text-white">{cls.name}</div>
-                        <div className="text-gray-300">{cls.trainer}</div>
-                        <div className="flex items-center mt-1">
-                          <Users className="h-3 w-3 mr-1 text-gray-300" />
-                          <span className={getCapacityColor(cls.booked, cls.capacity)}>
-                            {cls.booked}/{cls.capacity}
-                          </span>
-                        </div>
+                  <div 
+                    key={dayIndex} 
+                    className="p-2 min-h-[100px] border-r border-gray-700 last:border-r-0 relative bg-[#2A3037] hover:bg-[#3a4148] transition-colors duration-200"
+                    onClick={() => {
+                      if (dayClasses.length === 0) {
+                        const dateStr = day.toISOString().split('T')[0];
+                        setSelectedTimeSlot({ time: timeSlot, date: dateStr });
+                        setShowCreateModal(true);
+                      }
+                    }}
+                  >
+                    {dayClasses.length === 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-500 hover:text-gray-300 cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-200">
+                        <Plus className="h-6 w-6" />
                       </div>
-                    ))}
+                    )}
+                    {dayClasses.map((cls) => {
+                      const capacityStatus = getCapacityStatus(cls.booked, cls.capacity);
+                      return (
+                        <div
+                          key={cls.id}
+                          className={`${getClassCardColor(cls.type)} border-l-4 rounded-lg p-3 mb-1 text-xs 
+                                     hover:shadow-lg hover:scale-105 transition-all duration-200 cursor-pointer 
+                                     group relative overflow-hidden`}
+                          onMouseEnter={() => setHoveredClass(cls)}
+                          onMouseLeave={() => setHoveredClass(null)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedClass(cls);
+                            setShowClassDetails(true);
+                          }}
+                        >
+                          {/* Class Type Icon */}
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-1">
+                              {getClassTypeIcon(cls.type)}
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getClassTypeColor(cls.type)}`}>
+                                {cls.type}
+                              </span>
+                            </div>
+                            <div className={`w-2 h-2 rounded-full ${capacityStatus.color}`} title={capacityStatus.text}></div>
+                          </div>
+
+                          <div className="font-medium text-white text-sm mb-1">{cls.name}</div>
+                          <div className="text-gray-300 text-xs mb-2">{cls.trainer}</div>
+                          
+                          {/* Duration Badge */}
+                          <div className="flex items-center justify-between text-xs mb-2">
+                            <div className="flex items-center text-gray-400">
+                              <Clock className="h-3 w-3 mr-1" />
+                              <span>{cls.duration}min</span>
+                            </div>
+                            <div className="flex items-center">
+                              <Users className="h-3 w-3 mr-1 text-gray-300" />
+                              <span className={getCapacityColor(cls.booked, cls.capacity)}>
+                                {cls.booked}/{cls.capacity}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Member Avatars Preview */}
+                          {cls.members && cls.members.length > 0 && (
+                            <div className="flex items-center space-x-1 mt-2">
+                              <div className="flex -space-x-1">
+                                {cls.members.slice(0, 3).map((member) => (
+                                  <div
+                                    key={member.id}
+                                    className="w-5 h-5 rounded-full bg-[#7BC843] text-black text-xs flex items-center justify-center border border-gray-700"
+                                    title={member.name}
+                                  >
+                                    {member.avatar}
+                                  </div>
+                                ))}
+                                {cls.members.length > 3 && (
+                                  <div className="w-5 h-5 rounded-full bg-gray-600 text-white text-xs flex items-center justify-center border border-gray-700">
+                                    +{cls.members.length - 3}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Hover Actions */}
+                          <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-1">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedClass(cls);
+                                setShowEditModal(true);
+                              }}
+                              className="p-1 bg-[#3a4148] hover:bg-[#4a5158] rounded text-white transition-colors duration-200"
+                              title="Edit Class"
+                            >
+                              <Edit className="h-3 w-3" />
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Duplicate class logic
+                                alert(`Duplicating ${cls.name}...`);
+                              }}
+                              className="p-1 bg-[#3a4148] hover:bg-[#4a5158] rounded text-white transition-colors duration-200"
+                              title="Duplicate Class"
+                            >
+                              <Copy className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })}
             </div>
           ))}
+        </div>
+      ) : viewMode === 'day' ? (
+        /* Day View */
+        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => {
+                  const newDate = new Date(selectedDate);
+                  newDate.setDate(selectedDate.getDate() - 1);
+                  setSelectedDate(newDate);
+                }}
+                className="p-2 hover:bg-[#3a4148] rounded-lg transition-colors duration-200"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-300" />
+              </button>
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-white">
+                  {formatDate(selectedDate)}
+                </h3>
+                <p className="text-gray-300 text-sm mt-1">
+                  {getFilteredClasses().filter(cls => cls.date === selectedDate.toISOString().split('T')[0]).length} classes scheduled
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  const newDate = new Date(selectedDate);
+                  newDate.setDate(selectedDate.getDate() + 1);
+                  setSelectedDate(newDate);
+                }}
+                className="p-2 hover:bg-[#3a4148] rounded-lg transition-colors duration-200"
+              >
+                <ChevronRight className="h-5 w-5 text-gray-300" />
+              </button>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              {getFilteredClasses()
+                .filter(cls => cls.date === selectedDate.toISOString().split('T')[0])
+                .sort((a, b) => a.time.localeCompare(b.time))
+                .map((cls) => {
+                  const capacityStatus = getCapacityStatus(cls.booked, cls.capacity);
+                  return (
+                    <div
+                      key={cls.id}
+                      className={`${getClassCardColor(cls.type)} border-l-4 rounded-xl p-4 hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer group`}
+                      onClick={() => {
+                        setSelectedClass(cls);
+                        setShowClassDetails(true);
+                      }}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-3">
+                            <div className="flex items-center space-x-2">
+                              {getClassTypeIcon(cls.type)}
+                              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getClassTypeColor(cls.type)}`}>
+                                {cls.type}
+                              </span>
+                            </div>
+                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${capacityStatus.color} text-white`}>
+                              {capacityStatus.text}
+                            </div>
+                          </div>
+                          
+                          <h3 className="text-xl font-semibold text-white mb-2">{cls.name}</h3>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div className="flex items-center text-gray-300">
+                              <Clock className="h-4 w-4 mr-2" />
+                              <span>{cls.time} ({cls.duration}min)</span>
+                            </div>
+                            <div className="flex items-center text-gray-300">
+                              <Users className="h-4 w-4 mr-2" />
+                              <span className={getCapacityColor(cls.booked, cls.capacity)}>
+                                {cls.booked}/{cls.capacity} spots
+                              </span>
+                            </div>
+                            <div className="flex items-center text-gray-300">
+                              <span className="w-4 h-4 mr-2 flex items-center justify-center">👤</span>
+                              <span>{cls.trainer}</span>
+                            </div>
+                            <div className="flex items-center text-gray-300">
+                              <span className="w-4 h-4 mr-2 flex items-center justify-center">🏠</span>
+                              <span>{cls.room}</span>
+                            </div>
+                          </div>
+                          
+                          {/* Member Avatars */}
+                          {cls.members && cls.members.length > 0 && (
+                            <div className="mt-4">
+                              <p className="text-gray-400 text-xs mb-2">Registered Members:</p>
+                              <div className="flex items-center space-x-2">
+                                <div className="flex -space-x-2">
+                                  {cls.members.slice(0, 8).map((member) => (
+                                    <div
+                                      key={member.id}
+                                      className="w-8 h-8 rounded-full bg-[#7BC843] text-black text-sm flex items-center justify-center border-2 border-[#2A3037]"
+                                      title={member.name}
+                                    >
+                                      {member.avatar}
+                                    </div>
+                                  ))}
+                                  {cls.members.length > 8 && (
+                                    <div className="w-8 h-8 rounded-full bg-gray-600 text-white text-sm flex items-center justify-center border-2 border-[#2A3037]">
+                                      +{cls.members.length - 8}
+                                    </div>
+                                  )}
+                                </div>
+                                {cls.members.length > 0 && (
+                                  <span className="text-gray-400 text-xs ml-2">
+                                    and {cls.booked - cls.members.length} more
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedClass(cls);
+                              setShowEditModal(true);
+                            }}
+                            className="p-2 bg-[#3a4148] hover:bg-[#4a5158] rounded-lg text-white transition-colors duration-200"
+                            title="Edit Class"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              alert(`Duplicating ${cls.name}...`);
+                            }}
+                            className="p-2 bg-[#3a4148] hover:bg-[#4a5158] rounded-lg text-white transition-colors duration-200"
+                            title="Duplicate Class"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Delete ${cls.name}?`)) {
+                                alert('Class deleted successfully!');
+                              }
+                            }}
+                            className="p-2 bg-[#3a4148] hover:bg-red-600 rounded-lg text-white transition-colors duration-200"
+                            title="Delete Class"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              
+              {getFilteredClasses().filter(cls => cls.date === selectedDate.toISOString().split('T')[0]).length === 0 && (
+                <div className="text-center py-12">
+                  <div className="text-gray-400 text-lg font-medium mb-2">No classes scheduled</div>
+                  <div className="text-gray-500">Click "Add Class" to schedule a new class for this day</div>
+                  <button 
+                    onClick={() => setShowCreateModal(true)}
+                    className="mt-4 bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+                  >
+                    Schedule a Class
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : viewMode === 'month' ? (
+        /* Month View */
+        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => {
+                  const newDate = new Date(selectedDate);
+                  newDate.setMonth(selectedDate.getMonth() - 1);
+                  setSelectedDate(newDate);
+                }}
+                className="p-2 hover:bg-[#3a4148] rounded-lg transition-colors duration-200"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-300" />
+              </button>
+              <h3 className="text-xl font-semibold text-white">
+                {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </h3>
+              <button
+                onClick={() => {
+                  const newDate = new Date(selectedDate);
+                  newDate.setMonth(selectedDate.getMonth() + 1);
+                  setSelectedDate(newDate);
+                }}
+                className="p-2 hover:bg-[#3a4148] rounded-lg transition-colors duration-200"
+              >
+                <ChevronRight className="h-5 w-5 text-gray-300" />
+              </button>
+            </div>
+          </div>
+          
+          {/* Month Calendar Grid */}
+          <div className="p-6">
+            <div className="grid grid-cols-7 gap-2 mb-4">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <div key={day} className="text-center font-medium text-gray-300 py-2">
+                  {day}
+                </div>
+              ))}
+            </div>
+            
+            <div className="grid grid-cols-7 gap-2">
+              {Array.from({ length: 35 }, (_, i) => {
+                const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+                const startOfCalendar = new Date(startOfMonth);
+                startOfCalendar.setDate(startOfCalendar.getDate() - startOfMonth.getDay());
+                
+                const currentDay = new Date(startOfCalendar);
+                currentDay.setDate(startOfCalendar.getDate() + i);
+                
+                const isCurrentMonth = currentDay.getMonth() === selectedDate.getMonth();
+                const isToday = currentDay.toDateString() === new Date().toDateString();
+                const dayClasses = getFilteredClasses().filter(cls => cls.date === currentDay.toISOString().split('T')[0]);
+                
+                return (
+                  <div
+                    key={i}
+                    onClick={() => {
+                      setSelectedDate(currentDay);
+                      setViewMode('day');
+                    }}
+                    className={`aspect-square p-2 border border-gray-700 rounded-lg cursor-pointer transition-colors duration-200 ${
+                      isCurrentMonth 
+                        ? 'bg-[#3a4148] hover:bg-[#4a5158]' 
+                        : 'bg-[#2A3037] opacity-50'
+                    } ${
+                      isToday ? 'ring-2 ring-[#7BC843]' : ''
+                    }`}
+                  >
+                    <div className={`text-sm font-medium ${
+                      isCurrentMonth ? 'text-white' : 'text-gray-500'
+                    } ${
+                      isToday ? 'text-[#7BC843]' : ''
+                    }`}>
+                      {currentDay.getDate()}
+                    </div>
+                    
+                    {dayClasses.length > 0 && (
+                      <div className="mt-1">
+                        <div className="flex flex-wrap gap-1">
+                          {dayClasses.slice(0, 3).map((cls) => (
+                            <div
+                              key={cls.id}
+                              className={`w-2 h-2 rounded-full ${getClassTypeColor(cls.type).split(' ')[0]}`}
+                              title={cls.name}
+                            ></div>
+                          ))}
+                          {dayClasses.length > 3 && (
+                            <div className="w-2 h-2 rounded-full bg-gray-500" title={`+${dayClasses.length - 3} more`}></div>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">
+                          {dayClasses.length} class{dayClasses.length !== 1 ? 'es' : ''}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       ) : (
         /* List View */
@@ -615,7 +1191,10 @@ const ClassSchedule: React.FC = () => {
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">Create New Class</h2>
                 <button 
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setSelectedTimeSlot(null);
+                  }}
                   className="text-gray-400 hover:text-gray-200 text-2xl"
                 >
                   ×
@@ -668,6 +1247,7 @@ const ClassSchedule: React.FC = () => {
                   <input
                     type="date"
                     className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white"
+                    defaultValue={selectedTimeSlot?.date || ''}
                   />
                 </div>
                 <div>
@@ -675,6 +1255,7 @@ const ClassSchedule: React.FC = () => {
                   <input
                     type="time"
                     className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white"
+                    defaultValue={selectedTimeSlot?.time ? convertTo24Hour(selectedTimeSlot.time) : ''}
                   />
                 </div>
                 <div>
