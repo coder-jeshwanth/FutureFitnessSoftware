@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, UserCheck, Search, Filter, Download, XCircle, ChevronLeft, BarChart, List, ChevronDown, Smartphone, Fingerprint, MapPin, AlertTriangle, UserX, Coffee, LogOut, Eye } from 'lucide-react';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import './Attendance.css';
 
 // Custom QR code icon
@@ -24,6 +35,17 @@ const QrCode = (props: any) => (
   </svg>
 );
 
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 const attendanceData = [
   {
     id: 1,
@@ -37,7 +59,8 @@ const attendanceData = [
     avatar: 'AS',
     isLate: false,
     absenceReason: null,
-    profileImage: null
+    profileImage: null,
+    branch: 'Stonehousepet'
   },
   {
     id: 2,
@@ -51,7 +74,8 @@ const attendanceData = [
     avatar: 'PP',
     isLate: false,
     absenceReason: null,
-    profileImage: null
+    profileImage: null,
+    branch: 'Harinathpuram'
   },
   {
     id: 3,
@@ -65,7 +89,8 @@ const attendanceData = [
     avatar: 'RK',
     isLate: false,
     absenceReason: 'Personal emergency',
-    profileImage: null
+    profileImage: null,
+    branch: 'Stonehousepet'
   },
   {
     id: 4,
@@ -79,7 +104,8 @@ const attendanceData = [
     avatar: 'SR',
     isLate: false,
     absenceReason: null,
-    profileImage: null
+    profileImage: null,
+    branch: 'Vanamthopu Center'
   },
   {
     id: 5,
@@ -93,7 +119,8 @@ const attendanceData = [
     avatar: 'AS',
     isLate: true,
     absenceReason: null,
-    profileImage: null
+    profileImage: null,
+    branch: 'Current Office Center'
   },
   {
     id: 6,
@@ -107,7 +134,8 @@ const attendanceData = [
     avatar: 'NG',
     isLate: false,
     absenceReason: 'Medical appointment',
-    profileImage: null
+    profileImage: null,
+    branch: 'Vedayapalem'
   },
   {
     id: 7,
@@ -121,7 +149,8 @@ const attendanceData = [
     avatar: 'RV',
     isLate: false,
     absenceReason: null,
-    profileImage: null
+    profileImage: null,
+    branch: 'BV Nagar'
   },
   {
     id: 8,
@@ -135,7 +164,8 @@ const attendanceData = [
     avatar: 'DS',
     isLate: false,
     absenceReason: 'Travel',
-    profileImage: null
+    profileImage: null,
+    branch: 'Dhanalakshmi Puram'
   },
   {
     id: 9,
@@ -149,7 +179,8 @@ const attendanceData = [
     avatar: 'VM',
     isLate: false,
     absenceReason: null,
-    profileImage: null
+    profileImage: null,
+    branch: 'Harinathpuram'
   },
   {
     id: 10,
@@ -163,7 +194,8 @@ const attendanceData = [
     avatar: 'KR',
     isLate: false,
     absenceReason: 'Vacation',
-    profileImage: null
+    profileImage: null,
+    branch: 'Vedayapalem'
   },
   {
     id: 11,
@@ -177,7 +209,8 @@ const attendanceData = [
     avatar: 'SC',
     isLate: true,
     absenceReason: null,
-    profileImage: null
+    profileImage: null,
+    branch: 'BV Nagar'
   },
   {
     id: 12,
@@ -191,7 +224,8 @@ const attendanceData = [
     avatar: 'AP',
     isLate: false,
     absenceReason: 'Illness',
-    profileImage: null
+    profileImage: null,
+    branch: 'Current Office Center'
   }
 ];
 
@@ -351,7 +385,7 @@ const staffAttendance = [
   }
 ];
 
-const Attendance: React.FC = () => {
+const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
   const [activeTab, setActiveTab] = useState<'members' | 'trainers' | 'staff'>('members');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [startDate, setStartDate] = useState(new Date(new Date().setDate(new Date().getDate() - 6)).toISOString().split('T')[0]);
@@ -382,6 +416,11 @@ const Attendance: React.FC = () => {
   const getFilteredAttendance = () => {
     let filtered = attendanceData;
     
+    // Filter by branch (if not "All Branches")
+    if (selectedBranch && selectedBranch !== 'All Branches') {
+      filtered = filtered.filter(member => member.branch === selectedBranch);
+    }
+    
     if (statusFilter !== 'all') {
       filtered = filtered.filter(member => {
         if (statusFilter === 'present') return member.status === 'Present';
@@ -402,11 +441,18 @@ const Attendance: React.FC = () => {
   };
 
   const getStatusCounts = () => {
+    let branchData = attendanceData;
+    
+    // Filter by branch if not "All Branches"
+    if (selectedBranch && selectedBranch !== 'All Branches') {
+      branchData = attendanceData.filter(member => member.branch === selectedBranch);
+    }
+    
     return {
-      present: attendanceData.filter(m => m.status === 'Present').length,
-      absent: attendanceData.filter(m => m.status === 'Absent').length,
-      leave: attendanceData.filter(m => m.status === 'On Leave').length,
-      late: attendanceData.filter(m => m.isLate).length
+      present: branchData.filter(m => m.status === 'Present').length,
+      absent: branchData.filter(m => m.status === 'Absent').length,
+      leave: branchData.filter(m => m.status === 'On Leave').length,
+      late: branchData.filter(m => m.isLate).length
     };
   };
 
@@ -462,6 +508,78 @@ const Attendance: React.FC = () => {
     window.URL.revokeObjectURL(url);
   };
 
+  // Chart data generation functions
+  const getAttendanceRateChartData = () => {
+    // Generate last 7 days attendance rate data
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const rates = selectedBranch === 'All Branches' 
+      ? [85, 78, 92, 88, 76, 82, 90] // Sample data for all branches
+      : selectedBranch === 'Stonehousepet' 
+        ? [88, 82, 95, 90, 78, 85, 92]
+        : selectedBranch === 'Harinathpuram'
+          ? [82, 75, 88, 85, 72, 80, 87]
+          : [80, 73, 85, 82, 70, 78, 85]; // Default for other branches
+    
+    return {
+      labels: days,
+      datasets: [
+        {
+          label: 'Attendance Rate (%)',
+          data: rates,
+          borderColor: '#7BC843',
+          backgroundColor: 'rgba(123, 200, 67, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#7BC843',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+        },
+      ],
+    };
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        backgroundColor: '#2A3037',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        borderColor: '#7BC843',
+        borderWidth: 1,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100,
+        grid: {
+          color: '#374151',
+        },
+        ticks: {
+          color: '#9CA3AF',
+          callback: function(value: any) {
+            return value + '%';
+          },
+        },
+      },
+      x: {
+        grid: {
+          color: '#374151',
+        },
+        ticks: {
+          color: '#9CA3AF',
+        },
+      },
+    },
+  };
+
   const statusCounts = getStatusCounts();
   const filteredAttendance = getFilteredAttendance();
   const [scanningQR, setScanningQR] = useState(false);
@@ -498,6 +616,7 @@ const Attendance: React.FC = () => {
     absenceReason?: string | null;
     profileImage?: string | null;
     date?: string;
+    branch?: string;
   };
   
   // Get filtered data based on active tab, search term, and sort criteria
@@ -817,7 +936,104 @@ const Attendance: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Branch Information Banner */}
+      {selectedBranch && selectedBranch !== 'All Branches' && (
+        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-[#7BC843] rounded-full flex items-center justify-center">
+                <span className="text-black font-bold text-sm">
+                  {selectedBranch.split(' ').map(word => word[0]).join('').substring(0, 2)}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-white">
+                  Attendance for {selectedBranch}
+                </h3>
+                <p className="text-sm text-gray-400">
+                  Showing data for selected branch only
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-6 text-sm">
+              <div className="text-center">
+                <p className="text-gray-400">Present Today</p>
+                <p className="font-semibold text-green-400">{statusCounts.present}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-gray-400">Absent Today</p>
+                <p className="font-semibold text-red-400">{statusCounts.absent}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-gray-400">On Leave</p>
+                <p className="font-semibold text-yellow-400">{statusCounts.leave}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Top Chart Cards - Weekly Attendance Rate and Branch Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+          <div className="mb-4">
+            <h3 className="text-white font-semibold text-sm mb-1">Weekly Attendance Rate</h3>
+            <p className="text-gray-400 text-xs">
+              {selectedBranch === 'All Branches' ? 'All branches combined' : selectedBranch}
+            </p>
+          </div>
+          <div className="h-32">
+            <Line data={getAttendanceRateChartData()} options={chartOptions} />
+          </div>
+          <div className="mt-3 flex items-center justify-between text-xs">
+            <span className="text-gray-400">Current: {stats.percentage}%</span>
+            <span className="text-[#7BC843]">↗ +2.3% from last week</span>
+          </div>
+        </div>
+
+        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+          <div className="mb-4">
+            <h3 className="text-white font-semibold text-sm mb-1">
+              {selectedBranch === 'All Branches' ? 'All Branches Overview' : `${selectedBranch} Summary`}
+            </h3>
+            <p className="text-gray-400 text-xs">Performance metrics for today</p>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400 text-sm">Check-in Rate</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-20 bg-gray-700 rounded-full h-2">
+                  <div className="bg-green-500 h-2 rounded-full" style={{width: `${stats.percentage}%`}}></div>
+                </div>
+                <span className="text-white text-sm font-medium">{stats.percentage}%</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400 text-sm">On-time Arrivals</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-20 bg-gray-700 rounded-full h-2">
+                  <div className="bg-blue-500 h-2 rounded-full" style={{width: `${Math.max(0, 100 - (statusCounts.late * 10))}%`}}></div>
+                </div>
+                <span className="text-white text-sm font-medium">{Math.max(0, 100 - (statusCounts.late * 10))}%</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400 text-sm">Active Members</span>
+              <span className="text-[#7BC843] text-sm font-medium">
+                {attendanceData.filter(m => m.checkOut === 'Active' && (selectedBranch === 'All Branches' || m.branch === selectedBranch)).length} online
+              </span>
+            </div>
+            <div className="pt-3 border-t border-gray-700">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-sm">Total Gym Hours</span>
+                <span className="text-white text-sm font-medium">{getTotalGymHours()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Stats Cards with Visual Insights */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <div 
           className={`bg-green-600 rounded-xl shadow-sm border ${sortBy === 'present' ? 'border-green-400' : 'border-green-500'} p-6 cursor-pointer hover:bg-green-700 transition-colors duration-200 text-white`}
@@ -905,18 +1121,6 @@ const Attendance: React.FC = () => {
             </div>
           )}
         </div>
-
-        <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-400 text-sm">Attendance Rate</p>
-              <p className="text-2xl font-bold text-[#7BC843]">{stats.percentage}%</p>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-[#7BC843] flex items-center justify-center">
-              <span className="text-black text-sm font-bold">%</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Enhanced Filtering and Search Controls */}
@@ -958,7 +1162,16 @@ const Attendance: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-3 text-sm text-gray-300">
-            <span>Showing {filteredAttendance.length} of {attendanceData.length} members</span>
+            <span>
+              Showing {filteredAttendance.length} of {
+                selectedBranch === 'All Branches' 
+                  ? attendanceData.length 
+                  : attendanceData.filter(m => m.branch === selectedBranch).length
+              } members
+              {selectedBranch !== 'All Branches' && (
+                <span className="text-[#7BC843] ml-1">in {selectedBranch}</span>
+              )}
+            </span>
           </div>
         </div>
 
