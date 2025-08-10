@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Edit, Trash2, Eye, Dumbbell, Clock, Target, Play } from 'lucide-react';
+import { Search, Edit, Trash2, Dumbbell, Clock, Target } from 'lucide-react';
 
 const workoutPlans = [
   {
@@ -76,31 +76,85 @@ const WorkoutPlans: React.FC = () => {
   const [draggedExercise, setDraggedExercise] = useState<any>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [filterCategory, setFilterCategory] = useState('All Categories');
+  const [filterDifficulty, setFilterDifficulty] = useState('All Difficulty');
+  const [sortBy, setSortBy] = useState('Newest');
+  const [newPlanDuration, setNewPlanDuration] = useState('');
+  const [newPlanTrainer, setNewPlanTrainer] = useState('');
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Beginner': return 'bg-green-100 text-green-800';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'Advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Beginner': return 'bg-green-900 text-green-300';
+      case 'Intermediate': return 'bg-yellow-900 text-yellow-300';
+      case 'Advanced': return 'bg-red-900 text-red-300';
+      default: return 'bg-gray-800 text-gray-300';
     }
   };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'Strength': return 'bg-blue-100 text-blue-800';
-      case 'Cardio': return 'bg-red-100 text-red-800';
-      case 'Flexibility': return 'bg-purple-100 text-purple-800';
-      case 'Circuit': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Strength': return 'bg-blue-900 text-blue-300';
+      case 'Cardio': return 'bg-red-900 text-red-300';
+      case 'Flexibility': return 'bg-purple-900 text-purple-300';
+      case 'Circuit': return 'bg-orange-900 text-orange-300';
+      default: return 'bg-gray-800 text-gray-300';
+    }
+  };
+  
+  const getCategoryGradient = (category: string) => {
+    switch (category) {
+      case 'Strength': return 'from-blue-900/20 to-blue-800/5';
+      case 'Cardio': return 'from-red-900/20 to-red-800/5';
+      case 'Flexibility': return 'from-purple-900/20 to-purple-800/5';
+      case 'Circuit': return 'from-orange-900/20 to-orange-800/5';
+      default: return 'from-gray-800/20 to-gray-700/5';
+    }
+  };
+  
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'Strength': return '💪';
+      case 'Cardio': return '🏃';
+      case 'Flexibility': return '🧘';
+      case 'Circuit': return '⚡';
+      default: return '📋';
     }
   };
 
-  const filteredPlans = workoutPlans.filter(plan =>
-    plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    plan.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    plan.trainer.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPlans = workoutPlans.filter(plan => {
+    // Text search filter
+    const matchesSearch = 
+      plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      plan.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      plan.trainer.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Category filter
+    const matchesCategory = 
+      filterCategory === 'All Categories' || 
+      plan.category === filterCategory;
+    
+    // Difficulty filter
+    const matchesDifficulty = 
+      filterDifficulty === 'All Difficulty' || 
+      plan.difficulty === filterDifficulty;
+    
+    return matchesSearch && matchesCategory && matchesDifficulty;
+  }).sort((a, b) => {
+    // Sorting logic based on selected option
+    switch (sortBy) {
+      case 'Newest':
+        return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
+      case 'Most Popular':
+        return b.assignedMembers - a.assignedMembers;
+      case 'Duration':
+        return parseInt(a.duration) - parseInt(b.duration);
+      case 'Difficulty':
+        const difficultyRank = { 'Beginner': 1, 'Intermediate': 2, 'Advanced': 3 };
+        return difficultyRank[a.difficulty as keyof typeof difficultyRank] - difficultyRank[b.difficulty as keyof typeof difficultyRank];
+      default:
+        return 0;
+    }
+  });
 
   const openPlanModal = (plan: any) => {
     setSelectedPlan(plan);
@@ -189,7 +243,7 @@ const WorkoutPlans: React.FC = () => {
               setSelectedPlan(null);
               setShowModal(true);
             }}
-            className="bg-[#165D31] hover:bg-[#073418] text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+            className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2 shadow-md"
           >
             <Dumbbell className="h-5 w-5" />
             <span>Create Workout Plan</span>
@@ -199,7 +253,7 @@ const WorkoutPlans: React.FC = () => {
 
       {/* Search and Filters */}
       <div className="bg-[#3a4148] rounded-xl shadow-sm border border-gray-700 p-6">
-        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-3">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
@@ -207,23 +261,71 @@ const WorkoutPlans: React.FC = () => {
               placeholder="Search workout plans..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-[#2A3037] border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-[#165D31] focus:border-transparent placeholder-gray-400"
+              className="w-full pl-10 pr-4 py-3 bg-[#2A3037] border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] placeholder-gray-400"
             />
           </div>
-          <div className="flex space-x-3">
-            <select className="px-4 py-3 bg-[#2A3037] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
-              <option>All Categories</option>
-              <option>Strength</option>
-              <option>Cardio</option>
-              <option>Flexibility</option>
-              <option>Circuit</option>
-            </select>
-            <select className="px-4 py-3 bg-[#2A3037] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent">
-              <option>All Difficulty</option>
-              <option>Beginner</option>
-              <option>Intermediate</option>
-              <option>Advanced</option>
-            </select>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative">
+              <select 
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="min-w-[140px] px-4 py-3 bg-[#2A3037] border border-gray-700 text-white rounded-lg 
+                           focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none pr-10
+                           hover:bg-[#3a4148] hover:border-[#7BC843] transition-all duration-200"
+              >
+                <option>All Categories</option>
+                <option>Strength</option>
+                <option>Cardio</option>
+                <option>Flexibility</option>
+                <option>Circuit</option>
+              </select>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <select 
+                value={filterDifficulty}
+                onChange={(e) => setFilterDifficulty(e.target.value)}
+                className="min-w-[140px] px-4 py-3 bg-[#2A3037] border border-gray-700 text-white rounded-lg 
+                           focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none pr-10
+                           hover:bg-[#3a4148] hover:border-[#7BC843] transition-all duration-200"
+              >
+                <option>All Difficulty</option>
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+              </select>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="min-w-[140px] px-4 py-3 bg-[#2A3037] border border-gray-700 text-white rounded-lg 
+                           focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none pr-10
+                           hover:bg-[#3a4148] hover:border-[#7BC843] transition-all duration-200"
+              >
+                <option>Newest</option>
+                <option>Most Popular</option>
+                <option>Duration</option>
+                <option>Difficulty</option>
+              </select>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -231,23 +333,41 @@ const WorkoutPlans: React.FC = () => {
       {/* Workout Plans Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredPlans.map((plan) => (
-          <div key={plan.id} className="bg-[#3a4148] rounded-xl shadow-sm border border-gray-700 p-6 hover:shadow-lg transition-all duration-200">
-            <div className="flex items-start justify-between mb-4">
+          <div 
+            key={plan.id} 
+            onClick={() => openPlanModal(plan)} 
+            className={`bg-gradient-to-br ${getCategoryGradient(plan.category)} 
+                       bg-[#3a4148] rounded-xl shadow-sm border border-gray-700 p-6 
+                       hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] 
+                       hover:border-[#7BC843] hover:border-opacity-70 
+                       cursor-pointer transition-all duration-300 relative overflow-hidden`}
+          >
+            {/* Difficulty Badge (Top Right) */}
+            <div className="absolute top-2 right-2 z-10">
+              <span className={`px-3 py-1 rounded-full text-xs font-medium 
+                              shadow-md ${getDifficultyColor(plan.difficulty)}`}>
+                {plan.difficulty}
+              </span>
+            </div>
+            
+            <div className="flex items-start mb-6">
+              {/* Category Icon */}
+              <div className="w-14 h-14 rounded-lg flex items-center justify-center text-2xl bg-[#2A3037]/70 mr-4 shadow-md border border-gray-700">
+                {getCategoryIcon(plan.category)}
+              </div>
+              
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-white mb-2">{plan.name}</h3>
-                <p className="text-gray-300 text-sm mb-3">{plan.description}</p>
-                <div className="flex items-center space-x-2 mb-3">
+                <h3 className="text-lg font-semibold text-white mb-1">{plan.name}</h3>
+                <p className="text-gray-300 text-sm line-clamp-2">{plan.description}</p>
+                <div className="flex items-center mt-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(plan.category)}`}>
                     {plan.category}
-                  </span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(plan.difficulty)}`}>
-                    {plan.difficulty}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-3 mb-6">
+            <div className="space-y-2 mb-4">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4 text-gray-400" />
@@ -266,27 +386,31 @@ const WorkoutPlans: React.FC = () => {
                 <span className="text-gray-400">Trainer:</span>
                 <span className="text-white font-medium">{plan.trainer}</span>
               </div>
+              
+              {/* Popularity Indicator */}
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">Assigned to:</span>
-                <span className="text-white font-medium">{plan.assignedMembers} members</span>
+                <span className="text-gray-400">Popularity:</span>
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className={`w-1.5 h-4 mx-0.5 rounded-sm ${
+                      i < Math.ceil(plan.assignedMembers / 10) 
+                        ? 'bg-[#7BC843]' 
+                        : 'bg-gray-600'
+                    }`}></div>
+                  ))}
+                  <span className="text-white text-xs ml-2">{plan.assignedMembers}</span>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+            <div className="flex items-center justify-between pt-3 border-t border-gray-700">
               <div className="flex items-center space-x-2">
                 <button 
-                  onClick={() => openPlanModal(plan)}
-                  className="p-2 text-gray-300 hover:text-white hover:bg-[#2A3037] rounded-lg transition-colors duration-200"
-                  title="View Details"
-                >
-                  <Eye className="h-4 w-4" />
-                </button>
-                <button 
-                  onClick={() => {
-                    setSelectedPlan(null); // Clear selected plan to show edit form
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPlan(null);
                     setWorkoutExercises([]);
                     setShowModal(true);
-                    // Set this plan as being edited
                     setNewPlanName(plan.name);
                     setNewPlanDescription(plan.description);
                     setNewPlanCategory(plan.category);
@@ -298,14 +422,19 @@ const WorkoutPlans: React.FC = () => {
                 >
                   <Edit className="h-4 w-4" />
                 </button>
-                <button className="p-2 text-gray-300 hover:text-white hover:bg-[#2A3037] rounded-lg transition-colors duration-200" title="Delete">
+                <button 
+                  onClick={(e) => e.stopPropagation()} 
+                  className="p-2 text-gray-300 hover:text-white hover:bg-[#2A3037] rounded-lg transition-colors duration-200" 
+                  title="Delete"
+                >
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-              <button className="text-[#165D31] hover:text-white font-medium text-sm flex items-center space-x-1">
-                <Play className="h-4 w-4" />
-                <span>Preview</span>
-              </button>
+              
+              {/* Dates */}
+              <div className="text-right">
+                <div className="text-xs text-gray-500">Created: {new Date(plan.createdDate).toLocaleDateString()}</div>
+              </div>
             </div>
           </div>
         ))}
@@ -416,7 +545,7 @@ const WorkoutPlans: React.FC = () => {
                         <h4 className="font-medium text-white mb-3">Target Muscles</h4>
                         <div className="flex flex-wrap gap-2">
                           {['Chest', 'Legs', 'Core', 'Arms'].map((muscle, index) => (
-                            <span key={index} className="px-2 py-1 bg-[#165D31] text-white rounded-full text-sm">
+                            <span key={index} className="px-2 py-1 bg-[#7BC843] text-black rounded-full text-sm">
                               {muscle}
                             </span>
                           ))}
@@ -430,33 +559,57 @@ const WorkoutPlans: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-4">Plan Details</h3>
                     <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Plan Name</label>
+                      <div className="relative">
                         <input
                           type="text"
-                          className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white"
-                          placeholder="Enter plan name"
+                          id="planName"
+                          className="block w-full px-4 pt-5 pb-2 bg-[#3a4148] border border-gray-700 rounded-lg 
+                                   focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-white 
+                                   peer placeholder-transparent"
+                          placeholder="Plan Name"
                           value={newPlanName}
                           onChange={(e) => setNewPlanName(e.target.value)}
                         />
+                        <label 
+                          htmlFor="planName"
+                          className="absolute text-sm font-medium text-gray-400 duration-300 transform 
+                                   -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4
+                                   peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 
+                                   peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-[#7BC843]"
+                        >
+                          Plan Name
+                        </label>
                       </div>
                       
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                      <div className="relative">
                         <textarea
+                          id="planDescription"
                           rows={3}
-                          className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white"
-                          placeholder="Describe the workout plan"
+                          className="block w-full px-4 pt-5 pb-2 bg-[#3a4148] border border-gray-700 rounded-lg 
+                                   focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-white 
+                                   peer placeholder-transparent"
+                          placeholder="Description"
                           value={newPlanDescription}
                           onChange={(e) => setNewPlanDescription(e.target.value)}
                         />
+                        <label 
+                          htmlFor="planDescription"
+                          className="absolute text-sm font-medium text-gray-400 duration-300 transform 
+                                   -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4
+                                   peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 
+                                   peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-[#7BC843]"
+                        >
+                          Description
+                        </label>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                        <div className="relative">
                           <select 
-                            className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white"
+                            id="planCategory"
+                            className="block w-full px-4 pt-5 pb-2 bg-[#3a4148] border border-gray-700 rounded-lg 
+                                     focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-white 
+                                     appearance-none peer"
                             value={newPlanCategory}
                             onChange={(e) => setNewPlanCategory(e.target.value)}
                           >
@@ -466,11 +619,26 @@ const WorkoutPlans: React.FC = () => {
                             <option value="Flexibility">Flexibility</option>
                             <option value="Circuit">Circuit</option>
                           </select>
+                          <label 
+                            htmlFor="planCategory"
+                            className="absolute text-sm font-medium text-gray-400 duration-300 transform 
+                                     -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4
+                                     peer-focus:text-[#7BC843]"
+                          >
+                            Category
+                          </label>
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">Difficulty</label>
+                        <div className="relative">
                           <select 
-                            className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white"
+                            id="planDifficulty"
+                            className="block w-full px-4 pt-5 pb-2 bg-[#3a4148] border border-gray-700 rounded-lg 
+                                     focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-white 
+                                     appearance-none peer"
                             value={newPlanDifficulty}
                             onChange={(e) => setNewPlanDifficulty(e.target.value)}
                           >
@@ -479,27 +647,81 @@ const WorkoutPlans: React.FC = () => {
                             <option value="Intermediate">Intermediate</option>
                             <option value="Advanced">Advanced</option>
                           </select>
+                          <label 
+                            htmlFor="planDifficulty"
+                            className="absolute text-sm font-medium text-gray-400 duration-300 transform 
+                                     -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4
+                                     peer-focus:text-[#7BC843]"
+                          >
+                            Difficulty
+                          </label>
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">Duration (minutes)</label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white"
-                            placeholder="60"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">Trainer</label>
-                          <select className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white">
-                            <option>Select trainer</option>
-                            <option>Sneha Reddy</option>
-                            <option>Raj Singh</option>
-                            <option>Vikash Kumar</option>
-                            <option>Priya Sharma</option>
+                        <div className="relative">
+                          <select
+                            id="planDuration" 
+                            className="block w-full px-4 pt-5 pb-2 bg-[#3a4148] border border-gray-700 rounded-lg 
+                                     focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-white 
+                                     appearance-none peer"
+                            value={newPlanDuration}
+                            onChange={(e) => setNewPlanDuration(e.target.value)}
+                          >
+                            <option value="">Select duration</option>
+                            <option value="15 minutes">15 minutes</option>
+                            <option value="30 minutes">30 minutes</option>
+                            <option value="45 minutes">45 minutes</option>
+                            <option value="60 minutes">60 minutes</option>
+                            <option value="90 minutes">90 minutes</option>
                           </select>
+                          <label 
+                            htmlFor="planDuration"
+                            className="absolute text-sm font-medium text-gray-400 duration-300 transform 
+                                     -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4
+                                     peer-focus:text-[#7BC843]"
+                          >
+                            Duration
+                          </label>
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <select 
+                            id="planTrainer"
+                            className="block w-full px-4 pt-5 pb-2 bg-[#3a4148] border border-gray-700 rounded-lg 
+                                     focus:ring-2 focus:ring-[#7BC843] focus:border-transparent text-white 
+                                     appearance-none peer"
+                            value={newPlanTrainer}
+                            onChange={(e) => setNewPlanTrainer(e.target.value)}
+                          >
+                            <option value="">Select trainer</option>
+                            <option value="Sneha Reddy">Sneha Reddy</option>
+                            <option value="Raj Singh">Raj Singh</option>
+                            <option value="Vikash Kumar">Vikash Kumar</option>
+                            <option value="Priya Sharma">Priya Sharma</option>
+                          </select>
+                          <label 
+                            htmlFor="planTrainer"
+                            className="absolute text-sm font-medium text-gray-400 duration-300 transform 
+                                     -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4
+                                     peer-focus:text-[#7BC843]"
+                          >
+                            Trainer
+                          </label>
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -585,7 +807,7 @@ const WorkoutPlans: React.FC = () => {
                     </div>
                     
                     {workoutExercises.length > 0 && (
-                      <div className="mt-3 p-3 bg-[#165D31] bg-opacity-20 rounded-lg text-xs">
+                      <div className="mt-3 p-3 bg-[#7BC843] bg-opacity-10 rounded-lg text-xs">
                         <p className="font-medium text-white">AI has suggested optimal parameters for {workoutExercises.length} exercises</p>
                       </div>
                     )}
@@ -615,7 +837,7 @@ const WorkoutPlans: React.FC = () => {
                     >
                       Edit Plan
                     </button>
-                    <button className="px-6 py-3 bg-[#165D31] hover:bg-[#073418] text-white rounded-lg transition-colors duration-200">
+                    <button className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium shadow-md">
                       Assign to Members
                     </button>
                   </>
@@ -660,7 +882,7 @@ const WorkoutPlans: React.FC = () => {
                       disabled={!newPlanName || workoutExercises.length === 0}
                       className={`px-6 py-3 ${(!newPlanName || workoutExercises.length === 0) 
                         ? 'bg-gray-700 cursor-not-allowed' 
-                        : 'bg-[#165D31] hover:bg-[#073418] cursor-pointer'} text-white rounded-lg transition-colors duration-200`}
+                        : 'bg-[#7BC843] hover:bg-[#6AB732] cursor-pointer'} ${isDragging ? 'text-white' : 'text-black'} rounded-lg transition-colors duration-200`}
                     >
                       {isEditMode ? 'Update Plan' : 'Create Plan'}
                     </button>
@@ -691,7 +913,7 @@ const WorkoutPlans: React.FC = () => {
             <div className="p-6 text-white relative">
               {isDragging && (
                 <div className="fixed inset-0 pointer-events-none z-10 flex items-center justify-center bg-black bg-opacity-40">
-                  <div className="bg-[#165D31] text-white px-4 py-2 rounded-lg shadow-lg">
+                  <div className="bg-[#7BC843] text-black px-4 py-2 rounded-lg shadow-lg font-medium">
                     <p className="font-medium">Drop in workout plan area to add</p>
                     <p className="text-sm">AI will automatically suggest sets, reps and rest times</p>
                   </div>
@@ -832,7 +1054,7 @@ const WorkoutPlans: React.FC = () => {
 
               <div className="mt-6">
                 {workoutExercises.length > 0 && (
-                  <div className="p-4 bg-[#165D31] bg-opacity-20 rounded-lg mb-4 text-sm">
+                  <div className="p-4 bg-[#7BC843] bg-opacity-10 rounded-lg mb-4 text-sm">
                     <div className="flex items-start">
                       <div className="mr-3 mt-1">✓</div>
                       <div>
@@ -868,7 +1090,7 @@ const WorkoutPlans: React.FC = () => {
                     disabled={!newPlanName || workoutExercises.length === 0}
                     className={`px-6 py-3 ${(!newPlanName || workoutExercises.length === 0) 
                       ? 'bg-gray-700 cursor-not-allowed' 
-                      : 'bg-[#165D31] hover:bg-[#073418] cursor-pointer'} text-white rounded-lg transition-colors duration-200`}
+                      : 'bg-[#7BC843] hover:bg-[#6AB732] cursor-pointer'} ${isDragging ? 'text-white' : 'text-black'} rounded-lg transition-colors duration-200`}
                   >
                     Save Workout Plan
                   </button>
