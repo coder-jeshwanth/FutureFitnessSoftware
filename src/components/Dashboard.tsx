@@ -1,5 +1,18 @@
 import React from 'react';
-import { Users, UserCheck, IndianRupee , Calendar, AlertTriangle, TrendingUp, Activity, Clock } from 'lucide-react';
+import { Users, UserCheck, IndianRupee, Calendar, AlertTriangle, TrendingUp, Activity, Clock, UserRoundX } from 'lucide-react';
+import { 
+  Chart as ChartJS, 
+  ArcElement, 
+  Tooltip, 
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Filler
+} from 'chart.js';
+import { Doughnut, Bar, Line } from 'react-chartjs-2';
 
 interface DashboardProps {
   selectedBranch: string;
@@ -12,7 +25,7 @@ const statsCards = [
     change: '+12%',
     trend: 'up',
     icon: Users,
-    color: 'bg-[#165D31]'
+    color: 'bg-[#7BC843]'
   },
   {
     title: 'Active Members',
@@ -22,6 +35,14 @@ const statsCards = [
     icon: UserCheck,
     color: 'bg-blue-600'
   },
+   {
+    title: 'InActive Members',
+    value: '1,156',
+    change: '+8%',
+    trend: 'up',
+    icon: UserRoundX,
+    color: 'bg-yellow-600'
+  },
   {
     title: "This Month's Revenue",
     value: '₹2,45,680',
@@ -29,13 +50,6 @@ const statsCards = [
     trend: 'up',
     icon: IndianRupee ,
     color: 'bg-green-600'
-  },
-  {
-    title: 'Upcoming Classes',
-    value: '24',
-    trend: 'neutral',
-    icon: Calendar,
-    color: 'bg-purple-600'
   },
   {
     title: 'Pending Payments',
@@ -56,10 +70,177 @@ const recentActivities = [
 ];
 
 const quickActions = [
-  { label: 'Register Member', color: 'bg-[#165D31] hover:bg-[#073418]', icon: Users },
+  { label: 'Register Member', color: 'bg-[#7BC843] hover:bg-[#6BB536]', icon: Users },
   { label: 'Assign Trainer', color: 'bg-blue-600 hover:bg-blue-700', icon: UserCheck },
   { label: 'Create Class', color: 'bg-purple-600 hover:bg-purple-700', icon: Calendar }
 ];
+
+// Register the required Chart.js components
+ChartJS.register(
+  ArcElement, 
+  Tooltip, 
+  Legend, 
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Filler
+);
+
+const AttendanceTrendsChart = () => {
+  const attendanceData = [
+    { day: 'Mon', count: 156, percentage: 78, peak: 'Evening' },
+    { day: 'Tue', count: 142, percentage: 71, peak: 'Morning' },
+    { day: 'Wed', count: 167, percentage: 84, peak: 'Evening' },
+    { day: 'Thu', count: 134, percentage: 67, peak: 'Morning' },
+    { day: 'Fri', count: 189, percentage: 95, peak: 'Evening' },
+    { day: 'Sat', count: 201, percentage: 100, peak: 'Afternoon' },
+    { day: 'Sun', count: 98, percentage: 49, peak: 'Morning' }
+  ];
+
+  const data = {
+    labels: attendanceData.map(item => item.day),
+    datasets: [
+      {
+        label: 'Attendance',
+        data: attendanceData.map(item => item.percentage),
+        backgroundColor: 'rgba(123, 200, 67, 0.6)',
+        borderColor: '#7BC843',
+        borderWidth: 2,
+        borderRadius: 4,
+        hoverBackgroundColor: 'rgba(123, 200, 67, 0.8)',
+      }
+    ],
+  };
+  
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          title: function(context: any) {
+            return `${context[0].label}`;
+          },
+          label: function(context: any) {
+            const index = context.dataIndex;
+            return [
+              `Attendance: ${context.parsed.y}%`,
+              `Members: ${attendanceData[index].count}`,
+              `Peak Time: ${attendanceData[index].peak}`
+            ];
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+          drawBorder: false,
+        },
+        ticks: {
+          color: 'rgba(255, 255, 255, 0.7)',
+        }
+      },
+      y: {
+        beginAtZero: true,
+        max: 100,
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)',
+        },
+        ticks: {
+          color: 'rgba(255, 255, 255, 0.7)',
+          callback: function(value: any) {
+            return value + '%';
+          }
+        }
+      }
+    }
+  };
+
+  return (
+    <div className="h-60">
+      <Bar data={data} options={options} />
+    </div>
+  );
+};
+
+const ClassParticipationChart = () => {
+  const classData = [
+    { name: 'Yoga', percentage: 85, color: '#7BC843' },
+    { name: 'Cardio', percentage: 92, color: '#2563eb' },
+    { name: 'Weight Training', percentage: 78, color: '#9333ea' },
+    { name: 'Zumba', percentage: 65, color: '#db2777' }
+  ];
+
+  const data = {
+    labels: [],
+    datasets: [
+      {
+        data: classData.map(item => item.percentage),
+        backgroundColor: classData.map(item => item.color),
+        borderColor: classData.map(item => item.color),
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    cutout: '70%',
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context: any) {
+            const index = context.dataIndex;
+            return `${classData[index].name}: ${context.raw}%`;
+          }
+        }
+      }
+    },
+    maintainAspectRatio: false,
+  };
+
+  return (
+    <div className="flex items-stretch h-60">
+      <div className="w-5/12 flex items-center justify-center">
+        <div className="h-48 w-48">
+          <Doughnut data={data} options={options} />
+        </div>
+      </div>
+      <div className="w-7/12 flex flex-col justify-between py-2">
+        <div className="space-y-4">
+          {classData.map((item, index) => (
+            <div key={index} className="flex items-center space-x-3">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+              <div className="flex flex-col flex-grow">
+                <span className="text-sm font-medium text-gray-200">{item.name}</span>
+                <div className="flex items-center space-x-2 mt-1">
+                  <div className="w-full h-1.5 bg-gray-700 rounded-full">
+                    <div 
+                      className="h-1.5 rounded-full" 
+                      style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-400 w-9">{item.percentage}%</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 h-4"></div> {/* Extra space at the end */}
+      </div>
+    </div>
+  );
+};
 
 const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
   return (
@@ -103,79 +284,18 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
           <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-white">Member Growth</h3>
-              <TrendingUp className="h-5 w-5 text-[#165D31]" />
+              <TrendingUp className="h-5 w-5 text-[#7BC843]" />
             </div>
             <div className="h-48 flex items-end justify-between space-x-2">
               {[65, 78, 82, 95, 87, 102, 115].map((height, index) => (
                 <div key={index} className="flex-1 flex flex-col items-center">
                   <div 
-                    className="w-full bg-[#165D31] rounded-t-sm transition-all duration-500 hover:bg-[#073418]"
+                    className="w-full bg-[#7BC843] rounded-t-sm transition-all duration-500 hover:bg-[#6BB536]"
                     style={{ height: `${height}px` }}
                   />
                   <span className="text-xs text-gray-300 mt-2">
                     {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'][index]}
                   </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Class Participation */}
-          <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">Class Participation</h3>
-              <Activity className="h-5 w-5 text-blue-600" />
-            </div>
-            <div className="space-y-4">
-              {[
-                { name: 'Yoga', percentage: 85, color: 'bg-[#165D31]' },
-                { name: 'Cardio', percentage: 92, color: 'bg-blue-600' },
-                { name: 'Weight Training', percentage: 78, color: 'bg-purple-600' },
-                { name: 'Zumba', percentage: 65, color: 'bg-pink-600' }
-              ].map((item, index) => (
-                <div key={index}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-200">{item.name}</span>
-                    <span className="text-gray-300">{item.percentage}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className={`${item.color} h-2 rounded-full transition-all duration-500`}
-                      style={{ width: `${item.percentage}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Attendance Trends */}
-          <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">Attendance Trends</h3>
-              <Clock className="h-5 w-5 text-green-600" />
-            </div>
-            <div className="space-y-3">
-              {[
-                { day: 'Monday', count: 156, percentage: 78 },
-                { day: 'Tuesday', count: 142, percentage: 71 },
-                { day: 'Wednesday', count: 167, percentage: 84 },
-                { day: 'Thursday', count: 134, percentage: 67 },
-                { day: 'Friday', count: 189, percentage: 95 },
-                { day: 'Saturday', count: 201, percentage: 100 },
-                { day: 'Sunday', count: 98, percentage: 49 }
-              ].map((item, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-200 w-20">{item.day}</span>
-                  <div className="flex-1 mx-3">
-                    <div className="w-full bg-gray-600 rounded-full h-2">
-                      <div 
-                        className="bg-green-600 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${item.percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-300 w-12 text-right">{item.count}</span>
                 </div>
               ))}
             </div>
@@ -198,6 +318,24 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
                 );
               })}
             </div>
+          </div>
+
+          {/* Attendance Trends */}
+          <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-white">Attendance Trends</h3>
+              <Clock className="h-5 w-5 text-[#7BC843]" />
+            </div>
+            <AttendanceTrendsChart />
+          </div>
+
+          {/* Class Participation */}
+          <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-white">Class Participation</h3>
+              <Activity className="h-5 w-5 text-blue-600" />
+            </div>
+            <ClassParticipationChart />
           </div>
         </div>
 
