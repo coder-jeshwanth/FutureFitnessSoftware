@@ -229,6 +229,11 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [dateRange, setDateRange] = useState<{startDate: string | null, endDate: string | null}>({
+    startDate: null,
+    endDate: null
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [newUser, setNewUser] = useState({
     name: '',
@@ -245,6 +250,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
   // Filter states
   const [statusFilters, setStatusFilters] = useState<{[key: string]: boolean}>({
     Active: false,
+    InActive: false,
     pending: false,
     Expired: false
   });
@@ -303,7 +309,18 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
     // Pending only filter
     const matchesPending = !showPendingOnly || user.status === 'pending';
     
-    return matchesSearch && matchesBranch && matchesStatus && matchesMembership && matchesTrainer && matchesPending;
+    // Date range filter
+    let matchesDateRange = true;
+    if (dateRange.startDate && dateRange.endDate) {
+      const userJoinDate = new Date(user.joinDate);
+      const startDate = new Date(dateRange.startDate);
+      const endDate = new Date(dateRange.endDate);
+      // Add one day to make the end date inclusive
+      endDate.setDate(endDate.getDate() + 1);
+      matchesDateRange = userJoinDate >= startDate && userJoinDate < endDate;
+    }
+    
+    return matchesSearch && matchesBranch && matchesStatus && matchesMembership && matchesTrainer && matchesPending && matchesDateRange;
   });
 
   // Calculate pagination
@@ -375,6 +392,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
   const clearAllFilters = () => {
     setStatusFilters({
       Active: false,
+      InActive: false,
       pending: false,
       Expired: false
     });
@@ -499,7 +517,17 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                 <button className="px-3 py-1.5 text-gray-300 text-xs font-medium rounded hover:bg-[#3A4049] hover:text-[#7BC843] transition-colors">3d</button>
                 <button className="px-3 py-1.5 text-gray-300 text-xs font-medium rounded hover:bg-[#3A4049] hover:text-[#7BC843] transition-colors">1w</button>
                 <button className="px-3 py-1.5 text-gray-300 text-xs font-medium rounded hover:bg-[#3A4049] hover:text-[#7BC843] transition-colors">1m</button>
-                <button className="px-3 py-1.5 text-gray-300 text-xs font-medium rounded hover:bg-[#3A4049] hover:text-[#7BC843] transition-colors">Custom</button>
+                <button 
+                  onClick={() => setShowDateModal(true)}
+                  className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                    dateRange.startDate ? 'bg-[#7BC843] bg-opacity-20 text-[#7BC843]' : 'text-gray-300 hover:bg-[#3A4049] hover:text-[#7BC843]'
+                  }`}
+                >
+                  {dateRange.startDate && dateRange.endDate 
+                    ? `${dateRange.startDate.split('-')[2]}/${dateRange.startDate.split('-')[1]} - ${dateRange.endDate.split('-')[2]}/${dateRange.endDate.split('-')[1]}` 
+                    : 'Custom'
+                  }
+                </button>
               </div>
               <button 
                 onClick={() => setShowFilterModal(true)}
@@ -1005,7 +1033,12 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                           onChange={() => handleStatusFilterChange(status)}
                           className="form-checkbox h-5 w-5 text-[#7BC843] rounded border-gray-600 bg-[#23292F] focus:ring-[#7BC843] focus:ring-offset-gray-800"
                         />
-                        <span className={`text-white ${status === 'Active' ? 'text-green-500' : status === 'pending' ? 'text-yellow-500' : 'text-red-500'}`}>
+                        <span className={`text-white ${
+                          status === 'Active' ? 'text-green-500' : 
+                          status === 'InActive' ? 'text-orange-500' :
+                          status === 'Expired' ? 'text-red-500' :
+                          ''
+                        }`}>
                           {status.charAt(0).toUpperCase() + status.slice(1)}
                         </span>
                       </label>
@@ -1063,6 +1096,82 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                 >
                   Apply Filters
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Date Range Modal */}
+      {showDateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#2A3037] rounded-xl shadow-2xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-700 flex justify-between items-center">
+              <div className="flex items-center space-x-3">
+                <div className="bg-[#7BC843] bg-opacity-20 p-2 rounded-full">
+                  <Calendar className="h-6 w-6 text-[#7BC843]" />
+                </div>
+                <h2 className="text-xl font-bold text-white">Select Date Range</h2>
+              </div>
+              <button 
+                onClick={() => setShowDateModal(false)}
+                className="text-gray-400 hover:text-white text-2xl"
+              >
+                <X />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">Start Date</label>
+                    <input 
+                      type="date"
+                      value={dateRange.startDate || ''}
+                      onChange={(e) => setDateRange(prev => ({...prev, startDate: e.target.value}))}
+                      className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">End Date</label>
+                    <input 
+                      type="date"
+                      value={dateRange.endDate || ''}
+                      onChange={(e) => setDateRange(prev => ({...prev, endDate: e.target.value}))}
+                      className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex justify-end space-x-4 mt-6">
+                  <button 
+                    onClick={() => {
+                      setDateRange({ startDate: null, endDate: null });
+                      setShowDateModal(false);
+                    }}
+                    className="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                  >
+                    Clear
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (dateRange.startDate && dateRange.endDate) {
+                        // Date filtering logic is now handled in the filteredUsers function
+                        setShowDateModal(false);
+                      }
+                    }}
+                    disabled={!dateRange.startDate || !dateRange.endDate}
+                    className={`px-4 py-2 rounded-lg transition-colors duration-200 font-medium ${
+                      dateRange.startDate && dateRange.endDate 
+                        ? 'bg-[#7BC843] hover:bg-[#6AB732] text-black' 
+                        : 'bg-gray-600 cursor-not-allowed text-gray-400'
+                    }`}
+                  >
+                    Apply
+                  </button>
+                </div>
               </div>
             </div>
           </div>
