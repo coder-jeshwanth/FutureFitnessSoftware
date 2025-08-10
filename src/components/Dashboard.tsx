@@ -198,6 +198,14 @@ const ClassParticipationChart = () => {
         display: false
       },
       tooltip: {
+        enabled: true,
+        backgroundColor: 'rgba(42, 48, 55, 0.9)',
+        titleColor: '#fff',
+        bodyColor: '#e5e7eb',
+        borderColor: '#374151',
+        borderWidth: 1,
+        padding: 10,
+        displayColors: true,
         callbacks: {
           label: function(context: any) {
             const index = context.dataIndex;
@@ -206,23 +214,23 @@ const ClassParticipationChart = () => {
         }
       }
     },
-    maintainAspectRatio: false,
+    maintainAspectRatio: true,
   };
 
   return (
-    <div className="flex items-stretch h-60">
-      <div className="w-5/12 flex items-center justify-center">
-        <div className="h-48 w-48">
+    <div className="flex flex-col md:flex-row items-center md:items-stretch h-auto md:h-60 gap-6 md:gap-0">
+      <div className="w-full md:w-5/12 flex items-center justify-center py-2">
+        <div className="h-40 w-40 sm:h-48 sm:w-48 relative">
           <Doughnut data={data} options={options} />
         </div>
       </div>
-      <div className="w-7/12 flex flex-col justify-between py-2">
-        <div className="space-y-4">
+      <div className="w-full md:w-7/12 flex flex-col justify-center md:justify-between py-2">
+        <div className="space-y-3 md:space-y-4">
           {classData.map((item, index) => (
             <div key={index} className="flex items-center space-x-3">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-              <div className="flex flex-col flex-grow">
-                <span className="text-sm font-medium text-gray-200">{item.name}</span>
+              <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }}></div>
+              <div className="flex flex-col flex-grow min-w-0">
+                <span className="text-sm font-medium text-gray-200 truncate">{item.name}</span>
                 <div className="flex items-center space-x-2 mt-1">
                   <div className="w-full h-1.5 bg-gray-700 rounded-full">
                     <div 
@@ -230,7 +238,7 @@ const ClassParticipationChart = () => {
                       style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
                     />
                   </div>
-                  <span className="text-xs text-gray-400 w-9">{item.percentage}%</span>
+                  <span className="text-xs text-gray-400 w-9 flex-shrink-0">{item.percentage}%</span>
                 </div>
               </div>
             </div>
@@ -286,18 +294,91 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
               <h3 className="text-lg font-semibold text-white">Member Growth</h3>
               <TrendingUp className="h-5 w-5 text-[#7BC843]" />
             </div>
-            <div className="h-48 flex items-end justify-between space-x-2">
-              {[65, 78, 82, 95, 87, 102, 115].map((height, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center">
-                  <div 
-                    className="w-full bg-[#7BC843] rounded-t-sm transition-all duration-500 hover:bg-[#6BB536]"
-                    style={{ height: `${height}px` }}
-                  />
-                  <span className="text-xs text-gray-300 mt-2">
-                    {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'][index]}
-                  </span>
-                </div>
-              ))}
+            <div className="h-52">
+              <Line 
+                data={{
+                  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                  datasets: [
+                    {
+                      label: 'New Members',
+                      data: [25, 38, 42, 53, 47, 62, 75],
+                      backgroundColor: 'rgba(123, 200, 67, 0.2)',
+                      borderColor: '#7BC843',
+                      pointBackgroundColor: '#7BC843',
+                      pointBorderColor: '#fff',
+                      pointRadius: 4,
+                      tension: 0.3,
+                    },
+                    {
+                      label: 'Cumulative Total',
+                      data: [25, 63, 105, 158, 205, 267, 342],
+                      backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                      borderColor: '#3b82f6',
+                      pointBackgroundColor: '#3b82f6',
+                      pointBorderColor: '#fff',
+                      pointRadius: 4,
+                      tension: 0.3,
+                      fill: true,
+                    }
+                  ]
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      display: true,
+                      position: 'top',
+                      labels: {
+                        color: '#e5e7eb',
+                        font: {
+                          size: 10
+                        }
+                      }
+                    },
+                    tooltip: {
+                      backgroundColor: 'rgba(42, 48, 55, 0.9)',
+                      titleColor: '#fff',
+                      bodyColor: '#e5e7eb',
+                      borderColor: '#374151',
+                      borderWidth: 1,
+                      padding: 10,
+                      displayColors: true,
+                      callbacks: {
+                        title: function(tooltipItems) {
+                          return tooltipItems[0].label;
+                        },
+                        label: function(context) {
+                          const datasetLabel = context.dataset.label || '';
+                          const value = context.parsed.y || 0;
+                          return `${datasetLabel}: ${value} members`;
+                        }
+                      }
+                    }
+                  },
+                  scales: {
+                    x: {
+                      grid: {
+                        color: 'rgba(75, 85, 99, 0.2)',
+                      },
+                      ticks: {
+                        color: '#9ca3af'
+                      }
+                    },
+                    y: {
+                      grid: {
+                        color: 'rgba(75, 85, 99, 0.2)',
+                      },
+                      ticks: {
+                        color: '#9ca3af',
+                        callback: function(value) {
+                          return value;
+                        }
+                      }
+                    }
+                  }
+                }}
+              />
             </div>
           </div>
 
@@ -335,7 +416,9 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
               <h3 className="text-lg font-semibold text-white">Class Participation</h3>
               <Activity className="h-5 w-5 text-blue-600" />
             </div>
-            <ClassParticipationChart />
+            <div className="w-full h-full">
+              <ClassParticipationChart />
+            </div>
           </div>
         </div>
 

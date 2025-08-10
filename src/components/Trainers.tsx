@@ -907,20 +907,26 @@ const Trainers: React.FC<TrainersProps> = ({ selectedBranch: navbarSelectedBranc
                 
                 {/* Role Filter (for Staff tab) */}
                 {activeTab === 'staff' && (
-                  <div>
-                    <h4 className="text-white font-medium mb-3">Role</h4>
-                    <div className="space-y-2">
-                      {['All Roles', 'Admin', 'Manager', 'Receptionist'].map((role) => (
-                        <label key={role} className="flex items-center space-x-2 text-gray-300 hover:text-white cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={selectedRole === role}
-                            onChange={() => setSelectedRole(role)}
-                            className="rounded text-[#7BC843] h-4 w-4 focus:ring-[#7BC843] focus:ring-offset-gray-800"
-                          />
-                          <span>{role}</span>
-                        </label>
-                      ))}
+                  <div className="mt-5">
+                    <h4 className="text-white font-medium mb-3 flex items-center">
+                      <span className="w-3 h-3 rounded-full mr-2 bg-[#7BC843]"></span>
+                      Role
+                    </h4>
+                    <div className="relative">
+                      <select
+                        value={selectedRole}
+                        onChange={(e) => setSelectedRole(e.target.value)}
+                        className="w-full px-4 py-3 bg-[#23292F] text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-[#7BC843] appearance-none"
+                      >
+                        {['All Roles', 'Admin', 'Manager', 'Receptionist'].map((role) => (
+                          <option key={role} value={role}>{role}</option>
+                        ))}
+                      </select>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 )}
