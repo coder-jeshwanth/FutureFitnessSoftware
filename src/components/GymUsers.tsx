@@ -54,7 +54,7 @@ const users = [
     email: 'sneha.reddy@email.com',
     phone: '+91 65432 10987',
     membership: 'Standard',
-    status: 'Active',
+    status: 'InActive',
     planExpiry: '2025-04-20',
     trainer: 'Vikash Kumar',
     joinDate: '2024-03-05',
@@ -145,11 +145,11 @@ const users = [
   },
   {
     id: 11,
-    name: 'Neha Gupta',
-    email: 'neha.gupta@email.com',
+    name: 'kishore',
+    email: 'kishore@email.com',
     phone: '+91 98123 45678',
     membership: 'Basic',
-    status: 'pending',
+    status: 'InActive',
     planExpiry: '2025-01-05',
     trainer: 'Raj Singh',
     joinDate: '2023-11-05',
@@ -239,7 +239,8 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
     trainer: '',
     gender: '',
     dob: '',
-    paymentMethod: ''
+    paymentMethod: '',
+    cashReceived: ''
   });
   // Filter states
   const [statusFilters, setStatusFilters] = useState<{[key: string]: boolean}>({
@@ -336,7 +337,8 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
       trainer: '',
       gender: '',
       dob: '',
-      paymentMethod: ''
+      paymentMethod: '',
+      cashReceived: ''
     });
   };
   
@@ -428,8 +430,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
 
         {/* New Members Card */}
         <div 
-          className="bg-[#2A3037] p-8 rounded-xl flex justify-between items-center h-[130px] cursor-pointer hover:bg-[#353c44] transition-colors duration-200 group"
-          onClick={() => setShowAddModal(true)}
+          className="bg-[#2A3037] p-8 rounded-xl flex justify-between items-center h-[130px] hover:bg-[#353c44] transition-colors duration-200 group"
         >
           <div className="flex items-center">
             <div className="text-[#7BC843] mr-6">
@@ -443,8 +444,14 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
               </div>
             </div>
           </div>
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-            
+          <div className="group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="px-4 py-2 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium flex items-center"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Member
+            </button>
           </div>
         </div>
 
@@ -544,6 +551,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       user.status === 'Active' ? 'bg-green-600 text-white' : 
                       user.status === 'pending' ? 'bg-yellow-500 text-black' : 
+                      user.status === 'InActive' ? 'bg-orange-500 text-white' :
                       'bg-red-600 text-white'
                     }`}>
                       {user.status}
@@ -648,7 +656,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="name"
                         value={newUser.name}
                         onChange={handleInputChange}
-                        className="w-full bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                         placeholder="Enter full name"
                       />
                     </div>
@@ -660,7 +668,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="email"
                         value={newUser.email}
                         onChange={handleInputChange}
-                        className="w-full bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                         placeholder="Enter email address"
                       />
                     </div>
@@ -672,7 +680,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="phone"
                         value={newUser.phone}
                         onChange={handleInputChange}
-                        className="w-full bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                         placeholder="+91 XXXXX XXXXX"
                       />
                     </div>
@@ -684,7 +692,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="dob"
                         value={newUser.dob}
                         onChange={handleInputChange}
-                        className="w-full bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                       />
                     </div>
                     
@@ -694,7 +702,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="gender"
                         value={newUser.gender}
                         onChange={handleInputChange}
-                        className="w-full bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                       >
                         <option value="">Select Gender</option>
                         <option value="Male">Male</option>
@@ -719,11 +727,11 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="membership"
                         value={newUser.membership}
                         onChange={handleInputChange}
-                        className="w-full bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                       >
-                        <option value="Basic">Basic</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Premium">Premium</option>
+                        <option value="Basic">Basic(1000)</option>
+                        <option value="Standard">Standard(1500)</option>
+                        <option value="Premium">Premium(2000)</option>
                       </select>
                     </div>
                     
@@ -733,7 +741,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="trainer"
                         value={newUser.trainer}
                         onChange={handleInputChange}
-                        className="w-full bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                       >
                         <option value="">Select Trainer</option>
                         <option value="Vikash Kumar">Vikash Kumar</option>
@@ -748,7 +756,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="branch"
                         value={newUser.branch}
                         onChange={handleInputChange}
-                        className="w-full bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                       >
                         <option value="">Select Branch</option>
                         <option value="Stonehousepet">Stonehousepet</option>
@@ -767,13 +775,25 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="paymentMethod"
                         value={newUser.paymentMethod}
                         onChange={handleInputChange}
-                        className="w-full bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                       >
                         <option value="">Select Payment Method</option>
                         <option value="Cash">Cash</option>
                         <option value="UPI">UPI</option>
                         <option value="Card">Card</option>
                       </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-gray-400 text-sm mb-1">Cash Received</label>
+                      <input 
+                        type="text"
+                        name="cashReceived"
+                        value={newUser.cashReceived}
+                        onChange={handleInputChange}
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        placeholder="Enter amount received"
+                      />
                     </div>
                   </div>
                 </div>
