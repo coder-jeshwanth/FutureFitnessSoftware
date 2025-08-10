@@ -238,6 +238,8 @@ const ClassSchedule: React.FC<ClassScheduleProps> = ({ selectedBranch = 'All Bra
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
+  
+
 
   const getClassTypeColor = (type: string) => {
     switch (type) {
