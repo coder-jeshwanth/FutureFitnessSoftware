@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Filter, Search, List, Copy, Dumbbell, Heart, Zap, Target, Activity } from 'lucide-react';
+import { Calendar, Clock, Users, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Filter, Search, List, Copy, Dumbbell, Heart, Zap, Target, Activity, Music, Flame, Shield, Award } from 'lucide-react';
+
+// All available branches - same as in App.tsx
+const branches = [
+  'All Branches',
+  'Stonehousepet',
+  'Harinathpuram',
+  'Vanamthopu Center',
+  'Current Office Center',
+  'Vedayapalem',
+  'BV Nagar',
+  'Dhanalakshmi Puram'
+];
 
 const classes = [
   // Today's classes
@@ -14,6 +26,7 @@ const classes = [
     date: '2025-08-10', // Today
     type: 'Yoga',
     room: 'Studio A',
+    branch: 'Stonehousepet', // Added branch property
     members: [
       { id: 1, name: 'Sarah Johnson', avatar: 'SJ' },
       { id: 2, name: 'Mike Chen', avatar: 'MC' },
@@ -194,7 +207,11 @@ const timeSlots = [
   '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM'
 ];
 
-const ClassSchedule: React.FC = () => {
+interface ClassScheduleProps {
+  selectedBranch?: string;
+}
+
+const ClassSchedule: React.FC<ClassScheduleProps> = ({ selectedBranch = 'All Branches' }) => {
   const [viewMode, setViewMode] = useState<'calendar' | 'list' | 'day' | 'month'>('calendar');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -238,15 +255,15 @@ const ClassSchedule: React.FC = () => {
 
   const getClassTypeIcon = (type: string) => {
     switch (type) {
-      case 'Yoga': return <Heart className="h-4 w-4" />;
-      case 'HIIT': return <Zap className="h-4 w-4" />;
-      case 'Strength': return <Dumbbell className="h-4 w-4" />;
-      case 'Dance': return <Activity className="h-4 w-4" />;
-      case 'Cardio': return <Target className="h-4 w-4" />;
-      case 'Martial Arts': return <Target className="h-4 w-4" />;
-      case 'Pilates': return <Heart className="h-4 w-4" />;
-      case 'CrossFit': return <Dumbbell className="h-4 w-4" />;
-      default: return <Activity className="h-4 w-4" />;
+      case 'Yoga': return <Heart className="h-4 w-4 text-white" />;
+      case 'HIIT': return <Zap className="h-4 w-4 text-white" />;
+      case 'Strength': return <Dumbbell className="h-4 w-4 text-white" />;
+      case 'Dance': return <Music className="h-4 w-4 text-white" />;
+      case 'Cardio': return <Activity className="h-4 w-4 text-white" />;
+      case 'Martial Arts': return <Shield className="h-4 w-4 text-white" />;
+      case 'Pilates': return <Award className="h-4 w-4 text-white" />;
+      case 'CrossFit': return <Flame className="h-4 w-4 text-white" />;
+      default: return <Target className="h-4 w-4 text-white" />;
     }
   };
 
@@ -285,6 +302,11 @@ const ClassSchedule: React.FC = () => {
       const matchesType = filterType === 'All Types' || cls.type === filterType;
       const matchesTrainer = filterTrainer === 'All Trainers' || cls.trainer === filterTrainer;
       
+      // Branch filtering - use the branch property if available, otherwise use the ID-based approach
+      const matchesBranch = selectedBranch === 'All Branches' || 
+        (cls.branch ? cls.branch === selectedBranch : 
+        (cls.id % (branches.length - 1) === branches.indexOf(selectedBranch) - 1));
+      
       // Search functionality
       const matchesSearch = searchTerm === '' || 
         cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -298,7 +320,7 @@ const ClassSchedule: React.FC = () => {
         matchesDate = cls.date === filterDate;
       }
       
-      return matchesType && matchesTrainer && matchesDate && matchesSearch;
+      return matchesType && matchesTrainer && matchesDate && matchesSearch && matchesBranch;
     });
   };
 
@@ -340,6 +362,24 @@ const ClassSchedule: React.FC = () => {
     <div className="space-y-6 bg-[#2A3037] p-6 rounded-lg min-h-screen">
       {/* Header */}
       <div className="flex flex-col space-y-4">
+        {/* Branch Indicator - Only show when a specific branch is selected */}
+        {selectedBranch !== 'All Branches' && (
+          <div className="bg-[#3a4148] p-4 rounded-xl mb-2 flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="bg-[#7BC843] bg-opacity-20 p-2 rounded-full mr-3">
+                <svg className="h-5 w-5 text-[#7BC843]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </div>
+              <div>
+                <p className="text-gray-400 text-xs">Currently Viewing</p>
+                <h3 className="text-white font-medium">{selectedBranch} Branch</h3>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
           <div>
             <p className="text-gray-100 mt-1">Manage and schedule gym classes</p>
@@ -476,15 +516,18 @@ const ClassSchedule: React.FC = () => {
           </div>
           
           {/* Category Legend */}
-          <div className="mt-4 pt-4 border-t border-gray-700">
-            <div className="flex items-center space-x-1 text-sm text-gray-300 mb-2">
-              <span>Category Legend:</span>
+          <div className="mt-6 pt-5 border-t border-gray-700">
+            <div className="flex items-center space-x-2 text-lg font-medium text-white mb-3">
+              <List className="h-5 w-5" />
+              <span>Category Legend</span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-4">
               {['Yoga', 'HIIT', 'Strength', 'Dance', 'Cardio', 'Martial Arts', 'Pilates', 'CrossFit'].map((type) => (
-                <div key={type} className="flex items-center space-x-1">
-                  <div className={`w-3 h-3 rounded-full ${getClassTypeColor(type).split(' ')[0]}`}></div>
-                  <span className="text-xs text-gray-300">{type}</span>
+                <div key={type} className="flex items-center space-x-2 bg-[#3a4148] px-3 py-2 rounded-lg">
+                  <div className={`w-8 h-8 rounded-full ${getClassTypeColor(type).split(' ')[0]} flex items-center justify-center`}>
+                    {React.cloneElement(getClassTypeIcon(type), { className: "h-5 w-5 text-white" })}
+                  </div>
+                  <span className="text-sm font-medium text-white">{type}</span>
                 </div>
               ))}
             </div>
@@ -1266,13 +1309,23 @@ const ClassSchedule: React.FC = () => {
                     placeholder="60"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-2">Capacity</label>
-                  <input
-                    type="number"
-                    className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white"
-                    placeholder="20"
-                  />
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">Capacity</label>
+                    <input
+                      type="number"
+                      className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white"
+                      placeholder="20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">Branch</label>
+                    <select className="w-full px-4 py-3 bg-[#3a4148] border border-gray-700 rounded-lg focus:ring-2 focus:ring-[#165D31] focus:border-transparent text-white">
+                      {branches.filter(branch => branch !== 'All Branches').map((branch, index) => (
+                        <option key={index} value={branch}>{branch}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
               
@@ -1373,6 +1426,17 @@ const ClassSchedule: React.FC = () => {
                   <div>
                     <div className="font-medium">{selectedClass.room}</div>
                     <div className="text-sm text-gray-300">Location</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="h-5 w-5 mr-3 mt-0.5 flex justify-center items-center">🏢</div>
+                  <div>
+                    <div className="font-medium">
+                      {/* Display branch from property if available, otherwise use ID-based approach */}
+                      {selectedClass.branch || branches.filter(b => b !== 'All Branches')[selectedClass.id % (branches.length - 1)]}
+                    </div>
+                    <div className="text-sm text-gray-300">Branch</div>
                   </div>
                 </div>
               </div>
