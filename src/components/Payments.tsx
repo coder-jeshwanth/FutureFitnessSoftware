@@ -353,24 +353,20 @@ const Payments: React.FC<PaymentsProps> = ({ selectedBranch = 'All Branches' }) 
 
   return (
     <div className="space-y-6">
-
-      {/* Revenue Collection Progress */}
-      <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Revenue Collection Progress</h3>
-          <span className="text-2xl font-bold text-[#7BC843]">{stats.collectionRate.toFixed(1)}%</span>
+      {/* Branch Indicator - Only show when a specific branch is selected */}
+      {selectedBranch !== 'All Branches' && (
+        <div className="bg-[#3a4148] p-4 rounded-xl mb-2 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="bg-[#7BC843] bg-opacity-20 p-2 rounded-full mr-3">
+              <MapPin className="h-5 w-5 text-[#7BC843]" />
+            </div>
+            <div>
+              <p className="text-gray-400 text-xs">Currently Viewing</p>
+              <h3 className="text-white font-medium">{selectedBranch} Branch</h3>
+            </div>
+          </div>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-4 mb-4">
-          <div 
-            className="bg-gradient-to-r from-[#7BC843] to-green-400 h-4 rounded-full transition-all duration-500"
-            style={{ width: `${Math.min(stats.collectionRate, 100)}%` }}
-          ></div>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-400">Collected: ₹{stats.totalPaid.toLocaleString()}</span>
-          <span className="text-gray-400">Outstanding: ₹{(stats.totalDue - stats.totalPaid).toLocaleString()}</span>
-        </div>
-      </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -419,6 +415,24 @@ const Payments: React.FC<PaymentsProps> = ({ selectedBranch = 'All Branches' }) 
             </div>
             <Clock className="h-8 w-8 text-yellow-400" />
           </div>
+        </div>
+      </div>
+
+      {/* Revenue Collection Progress */}
+      <div className="bg-[#2A3037] rounded-xl shadow-sm border border-gray-700 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">Revenue Collection Progress</h3>
+          <span className="text-2xl font-bold text-[#7BC843]">{stats.collectionRate.toFixed(1)}%</span>
+        </div>
+        <div className="w-full bg-gray-700 rounded-full h-4 mb-4">
+          <div 
+            className="bg-gradient-to-r from-[#7BC843] to-green-400 h-4 rounded-full transition-all duration-500"
+            style={{ width: `${Math.min(stats.collectionRate, 100)}%` }}
+          ></div>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-400">Collected: ₹{stats.totalPaid.toLocaleString()}</span>
+          <span className="text-gray-400">Outstanding: ₹{(stats.totalDue - stats.totalPaid).toLocaleString()}</span>
         </div>
       </div>
 
@@ -1162,7 +1176,7 @@ const Payments: React.FC<PaymentsProps> = ({ selectedBranch = 'All Branches' }) 
                     setStatusFilter('All');
                     setMethodFilter('All');
                     setPlanFilter('All');
-                    setBranchFilter('All Branches');
+                    setBranchFilter(selectedBranch); // Respect the selectedBranch prop
                     setSortBy('dueDate');
                     setSortOrder('asc');
                   }}

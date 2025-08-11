@@ -14,7 +14,10 @@ import {
   LogOut,
   X,
   MapPin,
-  ChevronDown
+  ChevronDown,
+  User,
+  Lock,
+  HelpCircle
 } from 'lucide-react';
 import { FiSidebar } from "react-icons/fi";
 import logoImage from './components/Images/logo.png';
@@ -78,15 +81,20 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true); // Start with sidebar open
   const [selectedBranch, setSelectedBranch] = useState('All Branches');
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<{email: string; name: string} | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
   
-  // Close the dropdown when clicking outside
+  // Close the dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowBranchDropdown(false);
+      }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
       }
     }
     
@@ -108,7 +116,7 @@ function App() {
   const handleLogin = (email: string, password: string) => {
     // Simple authentication check (in a real app, this would be an API call)
     if (email === 'admin@futurefitness.com' && password === 'admin123') {
-      const user = { email, name: 'Admin User' };
+      const user = { email, name: 'Anand Kumar M' };
       setCurrentUser(user);
       setIsAuthenticated(true);
       localStorage.setItem('currentUser', JSON.stringify(user));
@@ -132,7 +140,7 @@ function App() {
       case 'workouts': return <WorkoutPlans />;
       case 'classes': return <ClassSchedule selectedBranch={selectedBranch} />;
       case 'attendance': return <Attendance selectedBranch={selectedBranch} />;
-      case 'payments': return <Payments />;
+      case 'payments': return <Payments selectedBranch={selectedBranch} />;
       case 'subscriptions': return <Subscriptions />;
       case 'reports': return <Reports />;
       case 'notifications': return <Notifications />;
@@ -245,8 +253,8 @@ function App() {
             </h2>
           </div>
           <div className="flex items-center space-x-4">
-            {/* Branch Dropdown - Show on Dashboard, Gym Users, Trainers, Classes and Attendance pages */}
-            {(activeMenu === 'users' || activeMenu === 'dashboard' || activeMenu === 'trainers' || activeMenu === 'classes' || activeMenu === 'attendance') && (
+            {/* Branch Dropdown - Show on Dashboard, Gym Users, Trainers, Classes, Payments and Attendance pages */}
+            {(activeMenu === 'users' || activeMenu === 'dashboard' || activeMenu === 'trainers' || activeMenu === 'classes' || activeMenu === 'attendance' || activeMenu === 'payments') && (
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setShowBranchDropdown(!showBranchDropdown)}
@@ -283,11 +291,64 @@ function App() {
               </div>
             )}
             
-            <div className="hidden md:flex items-center space-x-2 text-sm text-gray-300">
-              <div className="w-8 h-8 bg-[#7BC843] rounded-full flex items-center justify-center">
-                <span className="text-black font-medium">{currentUser?.name.charAt(0) || 'A'}</span>
+            <div className="hidden md:flex items-center space-x-2 text-sm text-gray-300 relative" ref={profileDropdownRef}>
+              <div 
+                className="flex items-center space-x-2 cursor-pointer" 
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              >
+                <div className="w-8 h-8 bg-[#7BC843] rounded-full flex items-center justify-center">
+                  <span className="text-black font-medium">{currentUser?.name.charAt(0) || 'A'}</span>
+                </div>
+                <span className="text-2xl text-white">{currentUser?.name || 'Anand Kumar M'}</span>
+                <ChevronDown className="h-4 w-4 text-gray-300" />
               </div>
-              <span className="text-2xl text-white">{currentUser?.name || 'Admin User'}</span>
+
+              {/* Profile Dropdown Menu */}
+              {showProfileDropdown && (
+                <div className="absolute right-0 top-full mt-2 w-48 rounded-md shadow-lg py-1 bg-[#2A3037] ring-1 ring-black ring-opacity-5 z-50">
+                  <button 
+                    className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-200 w-full text-left hover:bg-[#3A4049]"
+                    onClick={() => {
+                      alert('My Profile clicked');
+                      setShowProfileDropdown(false);
+                    }}
+                  >
+                    <User className="h-4 w-4" />
+                    <span>My Profile</span>
+                  </button>
+                  <button 
+                    className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-200 w-full text-left hover:bg-[#3A4049]"
+                    onClick={() => {
+                      alert('Change Password clicked');
+                      setShowProfileDropdown(false);
+                    }}
+                  >
+                    <Lock className="h-4 w-4" />
+                    <span>Change Password</span>
+                  </button>
+                  <button 
+                    className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-200 w-full text-left hover:bg-[#3A4049]"
+                    onClick={() => {
+                      alert('Help and Support clicked');
+                      setShowProfileDropdown(false);
+                    }}
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                    <span>Help and Support</span>
+                  </button>
+                  <div className="border-t border-gray-700 my-1"></div>
+                  <button 
+                    className="flex items-center space-x-2 px-4 py-2 text-sm text-red-400 w-full text-left hover:bg-[#3A4049]"
+                    onClick={() => {
+                      handleLogout();
+                      setShowProfileDropdown(false);
+                    }}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>
