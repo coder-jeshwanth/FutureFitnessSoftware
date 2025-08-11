@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, UserCheck, Search, Filter, Download, XCircle, ChevronLeft, BarChart, List, ChevronDown, Smartphone, Fingerprint, MapPin, AlertTriangle, UserX, Coffee, LogOut, Eye } from 'lucide-react';
+import { Calendar, Clock, Users, UserCheck, Search, Filter, Download, XCircle, ChevronLeft, BarChart, List, ChevronDown, Smartphone, Fingerprint, MapPin, AlertTriangle, UserX, Coffee, LogOut, LogIn, MoreVertical } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -401,7 +401,7 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
   const [showExportOptions, setShowExportOptions] = useState(false);
   const [exportRange, setExportRange] = useState('today');
   const [memberActions, setMemberActions] = useState<{[key: number]: 'present' | 'leave' | 'absent'}>({});
-  const [hoveredMember, setHoveredMember] = useState<number | null>(null);
+  const [openActionDropdown, setOpenActionDropdown] = useState<number | null>(null);
   
   // Existing check-in enhancement states
   const [showCheckInOptions, setShowCheckInOptions] = useState(false);
@@ -1333,9 +1333,6 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
                   <th className="text-left py-4 px-6 font-semibold text-white">
                     {activeTab === 'members' ? 'Member' : activeTab === 'trainers' ? 'Trainer' : 'Staff'}
                   </th>
-                  {activeTab === 'members' && (
-                    <th className="text-left py-4 px-6 font-semibold text-white">Membership ID</th>
-                  )}
                   {(activeTab === 'trainers' || activeTab === 'staff') && (
                     <th className="text-left py-4 px-6 font-semibold text-white">Role</th>
                   )}
@@ -1351,8 +1348,6 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
                   <tr 
                     key={record.id} 
                     className="hover:bg-[#353c44] transition-colors duration-200"
-                    onMouseEnter={() => setHoveredMember(record.id)}
-                    onMouseLeave={() => setHoveredMember(null)}
                   >
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-3">
@@ -1380,14 +1375,13 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
                         </div>
                         <div>
                           <button 
-                            className="font-semibold text-white hover:text-[#7BC843] transition-colors duration-200 text-left flex items-center"
+                            className="font-semibold text-white hover:text-[#7BC843] transition-colors duration-200 text-left"
                             onClick={() => {
                               setSelectedMember(record);
                               setViewMode('member');
                             }}
                           >
                             {record.name}
-                            <Eye className="h-4 w-4 ml-2 opacity-70" />
                           </button>
                           {/* Absence/Leave reason tooltip */}
                           {record.absenceReason && (
@@ -1400,13 +1394,11 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6">
-                      {activeTab === 'members' ? (
-                        <span className="text-gray-400">{record.membershipId}</span>
-                      ) : (
+                    {activeTab !== 'members' && (
+                      <td className="py-4 px-6">
                         <span className="text-gray-400">{record.role}</span>
-                      )}
-                    </td>
+                      </td>
+                    )}
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
                         <Clock className="h-4 w-4 text-gray-400" />
@@ -1443,47 +1435,42 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
-                        {/* Enhanced action buttons with dropdown on hover */}
-                        {hoveredMember === record.id ? (
-                          <div className="flex items-center space-x-1">
-                            {record.status === 'Absent' && (
-                              <button 
-                                className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
-                                onClick={() => setMemberActions({...memberActions, [record.id]: 'present'})}
-                              >
-                                Mark Present
-                              </button>
-                            )}
-                            {record.checkOut === 'Active' && (
-                              <button 
-                                className="px-2 py-1 bg-orange-600 text-white text-xs rounded hover:bg-orange-700 transition-colors"
-                                onClick={() => setMemberActions({...memberActions, [record.id]: 'absent'})}
-                              >
-                                Check Out
-                              </button>
-                            )}
-                            <button 
-                              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-                              onClick={() => {
-                                setSelectedMember(record);
-                                setViewMode('member');
-                              }}
-                            >
-                              View Details
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center space-x-2 text-gray-400">
-                            <button className="hover:text-white transition-colors">
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            {record.checkOut === 'Active' && (
-                              <button className="hover:text-orange-400 transition-colors">
-                                <LogOut className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        )}
+                        {/* Action dropdown */}
+                        <div className="relative">
+                          <button 
+                            className="p-1 rounded-full hover:bg-gray-700 transition-colors flex items-center justify-center"
+                            onClick={() => setOpenActionDropdown(openActionDropdown === record.id ? null : record.id)}
+                          >
+                            <MoreVertical className="w-4 h-4 text-gray-400" />
+                          </button>
+                          
+                          {openActionDropdown === record.id && (
+                            <div className="absolute right-0 mt-2 w-40 bg-[#23292F] rounded-lg border border-gray-700 shadow-lg z-10">
+                              <div className="py-1">
+                                <button 
+                                  className="w-full px-4 py-2 text-left text-white hover:bg-[#2A3037] flex items-center space-x-2"
+                                  onClick={() => {
+                                    setMemberActions({...memberActions, [record.id]: 'present'});
+                                    setOpenActionDropdown(null);
+                                  }}
+                                >
+                                  <LogIn className="w-4 h-4 text-green-400" />
+                                  <span>Check In</span>
+                                </button>
+                                <button 
+                                  className="w-full px-4 py-2 text-left text-white hover:bg-[#2A3037] flex items-center space-x-2"
+                                  onClick={() => {
+                                    setMemberActions({...memberActions, [record.id]: 'absent'});
+                                    setOpenActionDropdown(null);
+                                  }}
+                                >
+                                  <LogOut className="w-4 h-4 text-orange-400" />
+                                  <span>Check Out</span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -1727,11 +1714,11 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
                 </div>
                 <div>
                   <h3 className="text-xl font-medium text-white">{selectedMember.name}</h3>
-                  <p className="text-gray-400">
-                    {activeTab === 'members' 
-                      ? `Membership ID: ${selectedMember.membershipId}`
-                      : `Role: ${selectedMember.role}`}
-                  </p>
+                  {activeTab !== 'members' && (
+                    <p className="text-gray-400">
+                      Role: {selectedMember.role}
+                    </p>
+                  )}
                 </div>
               </div>
               
