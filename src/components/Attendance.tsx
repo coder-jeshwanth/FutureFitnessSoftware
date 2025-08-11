@@ -395,8 +395,6 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
   const [sortBy, setSortBy] = useState<'all' | 'present' | 'absent' | 'onLeave'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'trends' | 'member'>('list');
   const [selectedMember, setSelectedMember] = useState<any>(null);
-  const [dateRange, setDateRange] = useState('Today');
-  const [showDatePicker, setShowDatePicker] = useState(false);
   
   // New state variables for enhanced features
   const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent' | 'leave'>('all');
@@ -766,173 +764,7 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-3">
-          <div className="relative">
-            <button 
-              onClick={() => setShowCheckInOptions(!showCheckInOptions)}
-              className="bg-[#1E5AB3] hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
-            >
-              <UserCheck className="h-5 w-5" />
-              <span>Check-in Options</span>
-              <ChevronDown className="h-4 w-4" />
-            </button>
-            
-            {showCheckInOptions && (
-              <div className="absolute left-0 top-full mt-2 bg-[#23292F] rounded-xl border border-gray-700 shadow-lg z-10 w-64">
-                <div className="p-2">
-                  <button 
-                    onClick={() => {
-                      setShowCheckInModal(true);
-                      setShowCheckInOptions(false);
-                    }}
-                    className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
-                  >
-                    <UserCheck className="h-5 w-5 text-blue-400" />
-                    <span>Manual Check-in</span>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setShowQRModal(true);
-                      setShowCheckInOptions(false);
-                    }}
-                    className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
-                  >
-                    <QrCode className="h-5 w-5 text-purple-400" />
-                    <span>QR Code Check-in</span>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setShowBiometricModal(true);
-                      setShowCheckInOptions(false);
-                      setBiometricStatus('waiting');
-                      setBiometricMethod('fingerprint');
-                    }}
-                    className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
-                  >
-                    <Fingerprint className="h-5 w-5 text-green-400" />
-                    <span>Biometric Check-in</span>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setShowMobileCheckInModal(true);
-                      setShowCheckInOptions(false);
-                    }}
-                    className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
-                  >
-                    <Smartphone className="h-5 w-5 text-yellow-400" />
-                    <span>Mobile App Check-in</span>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setShowGeofencingModal(true);
-                      setShowCheckInOptions(false);
-                    }}
-                    className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
-                  >
-                    <MapPin className="h-5 w-5 text-red-400" />
-                    <span>Geofencing Settings</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={handleCheckOutAll}
-              className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Check Out All
-            </button>
-            
-            <button
-              onClick={() => setShowExportOptions(!showExportOptions)}
-              className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
-            >
-              <Download className="h-5 w-5" />
-              <span>Export Report</span>
-            </button>
-          </div>
-        </div>
-        
-        {/* Date Range Selector */}
-        <div className="flex items-center space-x-3 bg-[#2A3037] border border-gray-700 rounded-lg px-4 py-2">
-          <Calendar size={16} className="text-gray-400" />
-          <div className="relative">
-            <button
-              className="flex items-center space-x-1 text-white"
-              onClick={() => setShowDatePicker(!showDatePicker)}
-            >
-              <span>{dateRange}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
-            
-            {showDatePicker && (
-              <div className="absolute top-full right-0 mt-2 p-3 bg-[#23292F] rounded-xl border border-gray-700 shadow-lg z-10 w-52">
-                <div className="space-y-2">
-                  <button 
-                    className="w-full px-3 py-1.5 rounded hover:bg-[#2A3037] text-left text-white text-sm"
-                    onClick={() => {
-                      setDateRange('Today');
-                      setShowDatePicker(false);
-                    }}
-                  >
-                    Today
-                  </button>
-                  <button 
-                    className="w-full px-3 py-1.5 rounded hover:bg-[#2A3037] text-left text-white text-sm"
-                    onClick={() => {
-                      setDateRange('Yesterday');
-                      setShowDatePicker(false);
-                    }}
-                  >
-                    Yesterday
-                  </button>
-                  <button 
-                    className="w-full px-3 py-1.5 rounded hover:bg-[#2A3037] text-left text-white text-sm"
-                    onClick={() => {
-                      setDateRange('This Week');
-                      setShowDatePicker(false);
-                    }}
-                  >
-                    This Week
-                  </button>
-                  <button 
-                    className="w-full px-3 py-1.5 rounded hover:bg-[#2A3037] text-left text-white text-sm"
-                    onClick={() => {
-                      setDateRange('This Month');
-                      setShowDatePicker(false);
-                    }}
-                  >
-                    This Month
-                  </button>
-                  <button 
-                    className="w-full px-3 py-1.5 rounded hover:bg-[#2A3037] text-left text-white text-sm"
-                    onClick={() => {
-                      setDateRange('Last 30 Days');
-                      setShowDatePicker(false);
-                    }}
-                  >
-                    Last 30 Days
-                  </button>
-                  <div className="pt-2 border-t border-gray-700">
-                    <button 
-                      className="w-full px-3 py-1.5 rounded bg-[#165D31] hover:bg-[#0D4A22] text-left text-white text-sm flex justify-between items-center"
-                      onClick={() => {
-                        setShowDatePicker(false);
-                        // Custom date range picker logic would go here
-                      }}
-                    >
-                      <span>Custom Range</span>
-                      <Calendar size={14} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          <h1 className="text-2xl font-semibold text-white">Attendance Management</h1>
         </div>
       </div>
 
@@ -1161,17 +993,92 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
             </button>
           </div>
 
-          <div className="flex items-center space-x-3 text-sm text-gray-300">
-            <span>
-              Showing {filteredAttendance.length} of {
-                selectedBranch === 'All Branches' 
-                  ? attendanceData.length 
-                  : attendanceData.filter(m => m.branch === selectedBranch).length
-              } members
-              {selectedBranch !== 'All Branches' && (
-                <span className="text-[#7BC843] ml-1">in {selectedBranch}</span>
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <button 
+                onClick={() => setShowCheckInOptions(!showCheckInOptions)}
+                className="bg-[#1E5AB3] hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+              >
+                <UserCheck className="h-4 w-4" />
+                <span>Check-in Options</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+              
+              {showCheckInOptions && (
+                <div className="absolute left-0 top-full mt-2 bg-[#23292F] rounded-xl border border-gray-700 shadow-lg z-10 w-64">
+                  <div className="p-2">
+                    <button 
+                      onClick={() => {
+                        setShowCheckInModal(true);
+                        setShowCheckInOptions(false);
+                      }}
+                      className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
+                    >
+                      <UserCheck className="h-5 w-5 text-blue-400" />
+                      <span>Manual Check-in</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowQRModal(true);
+                        setShowCheckInOptions(false);
+                      }}
+                      className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
+                    >
+                      <QrCode className="h-5 w-5 text-purple-400" />
+                      <span>QR Code Check-in</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowBiometricModal(true);
+                        setShowCheckInOptions(false);
+                        setBiometricStatus('waiting');
+                        setBiometricMethod('fingerprint');
+                      }}
+                      className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
+                    >
+                      <Fingerprint className="h-5 w-5 text-green-400" />
+                      <span>Biometric Check-in</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowMobileCheckInModal(true);
+                        setShowCheckInOptions(false);
+                      }}
+                      className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
+                    >
+                      <Smartphone className="h-5 w-5 text-yellow-400" />
+                      <span>Mobile App Check-in</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowGeofencingModal(true);
+                        setShowCheckInOptions(false);
+                      }}
+                      className="w-full px-4 py-2 rounded-lg text-left text-white hover:bg-[#2A3037] flex items-center space-x-3"
+                    >
+                      <MapPin className="h-5 w-5 text-red-400" />
+                      <span>Geofencing Settings</span>
+                    </button>
+                  </div>
+                </div>
               )}
-            </span>
+            </div>
+            
+            <button
+              onClick={handleCheckOutAll}
+              className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Check Out All
+            </button>
+            
+            <button
+              onClick={() => setShowExportOptions(!showExportOptions)}
+              className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+            >
+              <Download className="h-4 w-4" />
+              <span>Export Report</span>
+            </button>
           </div>
         </div>
 
@@ -1307,7 +1214,6 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
                   const today = new Date();
                   setStartDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6).toISOString().split('T')[0]);
                   setEndDate(today.toISOString().split('T')[0]);
-                  setDateRange('Last 7 Days');
                 }}
                 className="px-3 py-1 text-xs bg-[#23292F] hover:bg-[#1A1F24] text-gray-300 border border-gray-700 rounded"
               >
@@ -1318,7 +1224,6 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
                   const today = new Date();
                   setStartDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 29).toISOString().split('T')[0]);
                   setEndDate(today.toISOString().split('T')[0]);
-                  setDateRange('Last 30 Days');
                 }}
                 className="px-3 py-1 text-xs bg-[#23292F] hover:bg-[#1A1F24] text-gray-300 border border-gray-700 rounded"
               >
@@ -1898,13 +1803,10 @@ const Attendance: React.FC<{selectedBranch: string}> = ({ selectedBranch }) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
-                  {getMemberAttendanceHistory(selectedMember.id)?.history.map((record, index) => (
-                    <tr key={index} className={`${record.date === new Date().toISOString().split('T')[0] ? 'bg-[#165D31] bg-opacity-20' : ''}`}>
+                  {getMemberAttendanceHistory(selectedMember.id)?.history.filter(record => record.date !== new Date().toISOString().split('T')[0]).map((record, index) => (
+                    <tr key={index}>
                       <td className="py-3 px-4 text-white">
                         {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        {record.date === new Date().toISOString().split('T')[0] && (
-                          <span className="ml-2 text-xs text-[#7BC843]">(Today)</span>
-                        )}
                       </td>
                       <td className="py-3 px-4 text-gray-400">{record.dayOfWeek}</td>
                       <td className="py-3 px-4 text-white">{record.checkIn}</td>
