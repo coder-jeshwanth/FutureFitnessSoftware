@@ -141,7 +141,7 @@ function App() {
       case 'classes': return <ClassSchedule selectedBranch={selectedBranch} />;
       case 'attendance': return <Attendance selectedBranch={selectedBranch} />;
       case 'payments': return <Payments selectedBranch={selectedBranch} />;
-      case 'subscriptions': return <Subscriptions />;
+      case 'subscriptions': return <Subscriptions selectedBranch={selectedBranch} />;
       case 'reports': return <Reports />;
       case 'notifications': return <Notifications />;
       case 'settings': return <AppSettings />;
@@ -253,8 +253,8 @@ function App() {
             </h2>
           </div>
           <div className="flex items-center space-x-4">
-            {/* Branch Dropdown - Show on Dashboard, Gym Users, Trainers, Classes, Payments and Attendance pages */}
-            {(activeMenu === 'users' || activeMenu === 'dashboard' || activeMenu === 'trainers' || activeMenu === 'classes' || activeMenu === 'attendance' || activeMenu === 'payments') && (
+            {/* Branch Dropdown - Show on Dashboard, Gym Users, Trainers, Classes, Payments, Subscriptions and Attendance pages */}
+            {(activeMenu === 'users' || activeMenu === 'dashboard' || activeMenu === 'trainers' || activeMenu === 'classes' || activeMenu === 'attendance' || activeMenu === 'payments' || activeMenu === 'subscriptions') && (
               <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setShowBranchDropdown(!showBranchDropdown)}
