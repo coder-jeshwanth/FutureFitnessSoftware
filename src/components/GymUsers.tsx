@@ -5,223 +5,106 @@ interface GymUsersProps {
   selectedBranch?: string;
 }
 
-const users = [
-  {
-    id: 1,
-    name: 'Arjun Sharma',
-    email: 'arjun.sharma@email.com',
-    phone: '+91 98765 43210',
-    membership: 'Premium',
-    status: 'Active',
-    planExpiry: '2025-03-15',
-    trainer: 'Vikash Kumar',
-    joinDate: '2024-01-15',
-    lastPayment: '₹5,000',
-    avatar: 'AS',
-    branch: 'Stonehousepet'
-  },
-  {
-    id: 2,
-    name: 'Priya Patel',
-    email: 'priya.patel@email.com',
-    phone: '+91 87654 32109',
-    membership: 'Basic',
-    status: 'Active',
-    planExpiry: '2025-02-28',
-    trainer: 'Sneha Reddy',
-    joinDate: '2024-02-10',
-    lastPayment: '₹2,500',
-    avatar: 'PP',
-    branch: 'Harinathpuram'
-  },
-  {
-    id: 3,
-    name: 'Rohit Kumar',
-    email: 'rohit.kumar@email.com',
-    phone: '+91 76543 21098',
-    membership: 'Premium',
-    status: 'Expired',
-    planExpiry: '2024-12-31',
-    trainer: 'Raj Singh',
-    joinDate: '2023-12-01',
-    lastPayment: '₹5,000',
-    avatar: 'RK',
-    branch: 'Vanamthopu Center'
-  },
-  {
-    id: 4,
-    name: 'Sneha Reddy',
-    email: 'sneha.reddy@email.com',
-    phone: '+91 65432 10987',
-    membership: 'Standard',
-    status: 'InActive',
-    planExpiry: '2025-04-20',
-    trainer: 'Vikash Kumar',
-    joinDate: '2024-03-05',
-    lastPayment: '₹3,500',
-    avatar: 'SR',
-    branch: 'Current Office Center'
-  },
-  {
-    id: 5,
-    name: 'Amit Singh',
-    email: 'amit.singh@email.com',
-    phone: '+91 54321 09876',
-    membership: 'Premium',
-    status: 'pending',
-    planExpiry: '2025-01-30',
-    trainer: 'Raj Singh',
-    joinDate: '2023-10-15',
-    lastPayment: '₹5,000',
-    avatar: 'AS',
-    branch: 'Vedayapalem'
-  },
-  {
-    id: 6,
-    name: 'Divya Mehta',
-    email: 'divya.mehta@email.com',
-    phone: '+91 89765 12345',
-    membership: 'Standard',
-    status: 'Active',
-    planExpiry: '2025-05-10',
-    trainer: 'Sneha Reddy',
-    joinDate: '2024-04-15',
-    lastPayment: '₹3,500',
-    avatar: 'DM',
-    branch: 'BV Nagar'
-  },
-  {
-    id: 7,
-    name: 'Rakesh Verma',
-    email: 'rakesh.verma@email.com',
-    phone: '+91 77788 99900',
-    membership: 'Premium',
-    status: 'Active',
-    planExpiry: '2025-07-22',
-    trainer: 'Vikash Kumar',
-    joinDate: '2024-01-22',
-    lastPayment: '₹5,000',
-    avatar: 'RV',
-    branch: 'Dhanalakshmi Puram'
-  },
-  {
-    id: 8,
-    name: 'Neha Gupta',
-    email: 'neha.gupta@email.com',
-    phone: '+91 98123 45678',
-    membership: 'Basic',
-    status: 'pending',
-    planExpiry: '2025-01-05',
-    trainer: 'Raj Singh',
-    joinDate: '2023-11-05',
-    lastPayment: '₹2,500',
-    avatar: 'NG'
-  },
-   {
-    id: 9,
-    name: 'Neha Gupta',
-    email: 'neha.gupta@email.com',
-    phone: '+91 98123 45678',
-    membership: 'Basic',
-    status: 'pending',
-    planExpiry: '2025-01-05',
-    trainer: 'Raj Singh',
-    joinDate: '2023-11-05',
-    lastPayment: '₹2,500',
-    avatar: 'NG'
-  },
-  {
-    id: 10,
-    name: 'Neha Gupta',
-    email: 'neha.gupta@email.com',
-    phone: '+91 98123 45678',
-    membership: 'Basic',
-    status: 'pending',
-    planExpiry: '2025-01-05',
-    trainer: 'Raj Singh',
-    joinDate: '2023-11-05',
-    lastPayment: '₹2,500',
-    avatar: 'NG'
-  },
-  {
-    id: 11,
-    name: 'kishore',
-    email: 'kishore@email.com',
-    phone: '+91 98123 45678',
-    membership: 'Basic',
-    status: 'InActive',
-    planExpiry: '2025-01-05',
-    trainer: 'Raj Singh',
-    joinDate: '2023-11-05',
-    lastPayment: '₹2,500',
-    avatar: 'NG'
-  },
-  {
-    id: 12,
-    name: 'Neha Gupta',
-    email: 'neha.gupta@email.com',
-    phone: '+91 98123 45678',
-    membership: 'Basic',
-    status: 'pending',
-    planExpiry: '2025-01-05',
-    trainer: 'Raj Singh',
-    joinDate: '2023-11-05',
-    lastPayment: '₹2,500',
-    avatar: 'NG'
-  },
-  {
-    id: 13,
-    name: 'Arjun Sharma',
-    email: 'arjun.sharma@email.com',
-    phone: '+91 98765 43210',
-    membership: 'Premium',
-    status: 'Active',
-    planExpiry: '2025-03-15',
-    trainer: 'Vikash Kumar',
-    joinDate: '2024-01-15',
-    lastPayment: '₹5,000',
-    avatar: 'AS'
-  },
-  {
-    id: 14,
-    name: 'Priya Patel',
-    email: 'priya.patel@email.com',
-    phone: '+91 87654 32109',
-    membership: 'Basic',
-    status: 'Active',
-    planExpiry: '2025-02-28',
-    trainer: 'Sneha Reddy',
-    joinDate: '2024-02-10',
-    lastPayment: '₹2,500',
-    avatar: 'PP'
-  },
-  {
-    id: 15,
-    name: 'Rohit Kumar',
-    email: 'rohit.kumar@email.com',
-    phone: '+91 76543 21098',
-    membership: 'Premium',
-    status: 'Expired',
-    planExpiry: '2024-12-31',
-    trainer: 'Raj Singh',
-    joinDate: '2023-12-01',
-    lastPayment: '₹5,000',
-    avatar: 'RK'
-  },
-  {
-    id:16,
-    name: 'Sneha Reddy',
-    email: 'sneha.reddy@email.com',
-    phone: '+91 65432 10987',
-    membership: 'Standard',
-    status: 'Active',
-    planExpiry: '2025-04-20',
-    trainer: 'Vikash Kumar',
-    joinDate: '2024-03-05',
-    lastPayment: '₹3,500',
-    avatar: 'SR'
-  },
-];
+// Function to generate random data
+const generateUsers = (count: number) => {
+  const firstNames = ['Arjun', 'Priya', 'Rohit', 'Sneha', 'Amit', 'Divya', 'Rakesh', 'Neha', 'Vikash', 'Ananya', 
+    'Rajesh', 'Pooja', 'Sanjay', 'Kavita', 'Deepak', 'Ritu', 'Suresh', 'Anjali', 'Manish', 'Sunita'];
+  
+  const lastNames = ['Sharma', 'Patel', 'Kumar', 'Reddy', 'Singh', 'Mehta', 'Verma', 'Gupta', 'Joshi', 'Das', 
+    'Rao', 'Malhotra', 'Nair', 'Iyer', 'Shah', 'Khanna', 'Agarwal', 'Chopra', 'Bose', 'Banerjee'];
+  
+  const branches = ['Stonehousepet', 'Harinathpuram', 'Vanamthopu Center', 'Current Office Center', 'Vedayapalem',
+    'BV Nagar', 'Dhanalakshmi Puram', 'Magunta Layout', 'Railway Colony', 'Brindavan Gardens'];
+  
+  const trainers = ['Vikash Kumar', 'Sneha Reddy', 'Raj Singh', 'Ananya Desai', 'Kiran Rao'];
+  
+  const statuses = ['Active', 'InActive', 'pending', 'Expired'];
+  
+  const memberships = ['Basic', 'Standard', 'Premium'];
+  
+  const users = [];
+  const today = new Date('2025-08-14'); // Current date
+
+  for (let i = 1; i <= count; i++) {
+    // Random name components
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const fullName = `${firstName} ${lastName}`;
+    
+    // Create email from name
+    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@email.com`;
+    
+    // Generate random phone number
+    const phone = `+91 ${Math.floor(70000 + Math.random() * 30000)} ${Math.floor(10000 + Math.random() * 90000)}`;
+    
+    // Select random values for other fields
+    const membership = memberships[Math.floor(Math.random() * memberships.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const trainer = trainers[Math.floor(Math.random() * trainers.length)];
+    const branch = branches[Math.floor(Math.random() * branches.length)];
+    
+    // Generate random join date (between 2 years ago and today)
+    const twoYearsAgo = new Date(today);
+    twoYearsAgo.setFullYear(today.getFullYear() - 2);
+    
+    // Randomly decide if this user is a new member (joined in last 30 days)
+    const isNewMember = i <= 25; // Make 25 users new members
+    
+    let joinDate;
+    if (isNewMember) {
+      // For new members, join date is within last 30 days
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      
+      const randomDaysAgo = Math.floor(Math.random() * 30);
+      joinDate = new Date(today);
+      joinDate.setDate(today.getDate() - randomDaysAgo);
+    } else {
+      // For older members, join date is between 2 years ago and 31 days ago
+      const thirtyOneDaysAgo = new Date(today);
+      thirtyOneDaysAgo.setDate(today.getDate() - 31);
+      
+      const timeDiff = thirtyOneDaysAgo.getTime() - twoYearsAgo.getTime();
+      joinDate = new Date(twoYearsAgo.getTime() + Math.random() * timeDiff);
+    }
+    
+    // Format join date as 'YYYY-MM-DD'
+    const formattedJoinDate = joinDate.toISOString().split('T')[0];
+    
+    // Calculate plan expiry (1 year from join date)
+    const planExpiry = new Date(joinDate);
+    planExpiry.setFullYear(planExpiry.getFullYear() + 1);
+    const formattedPlanExpiry = planExpiry.toISOString().split('T')[0];
+    
+    // Generate payment amount based on membership
+    let paymentAmount;
+    if (membership === 'Basic') paymentAmount = '₹2,500';
+    else if (membership === 'Standard') paymentAmount = '₹3,500';
+    else paymentAmount = '₹5,000';
+    
+    // Generate avatar from initials
+    const avatar = `${firstName[0]}${lastName[0]}`;
+    
+    users.push({
+      id: i,
+      name: fullName,
+      email,
+      phone,
+      membership,
+      status,
+      planExpiry: formattedPlanExpiry,
+      trainer,
+      joinDate: formattedJoinDate,
+      lastPayment: paymentAmount,
+      avatar,
+      branch
+    });
+  }
+  
+  return users;
+};
+
+const users = generateUsers(100);
 
 const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -408,6 +291,43 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
     setShowPendingOnly(false);
   };
 
+  // Calculate total members based on branch selection
+  const getTotalMembersForBranch = (branch: string) => {
+    if (branch === 'All Branches') {
+      return users.length; // Return total count of all users
+    } else {
+      // Count only users from the selected branch
+      return users.filter(user => user.branch === branch).length;
+    }
+  };
+
+  // Calculate new members (joined in last 30 days) based on branch selection
+  const getNewMembersForBranch = (branch: string) => {
+    const today = new Date('2025-08-14'); // Current date
+    const thirtyDaysAgo = new Date('2025-08-14');
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    
+    if (branch === 'All Branches') {
+      // Count all members who joined in last 30 days
+      return users.filter(user => {
+        const joinDate = new Date(user.joinDate);
+        return joinDate >= thirtyDaysAgo && joinDate <= today;
+      }).length;
+    } else {
+      // Count members from the selected branch who joined in last 30 days
+      return users.filter(user => {
+        const joinDate = new Date(user.joinDate);
+        return user.branch === branch && joinDate >= thirtyDaysAgo && joinDate <= today;
+      }).length;
+    }
+  };
+
+  // Get the total members count for the selected branch
+  const totalMembersCount = getTotalMembersForBranch(selectedBranch);
+  
+  // Get the new members count for the selected branch
+  const newMembersCount = getNewMembersForBranch(selectedBranch);
+
   return (
     <div className="space-y-6 bg-black p-6 rounded-lg">
       {/* Stats Cards */}
@@ -441,7 +361,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
             </div>
             <div>
               <p className="text-gray-400 text-sm mb-2">Total Members</p>
-              <h2 className="text-white text-4xl font-bold">451</h2>
+              <h2 className="text-white text-4xl font-bold">{totalMembersCount}</h2>
             </div>
           </div>
         </div>
@@ -457,7 +377,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
             <div>
               <p className="text-gray-400 text-sm mb-2">New Members</p>
               <div className="flex items-end">
-                <h2 className="text-white text-4xl font-bold">40</h2>
+                <h2 className="text-white text-4xl font-bold">{newMembersCount}</h2>
                 <span className="text-gray-400 text-xs ml-2 mb-1">(last 30 days)</span>
               </div>
             </div>
@@ -484,7 +404,11 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
             </div>
             <div>
               <p className="text-gray-400 text-sm mb-2">Pending Dues</p>
-              <h2 className="text-white text-4xl font-bold">5</h2>
+              <h2 className="text-white text-4xl font-bold">
+                {selectedBranch === 'All Branches' 
+                  ? users.filter(user => user.status === 'pending').length
+                  : users.filter(user => user.status === 'pending' && user.branch === selectedBranch).length}
+              </h2>
             </div>
           </div>
           {showPendingOnly && (
