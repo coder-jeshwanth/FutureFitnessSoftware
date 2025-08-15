@@ -5,6 +5,52 @@ interface GymUsersProps {
   selectedBranch?: string;
 }
 
+// Branch-specific pricing structure (copied from Subscriptions.tsx)
+const branchPricing = {
+  'Harinathpuram': {
+    '1 month': { price: 3000, discounted: null },
+    '3 months': { price: 7000, discounted: 6000 },
+    '6 months': { price: 10000, discounted: 9000 },
+    '1 year': { price: 18000, discounted: 13000 }
+  },
+  'Stonehousepet': {
+    '1 month': { price: 3000, discounted: null },
+    '3 months': { price: 7000, discounted: 6000 },
+    '6 months': { price: 10000, discounted: 9000 },
+    '1 year': { price: 18000, discounted: 13000 }
+  },
+  'Vedayapalem': {
+    '1 month': { price: 3000, discounted: null },
+    '3 months': { price: 7000, discounted: 6000 },
+    '6 months': { price: 10000, discounted: 9000 },
+    '1 year': { price: 18000, discounted: 13000 }
+  },
+  'Current Office Center': {
+    '1 month': { price: 2500, discounted: null },
+    '3 months': { price: 6000, discounted: 5500 },
+    '6 months': { price: 9000, discounted: 8000 },
+    '1 year': { price: 16000, discounted: 11000 }
+  },
+  'Vanamthopu Center': {
+    '1 month': { price: 3500, discounted: null },
+    '3 months': { price: 9000, discounted: 7500 },
+    '6 months': { price: 14000, discounted: 10000 },
+    '1 year': { price: 20000, discounted: 14000 }
+  },
+  'BV Nagar': {
+    '1 month': { price: 3000, discounted: null },
+    '3 months': { price: 8000, discounted: 7000 },
+    '6 months': { price: 12000, discounted: 10000 },
+    '1 year': { price: 18000, discounted: 13000 }
+  },
+  'Dhanalakshmi Puram': {
+    '1 month': { price: 3000, discounted: null },
+    '3 months': { price: 7000, discounted: 6000 },
+    '6 months': { price: 10000, discounted: 9000 },
+    '1 year': { price: 18000, discounted: 13000 }
+  }
+};
+
 // Function to generate random data
 const generateUsers = (count: number) => {
   const firstNames = ['Arjun', 'Priya', 'Rohit', 'Sneha', 'Amit', 'Divya', 'Rakesh', 'Neha', 'Vikash', 'Ananya', 
@@ -122,13 +168,15 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
     name: '',
     email: '',
     phone: '',
-    membership: 'Basic',
     branch: '',
     trainer: '',
     gender: '',
     dob: '',
     paymentMethod: '',
-    cashReceived: ''
+    cashReceived: '',
+    membershipPlan: '', // Selected plan (1 month, 3 months, etc.)
+    membershipPrice: 0, // The full price of the selected plan
+    remainingAmount: 0 // The remaining amount to be paid
   });
   // Filter states
   const [statusFilters, setStatusFilters] = useState<{[key: string]: boolean}>({
@@ -232,22 +280,73 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
       name: '',
       email: '',
       phone: '',
-      membership: 'Basic',
       branch: '',
       trainer: '',
       gender: '',
       dob: '',
       paymentMethod: '',
-      cashReceived: ''
+      cashReceived: '',
+      membershipPlan: '',
+      membershipPrice: 0,
+      remainingAmount: 0
     });
   };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewUser(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    if (name === 'branch') {
+      // When branch changes, reset plan selection
+      setNewUser(prev => ({
+        ...prev,
+        [name]: value,
+        membershipPlan: '',
+        membershipPrice: 0,
+        remainingAmount: 0
+      }));
+    } 
+    else if (name === 'membershipPlan' && newUser.branch) {
+      // When membership plan changes, update the price
+      const branchPlans = branchPricing[newUser.branch as keyof typeof branchPricing];
+      if (branchPlans && value) {
+        const planPrice = branchPlans[value as keyof typeof branchPlans]?.discounted || 
+                        branchPlans[value as keyof typeof branchPlans]?.price || 0;
+        
+        // Calculate remaining amount if cash received value exists
+        const cashReceived = parseFloat(newUser.cashReceived) || 0;
+        const remaining = planPrice - cashReceived;
+        
+        setNewUser(prev => ({
+          ...prev,
+          [name]: value,
+          membershipPrice: planPrice,
+          remainingAmount: remaining >= 0 ? remaining : 0
+        }));
+      } else {
+        setNewUser(prev => ({
+          ...prev,
+          [name]: value
+        }));
+      }
+    }
+    else if (name === 'cashReceived' && newUser.membershipPrice > 0) {
+      // When cash received changes, update the remaining amount
+      const cashAmount = parseFloat(value) || 0;
+      const remaining = newUser.membershipPrice - cashAmount;
+      
+      setNewUser(prev => ({
+        ...prev,
+        [name]: value,
+        remainingAmount: remaining >= 0 ? remaining : 0
+      }));
+    }
+    else {
+      // Default handler for other fields
+      setNewUser(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
   
   // Filter management functions
@@ -673,35 +772,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                   </h3>
                   
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-gray-400 text-sm mb-1">Membership Plan</label>
-                      <select
-                        name="membership"
-                        value={newUser.membership}
-                        onChange={handleInputChange}
-                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
-                      >
-                        <option value="Basic">Basic(1000)</option>
-                        <option value="Standard">Standard(1500)</option>
-                        <option value="Premium">Premium(2000)</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-gray-400 text-sm mb-1">Assigned Trainer</label>
-                      <select
-                        name="trainer"
-                        value={newUser.trainer}
-                        onChange={handleInputChange}
-                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
-                      >
-                        <option value="">Select Trainer</option>
-                        <option value="Vikash Kumar">Vikash Kumar</option>
-                        <option value="Sneha Reddy">Sneha Reddy</option>
-                        <option value="Raj Singh">Raj Singh</option>
-                      </select>
-                    </div>
-                    
+                    {/* First: Branch Location */}
                     <div>
                       <label className="block text-gray-400 text-sm mb-1">Branch Location</label>
                       <select
@@ -721,6 +792,57 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                       </select>
                     </div>
                     
+
+                    {/* Membership Plan */}
+                    <div>
+                      <div className="flex justify-between items-center">
+                        <label className="block text-gray-400 text-sm mb-1">Membership Plan</label>
+                        {newUser.membershipPrice > 0 && (
+                          <span className="text-green-400 text-sm font-medium mb-1 bg-green-400 bg-opacity-10 px-2 py-0.5 rounded">
+                            ₹{newUser.membershipPrice.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                      <select
+                        name="membershipPlan"
+                        value={newUser.membershipPlan}
+                        onChange={handleInputChange}
+                        disabled={!newUser.branch}
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <option value="">Select Membership Plan</option>
+                        {newUser.branch && Object.keys(branchPricing[newUser.branch as keyof typeof branchPricing] || {}).map(planKey => {
+                          const plan = branchPricing[newUser.branch as keyof typeof branchPricing][planKey as keyof typeof branchPricing[keyof typeof branchPricing]];
+                          const price = plan.discounted || plan.price;
+                          return (
+                            <option key={planKey} value={planKey}>
+                              {planKey} (₹{price.toLocaleString()})
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+
+                    {/* Third: Assigned Trainer */}
+                    <div>
+                      <label className="block text-gray-400 text-sm mb-1">Assigned Trainer</label>
+                      <select
+                        name="trainer"
+                        value={newUser.trainer}
+                        onChange={handleInputChange}
+                        disabled={!newUser.branch || !newUser.membershipPlan}
+                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <option value="">Select Trainer</option>
+                        <option value="Vikash Kumar">Vikash Kumar</option>
+                        <option value="Sneha Reddy">Sneha Reddy</option>
+                        <option value="Raj Singh">Raj Singh</option>
+                        <option value="Ananya Desai">Ananya Desai</option>
+                        <option value="Kiran Rao">Kiran Rao</option>
+                      </select>
+                    </div>
+                    
+                    {/* Payment Details */}
                     <div>
                       <label className="block text-gray-400 text-sm mb-1">Payment Method</label>
                       <select
@@ -737,7 +859,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                     </div>
                     
                     <div>
-                      <label className="block text-gray-400 text-sm mb-1">Cash Received</label>
+                      <label className="block text-gray-400 text-sm mb-1">Amount Received</label>
                       <input 
                         type="text"
                         name="cashReceived"
@@ -746,25 +868,47 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
                         placeholder="Enter amount received"
                       />
+                      
+                      {/* Show remaining amount if any */}
+                      {newUser.membershipPrice > 0 && newUser.cashReceived && newUser.remainingAmount > 0 && (
+                        <p className="text-red-500 text-sm mt-2 font-medium">
+                          Remaining amount: ₹{newUser.remainingAmount.toLocaleString()}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
               
-              <div className="mt-8 flex justify-end space-x-4">
-                <button 
-                  onClick={() => setShowAddModal(false)}
-                  className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors duration-200"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleAddUser}
-                  className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium flex items-center"
-                >
-                  <Save className="h-5 w-5 mr-2" />
-                  Save Member
-                </button>
+              <div className="mt-8">
+                {/* Show remaining amount warning if needed */}
+                {newUser.membershipPrice > 0 && newUser.cashReceived && newUser.remainingAmount > 0 && (
+                  <div className="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg">
+                    <p className="text-red-500 font-medium flex items-center">
+                      <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      Remaining Amount: ₹{newUser.remainingAmount.toLocaleString()}
+                    </p>
+                  </div>
+                )}
+                
+                <div className="flex justify-end space-x-4">
+                  <button 
+                    onClick={() => setShowAddModal(false)}
+                    className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleAddUser}
+                    className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium flex items-center"
+                    disabled={!newUser.name || !newUser.branch || !newUser.membershipPlan || !newUser.trainer}
+                  >
+                    <Save className="h-5 w-5 mr-2" />
+                    Save Member
+                  </button>
+                </div>
               </div>
             </div>
           </div>
