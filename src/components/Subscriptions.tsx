@@ -107,10 +107,10 @@ const branchPricing = {
     '1 year': { price: 18000, discounted: 13000 }
   },
   'Dhanalakshmi Puram': {
-    '1 month': { price: 3000, discounted: null },
-    '3 months': { price: 7000, discounted: 6000 },
-    '6 months': { price: 10000, discounted: 9000 },
-    '1 year': { price: 18000, discounted: 13000 }
+    '1 month': { price: 2000, discounted: null },
+    '3 months': { price: 7000, discounted: 5000 },
+    '6 months': { price: 9000, discounted: 7500 },
+    '1 year': { price: 14000, discounted: 10000 }
   }
 };
 
