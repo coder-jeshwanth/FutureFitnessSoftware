@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Plus, Edit, Trash2, Eye, User, Phone, Mail, Calendar, CreditCard, Dumbbell, X, Save, Cake, Users as UsersIcon } from 'lucide-react';
+import { Search, Filter, Plus, Edit, Trash2, Eye, User as UserIcon, Phone, Mail, Calendar, CreditCard, Dumbbell, X, Save, Cake, Users as UsersIcon } from 'lucide-react';
+import { generateUsers, User as GymUser } from './GymUsersData';
 
 interface GymUsersProps {
   selectedBranch?: string;
@@ -51,7 +52,8 @@ const branchPricing = {
   }
 };
 
-// Function to generate random data
+// We now import users from GymUsersData.ts
+/* Commenting out the original function as it's moved to GymUsersData.ts
 const generateUsers = (count: number) => {
   const firstNames = ['Arjun', 'Priya', 'Rohit', 'Sneha', 'Amit', 'Divya', 'Rakesh', 'Neha', 'Vikash', 'Ananya', 
     'Rajesh', 'Pooja', 'Sanjay', 'Kavita', 'Deepak', 'Ritu', 'Suresh', 'Anjali', 'Manish', 'Sunita'];
@@ -149,7 +151,9 @@ const generateUsers = (count: number) => {
   
   return users;
 };
+*/
 
+// Use the imported function to generate users
 const users = generateUsers(100);
 
 const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) => {
@@ -159,10 +163,13 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [invoiceData, setInvoiceData] = useState<any>(null);
   const [dateRange, setDateRange] = useState<{startDate: string | null, endDate: string | null}>({
     startDate: null,
     endDate: null
   });
+  const [timeFilter, setTimeFilter] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [newUser, setNewUser] = useState({
     name: '',
@@ -209,8 +216,104 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedBranch, showPendingOnly, statusFilters, membershipFilters, trainerFilters]);
+  
+  // Function to generate an invoice preview
+  const showInvoicePreview = (userData: any) => {
+    // Generate a unique invoice number
+    const invoiceNumber = `INV-${Date.now().toString().substring(6)}`;
+    
+    // Format today's date
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    // Calculate membership end date based on the plan
+    const endDate = new Date();
+    
+    // Extract the duration from the plan name (e.g., "1 month", "3 months", "6 months", "1 year")
+    if (userData.membershipPlan) {
+      if (userData.membershipPlan.includes("month")) {
+        // Get the number from the plan (e.g., "1" from "1 month" or "3" from "3 months")
+        const months = parseInt(userData.membershipPlan);
+        endDate.setMonth(today.getMonth() + months);
+      } else if (userData.membershipPlan.includes("year")) {
+        // Get the number from the plan (e.g., "1" from "1 year")
+        const years = parseInt(userData.membershipPlan);
+        endDate.setFullYear(today.getFullYear() + years);
+      }
+    }
+    
+    const formattedEndDate = endDate.toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    // Create invoice data
+    const invoice = {
+      invoiceNumber,
+      date: formattedDate,
+      memberName: userData.name,
+      email: userData.email,
+      phone: userData.phone,
+      gender: userData.gender,
+      branch: userData.branch,
+      membershipPlan: userData.membershipPlan,
+      trainer: userData.trainer,
+      startDate: formattedDate,
+      endDate: formattedEndDate,
+      totalAmount: userData.membershipPrice,
+      paidAmount: parseFloat(userData.cashReceived) || 0,
+      remainingAmount: userData.remainingAmount,
+      paymentMethod: userData.paymentMethod
+    };
+    
+    // Set invoice data and show modal
+    setInvoiceData(invoice);
+    setShowInvoiceModal(true);
+  };
 
   // Status and membership color functions removed as they're now inlined
+
+  // Helper function to apply time filter
+  const applyTimeFilter = (user: any, filterType: string | null) => {
+    if (!filterType) return true;
+    
+    const userJoinDate = new Date(user.joinDate);
+    const today = new Date('2025-08-15'); // Current date (hardcoded for consistency)
+    
+    switch (filterType) {
+      case '1d':
+        // Last 24 hours
+        const oneDayAgo = new Date(today);
+        oneDayAgo.setDate(today.getDate() - 1);
+        return userJoinDate >= oneDayAgo;
+      
+      case '3d':
+        // Last 3 days
+        const threeDaysAgo = new Date(today);
+        threeDaysAgo.setDate(today.getDate() - 3);
+        return userJoinDate >= threeDaysAgo;
+      
+      case '1w':
+        // Last week
+        const oneWeekAgo = new Date(today);
+        oneWeekAgo.setDate(today.getDate() - 7);
+        return userJoinDate >= oneWeekAgo;
+      
+      case '1m':
+        // Last month
+        const oneMonthAgo = new Date(today);
+        oneMonthAgo.setMonth(today.getMonth() - 1);
+        return userJoinDate >= oneMonthAgo;
+      
+      default:
+        return true;
+    }
+  };
 
   // Filter users based on search term, selected branch, and applied filters
   const filteredUsers = users.filter(user => {
@@ -240,6 +343,9 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
     // Pending only filter
     const matchesPending = !showPendingOnly || user.status === 'pending';
     
+    // Time filter (1d, 3d, 1w, 1m)
+    const matchesTimeFilter = applyTimeFilter(user, timeFilter);
+    
     // Date range filter
     let matchesDateRange = true;
     if (dateRange.startDate && dateRange.endDate) {
@@ -251,7 +357,8 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
       matchesDateRange = userJoinDate >= startDate && userJoinDate < endDate;
     }
     
-    return matchesSearch && matchesBranch && matchesStatus && matchesMembership && matchesTrainer && matchesPending && matchesDateRange;
+    return matchesSearch && matchesBranch && matchesStatus && matchesMembership && 
+           matchesTrainer && matchesPending && matchesDateRange && matchesTimeFilter;
   });
 
   // Calculate pagination
@@ -270,28 +377,76 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
   };
   
   const handleAddUser = () => {
-    // Here you would typically call an API to save the new user
-    // For now, we'll just log the new user and close the modal
-    console.log('Adding new user:', newUser);
-    setShowAddModal(false);
+    // Validate age requirement before submitting
+    let errors: {[key: string]: string} = {};
+    let isValid = true;
     
-    // Reset the form
-    setNewUser({
-      name: '',
-      email: '',
-      phone: '',
-      branch: '',
-      trainer: '',
-      gender: '',
-      dob: '',
-      paymentMethod: '',
-      cashReceived: '',
-      membershipPlan: '',
-      membershipPrice: 0,
-      remainingAmount: 0
-    });
+    // Check DOB for age requirement
+    if (newUser.dob) {
+      const birthDate = new Date(newUser.dob);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      if (age < 15) {
+        errors.dob = 'Member must be at least 15 years old';
+        isValid = false;
+      }
+    } else if (!newUser.dob) {
+      errors.dob = 'Date of Birth is required';
+      isValid = false;
+    }
+    
+    // Required fields validation
+    if (!newUser.name) {
+      errors.name = 'Name is required';
+      isValid = false;
+    }
+    if (!newUser.branch) {
+      errors.branch = 'Branch is required';
+      isValid = false;
+    }
+    if (!newUser.membershipPlan) {
+      errors.membershipPlan = 'Membership Plan is required';
+      isValid = false;
+    }
+    
+    // Update validation errors
+    setValidationErrors(errors);
+    
+    // If form is valid, submit
+    if (isValid) {
+      // Here you would typically call an API to save the new user
+      console.log('Adding new user:', newUser);
+      setShowAddModal(false);
+      
+      // Reset the form
+      setNewUser({
+        name: '',
+        email: '',
+        phone: '',
+        branch: '',
+        trainer: '',
+        gender: '',
+        dob: '',
+        paymentMethod: '',
+        cashReceived: '',
+        membershipPlan: '',
+        membershipPrice: 0,
+        remainingAmount: 0
+      });
+      // Clear validation errors
+      setValidationErrors({});
+    }
   };
   
+  // State for validation errors
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
@@ -304,6 +459,8 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
         membershipPrice: 0,
         remainingAmount: 0
       }));
+      // Clear branch-related validation errors
+      setValidationErrors(prev => ({...prev, [name]: ''}));
     } 
     else if (name === 'membershipPlan' && newUser.branch) {
       // When membership plan changes, update the price
@@ -322,6 +479,8 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
           membershipPrice: planPrice,
           remainingAmount: remaining >= 0 ? remaining : 0
         }));
+        // Clear plan-related validation errors
+        setValidationErrors(prev => ({...prev, [name]: ''}));
       } else {
         setNewUser(prev => ({
           ...prev,
@@ -339,6 +498,37 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
         [name]: value,
         remainingAmount: remaining >= 0 ? remaining : 0
       }));
+      // Clear cash-related validation errors
+      setValidationErrors(prev => ({...prev, [name]: ''}));
+    }
+    else if (name === 'dob') {
+      // Age validation for Date of Birth
+      if (value) {
+        const birthDate = new Date(value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        // If birth month hasn't occurred yet this year or if birth month is current month but birth day hasn't occurred yet
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        
+        // Check if age is at least 15 years
+        if (age < 15) {
+          setValidationErrors(prev => ({
+            ...prev, 
+            [name]: 'Member must be at least 15 years old'
+          }));
+        } else {
+          setValidationErrors(prev => ({...prev, [name]: ''}));
+        }
+      }
+      
+      setNewUser(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
     else {
       // Default handler for other fields
@@ -346,6 +536,8 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
         ...prev,
         [name]: value
       }));
+      // Clear field-specific validation errors
+      setValidationErrors(prev => ({...prev, [name]: ''}));
     }
   };
   
@@ -456,7 +648,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
         <div className="bg-[#2A3037] p-8 rounded-xl flex justify-between items-center h-[130px]">
           <div className="flex items-center">
             <div className="text-[#7BC843] mr-6">
-              <User className="h-12 w-12" />
+              <UserIcon className="h-12 w-12" />
             </div>
             <div>
               <p className="text-gray-400 text-sm mb-2">Total Members</p>
@@ -536,12 +728,47 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
 
             <div className="flex items-center space-x-8">
               <div className="bg-[#23292F] rounded-lg p-1 flex space-x-1">
-                <button className="px-3 py-1.5 text-gray-300 text-xs font-medium rounded hover:bg-[#3A4049] hover:text-[#7BC843] transition-colors">1d</button>
-                <button className="px-3 py-1.5 text-gray-300 text-xs font-medium rounded hover:bg-[#3A4049] hover:text-[#7BC843] transition-colors">3d</button>
-                <button className="px-3 py-1.5 text-gray-300 text-xs font-medium rounded hover:bg-[#3A4049] hover:text-[#7BC843] transition-colors">1w</button>
-                <button className="px-3 py-1.5 text-gray-300 text-xs font-medium rounded hover:bg-[#3A4049] hover:text-[#7BC843] transition-colors">1m</button>
                 <button 
-                  onClick={() => setShowDateModal(true)}
+                  onClick={() => {
+                    setTimeFilter(timeFilter === '1d' ? null : '1d');
+                    setDateRange({ startDate: null, endDate: null });
+                  }}
+                  className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                    timeFilter === '1d' ? 'bg-[#7BC843] bg-opacity-20 text-[#7BC843]' : 'text-gray-300 hover:bg-[#3A4049] hover:text-[#7BC843]'
+                  }`}
+                >1d</button>
+                <button 
+                  onClick={() => {
+                    setTimeFilter(timeFilter === '3d' ? null : '3d');
+                    setDateRange({ startDate: null, endDate: null });
+                  }}
+                  className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                    timeFilter === '3d' ? 'bg-[#7BC843] bg-opacity-20 text-[#7BC843]' : 'text-gray-300 hover:bg-[#3A4049] hover:text-[#7BC843]'
+                  }`}
+                >3d</button>
+                <button 
+                  onClick={() => {
+                    setTimeFilter(timeFilter === '1w' ? null : '1w');
+                    setDateRange({ startDate: null, endDate: null });
+                  }}
+                  className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                    timeFilter === '1w' ? 'bg-[#7BC843] bg-opacity-20 text-[#7BC843]' : 'text-gray-300 hover:bg-[#3A4049] hover:text-[#7BC843]'
+                  }`}
+                >1w</button>
+                <button 
+                  onClick={() => {
+                    setTimeFilter(timeFilter === '1m' ? null : '1m');
+                    setDateRange({ startDate: null, endDate: null });
+                  }}
+                  className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                    timeFilter === '1m' ? 'bg-[#7BC843] bg-opacity-20 text-[#7BC843]' : 'text-gray-300 hover:bg-[#3A4049] hover:text-[#7BC843]'
+                  }`}
+                >1m</button>
+                <button 
+                  onClick={() => {
+                    setShowDateModal(true);
+                    setTimeFilter(null);
+                  }}
                   className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                     dateRange.startDate ? 'bg-[#7BC843] bg-opacity-20 text-[#7BC843]' : 'text-gray-300 hover:bg-[#3A4049] hover:text-[#7BC843]'
                   }`}
@@ -695,7 +922,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                 {/* Personal Information */}
                 <div className="space-y-6">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <User className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    <UserIcon className="h-5 w-5 mr-2 text-[#7BC843]" />
                     Personal Information
                   </h3>
                   
@@ -707,9 +934,12 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="name"
                         value={newUser.name}
                         onChange={handleInputChange}
-                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className={`w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 ${validationErrors.name ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-[#7BC843] border-none'}`}
                         placeholder="Enter full name"
                       />
+                      {validationErrors.name && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.name}</p>
+                      )}
                     </div>
                     
                     <div>
@@ -743,8 +973,11 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="dob"
                         value={newUser.dob}
                         onChange={handleInputChange}
-                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className={`w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 ${validationErrors.dob ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-[#7BC843] border-none'}`}
                       />
+                      {validationErrors.dob && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.dob}</p>
+                      )}
                     </div>
                     
                     <div>
@@ -779,7 +1012,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         name="branch"
                         value={newUser.branch}
                         onChange={handleInputChange}
-                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none"
+                        className={`w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 ${validationErrors.branch ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-[#7BC843] border-none'}`}
                       >
                         <option value="">Select Branch</option>
                         <option value="Stonehousepet">Stonehousepet</option>
@@ -790,6 +1023,9 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         <option value="BV Nagar">BV Nagar</option>
                         <option value="Dhanalakshmi Puram">Dhanalakshmi Puram</option>
                       </select>
+                      {validationErrors.branch && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.branch}</p>
+                      )}
                     </div>
                     
 
@@ -808,7 +1044,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                         value={newUser.membershipPlan}
                         onChange={handleInputChange}
                         disabled={!newUser.branch}
-                        className="w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#7BC843] border-none disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={`w-full h-10 bg-[#23292F] text-white py-2 px-3 rounded-lg focus:outline-none focus:ring-1 ${validationErrors.membershipPlan ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-[#7BC843] border-none'} disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         <option value="">Select Membership Plan</option>
                         {newUser.branch && Object.keys(branchPricing[newUser.branch as keyof typeof branchPricing] || {}).map(planKey => {
@@ -821,6 +1057,9 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                           );
                         })}
                       </select>
+                      {validationErrors.membershipPlan && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors.membershipPlan}</p>
+                      )}
                     </div>
 
                     {/* Third: Assigned Trainer */}
@@ -893,21 +1132,36 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                   </div>
                 )}
                 
-                <div className="flex justify-end space-x-4">
+                <div className="flex justify-between items-center">
+                  {/* Invoice Button (Left Side) */}
                   <button 
-                    onClick={() => setShowAddModal(false)}
-                    className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                    onClick={() => showInvoicePreview(newUser)}
+                    className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200 font-medium flex items-center"
+                    disabled={!newUser.name || !newUser.branch || !newUser.membershipPlan}
                   >
-                    Cancel
+                    <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    View Invoice
                   </button>
-                  <button 
-                    onClick={handleAddUser}
-                    className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium flex items-center"
-                    disabled={!newUser.name || !newUser.branch || !newUser.membershipPlan || !newUser.trainer}
-                  >
-                    <Save className="h-5 w-5 mr-2" />
-                    Save Member
-                  </button>
+                  
+                  {/* Cancel and Save Buttons (Right Side) */}
+                  <div className="flex space-x-4">
+                    <button 
+                      onClick={() => setShowAddModal(false)}
+                      className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={handleAddUser}
+                      className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium flex items-center"
+                      disabled={!newUser.name || !newUser.branch || !newUser.membershipPlan || !newUser.trainer}
+                    >
+                      <Save className="h-5 w-5 mr-2" />
+                      Save Member
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -944,7 +1198,7 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                 {/* Personal Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <User className="h-5 w-5 mr-2 text-[#7BC843]" />
+                    <UserIcon className="h-5 w-5 mr-2 text-[#7BC843]" />
                     Personal Information
                   </h3>
                   <div className="space-y-4">
@@ -1240,6 +1494,146 @@ const GymUsers: React.FC<GymUsersProps> = ({ selectedBranch = 'All Branches' }) 
                     Apply
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Invoice Preview Modal */}
+      {showInvoiceModal && invoiceData && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-300 flex justify-between items-center bg-gray-100">
+              <div className="flex items-center space-x-3">
+                <div className="bg-[#7BC843] p-2 rounded-full">
+                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800">Membership Invoice</h2>
+              </div>
+              <button 
+                onClick={() => setShowInvoiceModal(false)}
+                className="text-gray-600 hover:text-gray-800 text-2xl"
+              >
+                <X />
+              </button>
+            </div>
+
+            <div className="p-8">
+              {/* Invoice Header */}
+              <div className="flex justify-between items-start mb-10">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-800">Future Fitness</h1>
+                  <p className="text-gray-600 mt-1">Your Path to a Healthier Tomorrow</p>
+                  <p className="text-gray-600 mt-4">{invoiceData.branch} Branch</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-semibold text-gray-800">INVOICE</p>
+                  <p className="text-gray-600 mt-1">#{invoiceData.invoiceNumber}</p>
+                  <p className="text-gray-600 mt-1">Date: {invoiceData.date}</p>
+                </div>
+              </div>
+
+              {/* Member Information */}
+              <div className="bg-gray-100 p-6 rounded-lg mb-8">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Member Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Name</p>
+                    <p className="text-gray-800 font-medium">{invoiceData.memberName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="text-gray-800">{invoiceData.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Phone</p>
+                    <p className="text-gray-800">{invoiceData.phone}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Gender</p>
+                    <p className="text-gray-800">{invoiceData.gender}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Membership Details */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Membership Details</h3>
+                <div className="overflow-hidden border border-gray-200 rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">Membership Plan</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{invoiceData.membershipPlan}</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">Assigned Trainer</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{invoiceData.trainer || 'N/A'}</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">Start Date</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{invoiceData.startDate}</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">End Date</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{invoiceData.endDate}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Payment Information */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Payment Information</h3>
+                <div className="bg-gray-100 p-6 rounded-lg">
+                  <div className="flex justify-between mb-4">
+                    <span className="text-gray-600">Total Amount:</span>
+                    <span className="text-gray-800 font-semibold">₹{invoiceData.totalAmount.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between mb-4">
+                    <span className="text-gray-600">Payment Method:</span>
+                    <span className="text-gray-800">{invoiceData.paymentMethod || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between mb-4">
+                    <span className="text-gray-600">Paid Amount:</span>
+                    <span className="text-green-600 font-semibold">₹{invoiceData.paidAmount.toLocaleString()}</span>
+                  </div>
+                  {invoiceData.remainingAmount > 0 && (
+                    <div className="flex justify-between pt-4 border-t border-gray-300">
+                      <span className="text-gray-600 font-medium">Remaining Amount:</span>
+                      <span className="text-red-600 font-semibold">₹{invoiceData.remainingAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Print/Download Buttons */}
+              <div className="mt-10 flex justify-end space-x-4">
+                <button 
+                  onClick={() => window.print()}
+                  className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors duration-200 font-medium flex items-center"
+                >
+                  <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  Print Invoice
+                </button>
+                <button 
+                  onClick={() => setShowInvoiceModal(false)}
+                  className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-white rounded-lg transition-colors duration-200 font-medium"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>

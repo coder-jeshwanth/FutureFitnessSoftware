@@ -14,52 +14,127 @@ import {
 } from 'chart.js';
 import { Doughnut, Bar, Line } from 'react-chartjs-2';
 
+// Define User interface and generateUsers function inline to avoid import issues
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  membership: string;
+  status: string;
+  planExpiry: string;
+  trainer: string;
+  joinDate: string;
+  lastPayment: string;
+  avatar: string;
+  branch: string;
+  remainingAmount?: number;
+}
+
+const generateUsers = (count: number): User[] => {
+  const today = new Date('2025-08-15'); // Hardcoded date for consistency
+  const twoYearsAgo = new Date(today);
+  twoYearsAgo.setFullYear(today.getFullYear() - 2);
+
+  const firstNames = ['Arjun', 'Priya', 'Rohit', 'Sneha', 'Amit', 'Divya', 'Rakesh', 'Neha', 'Vikash', 'Ananya', 
+    'Rahul', 'Pooja', 'Sanjay', 'Aishwarya', 'Ravi', 'Meera', 'Suresh', 'Kavita', 'Vijay', 'Swati'];
+  
+  const lastNames = ['Sharma', 'Patel', 'Kumar', 'Reddy', 'Singh', 'Mehta', 'Verma', 'Gupta', 'Joshi', 'Das', 
+    'Nair', 'Khan', 'Chowdhury', 'Shah', 'Rao', 'Malhotra', 'Banerjee', 'Agarwal', 'Yadav', 'Srivastava'];
+  
+  const branches = ['Stonehousepet', 'Harinathpuram', 'Vanamthopu Center', 'Current Office Center', 'Vedayapalem',
+    'BV Nagar', 'Dhanalakshmi Puram'];
+
+  const memberships = ['Basic', 'Standard', 'Premium'];
+  const statuses = ['Active', 'InActive', 'pending', 'Expired'];
+  const trainers = ['Rajesh', 'Nisha', 'Vikram', 'Anjali', 'Sandeep'];
+
+  const users: User[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    // Random name components
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const fullName = `${firstName} ${lastName}`;
+    
+    // Create email from name
+    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@email.com`;
+    
+    // Generate phone number
+    const phone = `+91 ${Math.floor(7000000000 + Math.random() * 3000000000)}`;
+    
+    // Random membership and status
+    const membership = memberships[Math.floor(Math.random() * memberships.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    
+    // Random trainer and branch
+    const trainer = trainers[Math.floor(Math.random() * trainers.length)];
+    const branch = branches[Math.floor(Math.random() * branches.length)];
+    
+    const isNewMember = i <= 25; // Make 25 users new members
+    
+    let joinDate;
+    if (isNewMember) {
+      // For new members, join date is within last 30 days
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      
+      const randomDaysAgo = Math.floor(Math.random() * 30);
+      joinDate = new Date(today);
+      joinDate.setDate(today.getDate() - randomDaysAgo);
+    } else {
+      // For older members, join date is between 2 years ago and 31 days ago
+      const thirtyOneDaysAgo = new Date(today);
+      thirtyOneDaysAgo.setDate(today.getDate() - 31);
+      
+      const timeDiff = thirtyOneDaysAgo.getTime() - twoYearsAgo.getTime();
+      joinDate = new Date(twoYearsAgo.getTime() + Math.random() * timeDiff);
+    }
+    
+    // Format join date as 'YYYY-MM-DD'
+    const formattedJoinDate = joinDate.toISOString().split('T')[0];
+    
+    // Calculate plan expiry (1 year from join date)
+    const planExpiry = new Date(joinDate);
+    planExpiry.setFullYear(planExpiry.getFullYear() + 1);
+    const formattedPlanExpiry = planExpiry.toISOString().split('T')[0];
+    
+    // Generate payment amount based on membership
+    let paymentAmount;
+    if (membership === 'Basic') paymentAmount = '₹2,500';
+    else if (membership === 'Standard') paymentAmount = '₹3,500';
+    else paymentAmount = '₹5,000';
+    
+    // Generate avatar from initials
+    const avatar = `${firstName[0]}${lastName[0]}`;
+    
+    users.push({
+      id: i,
+      name: fullName,
+      email,
+      phone,
+      membership,
+      status,
+      planExpiry: formattedPlanExpiry,
+      trainer,
+      joinDate: formattedJoinDate,
+      lastPayment: paymentAmount,
+      avatar,
+      branch,
+      // Add random remaining amount for 'pending' status users
+      remainingAmount: status === 'pending' ? Math.floor(Math.random() * 2000) + 500 : 0
+    });
+  }
+  
+  return users;
+};
+
 interface DashboardProps {
   selectedBranch: string;
 }
 
-const statsCards = [
-  {
-    title: 'Total Members',
-    value: '1,247',
-    change: '+12%',
-    trend: 'up',
-    icon: Users,
-    color: 'bg-[#7BC843]'
-  },
-  {
-    title: 'Active Members',
-    value: '1,156',
-    change: '+8%',
-    trend: 'up',
-    icon: UserCheck,
-    color: 'bg-blue-600'
-  },
-   {
-    title: 'InActive Members',
-    value: '1,156',
-    change: '+8%',
-    trend: 'up',
-    icon: UserRoundX,
-    color: 'bg-yellow-600'
-  },
-  {
-    title: "This Month's Revenue",
-    value: '₹2,45,680',
-    change: '+15%',
-    trend: 'up',
-    icon: IndianRupee ,
-    color: 'bg-green-600'
-  },
-  {
-    title: 'Pending Payments',
-    value: '47',
-    change: '-5%',
-    trend: 'down',
-    icon: AlertTriangle,
-    color: 'bg-red-600'
-  }
-];
+// Generate users with the same function as in GymUsers
+const users = generateUsers(100);
 
 const recentActivities = [
   { id: 1, type: 'member_joined', name: 'Arjun Sharma', time: '2 hours ago', action: 'joined the gym' },
@@ -251,6 +326,61 @@ const ClassParticipationChart = () => {
 };
 
 const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
+  // Filter users and generate dynamic stats based on selectedBranch
+  const filteredUsers = selectedBranch === 'All Branches' 
+    ? users 
+    : users.filter((user: User) => user.branch === selectedBranch);
+  
+  // Calculate counts
+  const totalMembers = filteredUsers.length;
+  const activeMembers = filteredUsers.filter((user: User) => user.status === 'Active').length;
+  const inactiveMembers = filteredUsers.filter((user: User) => user.status === 'InActive').length;
+  const pendingPayments = filteredUsers.filter((user: User) => user.status === 'pending').length;
+  
+  // Create stats cards with real data
+  const statsCards = [
+    {
+      title: 'Total Members',
+      value: totalMembers.toLocaleString(),
+      change: '+12%', // Could calculate this dynamically in a real app
+      trend: 'up',
+      icon: Users,
+      color: 'bg-[#7BC843]'
+    },
+    {
+      title: 'Active Members',
+      value: activeMembers.toLocaleString(),
+      change: '+8%',
+      trend: 'up',
+      icon: UserCheck,
+      color: 'bg-blue-600'
+    },
+    {
+      title: 'InActive Members',
+      value: inactiveMembers.toLocaleString(),
+      change: '+2%',
+      trend: 'up',
+      icon: UserRoundX,
+      color: 'bg-yellow-600'
+    },
+    {
+      title: "This Month's Revenue",
+      value: '₹2,45,680',
+      change: '+15%',
+      trend: 'up',
+      icon: IndianRupee,
+      color: 'bg-green-600'
+    },
+    {
+      title: 'Pending Payments',
+      value: pendingPayments.toLocaleString(),
+      change: '-5%',
+      trend: 'down',
+      icon: AlertTriangle,
+      color: 'bg-red-600'
+    }
+  ];
+
   return (
     <div className="space-y-6 bg-black p-6 rounded-lg">
       {/* Branch Title */}
