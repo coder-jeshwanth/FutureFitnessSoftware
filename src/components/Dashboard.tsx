@@ -376,7 +376,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [invoiceData, setInvoiceData] = useState<any>(null);
-  
+
   // State for Create Class Modal
   const [showCreateClassModal, setShowCreateClassModal] = useState(false);
   const [newClass, setNewClass] = useState({
@@ -391,7 +391,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
     branch: selectedBranch !== 'All Branches' ? selectedBranch : '',
     description: ''
   });
-  const [classValidationErrors, setClassValidationErrors] = useState<{[key: string]: string}>({});
+  const [classValidationErrors, setClassValidationErrors] = useState<{ [key: string]: string }>({});
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
@@ -637,14 +637,14 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
       [name]: value
     }));
     // Clear field-specific validation errors
-    setClassValidationErrors(prev => ({...prev, [name]: ''}));
+    setClassValidationErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   const handleCreateClass = () => {
     // Validate required fields
-    let errors: {[key: string]: string} = {};
+    let errors: { [key: string]: string } = {};
     let isValid = true;
-    
+
     if (!newClass.name) {
       errors.name = 'Class name is required';
       isValid = false;
@@ -681,16 +681,16 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
       errors.branch = 'Branch is required';
       isValid = false;
     }
-    
+
     // Update validation errors
     setClassValidationErrors(errors);
-    
+
     // If form is valid, submit
     if (isValid) {
       // Here you would typically call an API to save the new class
       console.log('Creating new class:', newClass);
       setShowCreateClassModal(false);
-      
+
       // Reset the form
       setNewClass({
         name: '',
@@ -706,12 +706,12 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
       });
       // Clear validation errors
       setClassValidationErrors({});
-      
+
       // Show success message
       alert('Class created successfully!');
     }
   };
-  
+
   // Filter users and generate dynamic stats based on selectedBranch
   const filteredUsers = selectedBranch === 'All Branches'
     ? users
@@ -787,8 +787,8 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
                   <Icon className="h-6 w-6 text-white" />
                 </div>
                 <div className={`text-sm font-medium ${card.trend === 'up' ? 'text-green-600' :
-                    card.trend === 'down' ? 'text-red-600' :
-                      'text-white-600'
+                  card.trend === 'down' ? 'text-red-600' :
+                    'text-white-600'
                   }`}>
                   {card.change}
                 </div>
@@ -1385,7 +1385,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
             <div className="p-6 border-b border-gray-700">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">Create New Class</h2>
-                <button 
+                <button
                   onClick={() => setShowCreateClassModal(false)}
                   className="text-gray-400 hover:text-gray-200 text-2xl"
                 >
@@ -1412,7 +1412,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-200 mb-2">Class Type</label>
-                  <select 
+                  <select
                     name="type"
                     value={newClass.type}
                     onChange={handleClassInputChange}
@@ -1434,7 +1434,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-200 mb-2">Trainer</label>
-                  <select 
+                  <select
                     name="trainer"
                     value={newClass.trainer}
                     onChange={handleClassInputChange}
@@ -1452,7 +1452,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-200 mb-2">Room</label>
-                  <select 
+                  <select
                     name="room"
                     value={newClass.room}
                     onChange={handleClassInputChange}
@@ -1526,7 +1526,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-200 mb-2">Branch</label>
-                    <select 
+                    <select
                       name="branch"
                       value={newClass.branch}
                       onChange={handleClassInputChange}
@@ -1547,7 +1547,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-200 mb-2">Description</label>
                 <textarea
@@ -1561,13 +1561,13 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedBranch }) => {
               </div>
 
               <div className="mt-8 flex justify-end space-x-4">
-                <button 
+                <button
                   onClick={() => setShowCreateClassModal(false)}
                   className="px-6 py-3 border border-gray-600 text-gray-200 rounded-lg hover:bg-[#3a4148] transition-colors duration-200"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={handleCreateClass}
                   className="px-6 py-3 bg-[#7BC843] hover:bg-[#6AB732] text-black rounded-lg transition-colors duration-200 font-medium"
                 >
