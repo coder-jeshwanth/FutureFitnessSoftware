@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import { Save, Upload, Shield, CreditCard, Bell, Building, Users, Key, Globe, Smartphone } from 'lucide-react';
+import { Save, Shield, CreditCard, Bell, Building, Users, Globe, Smartphone, Key, X } from 'lucide-react';
 
 const AppSettings: React.FC = () => {
   const [activeSection, setActiveSection] = useState('general');
+  const [showAddBranchForm, setShowAddBranchForm] = useState(false);
+  const [newBranch, setNewBranch] = useState({ name: '', address: '', active: true });
+  const [branches, setBranches] = useState([
+    { name: 'Main Branch - Mumbai', address: '123 Fitness Street, Mumbai', active: true },
+    { name: 'Branch 2 - Pune', address: '456 Health Avenue, Pune', active: true },
+    { name: 'Branch 3 - Delhi', address: '789 Wellness Road, Delhi', active: false }
+  ]);
+  const [editingBranch, setEditingBranch] = useState<{index: number, data: {name: string, address: string, active: boolean}} | null>(null);
 
   const sections = [
     { id: 'general', label: 'General Settings', icon: Building },
@@ -15,7 +23,7 @@ const AppSettings: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header with Save Button */}
       <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center space-y-4 sm:space-y-0">
         <button className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2">
           <Save className="h-5 w-5" />
@@ -77,36 +85,6 @@ const AppSettings: React.FC = () => {
                     defaultValue="+91 98765 43210"
                     className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Time Zone</label>
-                  <select className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent">
-                    <option>Asia/Kolkata (IST)</option>
-                    <option>America/New_York (EST)</option>
-                    <option>Europe/London (GMT)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Address</label>
-                <textarea
-                  rows={3}
-                  defaultValue="123 Fitness Street, Mumbai, Maharashtra 400001"
-                  className="w-full px-4 py-3 bg-[#23292F] border border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Logo</label>
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-[#7BC843] rounded-lg flex items-center justify-center">
-                    <span className="text-black font-bold text-xl">FP</span>
-                  </div>
-                  <button className="bg-[#23292F] hover:bg-[#1A2026] text-gray-300 px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2">
-                    <Upload className="h-4 w-4" />
-                    <span>Upload New Logo</span>
-                  </button>
                 </div>
               </div>
             </div>
@@ -381,30 +359,150 @@ const AppSettings: React.FC = () => {
               <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6 mb-6">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-100">Current Branches</h4>
-                  <button className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-4 py-2 rounded-lg transition-colors duration-200">
+                  <button 
+                    onClick={() => setShowAddBranchForm(true)} 
+                    className="bg-[#7BC843] hover:bg-[#6AB732] text-black px-4 py-2 rounded-lg transition-colors duration-200">
                     Add Branch
                   </button>
                 </div>
                 
+                <Modal isOpen={showAddBranchForm} onClose={() => setShowAddBranchForm(false)} title="Add New Branch">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Branch Name <span className="text-red-500">*</span></label>
+                      <input
+                        type="text"
+                        value={newBranch.name}
+                        onChange={(e) => setNewBranch({...newBranch, name: e.target.value})}
+                        className={`w-full px-4 py-3 bg-[#23292F] border ${!newBranch.name && 'border-red-500'} border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent`}
+                        placeholder="Enter branch name"
+                        required
+                      />
+                      {!newBranch.name && <p className="text-red-500 text-xs mt-1">Branch name is required</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Branch Address <span className="text-red-500">*</span></label>
+                      <input
+                        type="text"
+                        value={newBranch.address}
+                        onChange={(e) => setNewBranch({...newBranch, address: e.target.value})}
+                        className={`w-full px-4 py-3 bg-[#23292F] border ${!newBranch.address && 'border-red-500'} border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent`}
+                        placeholder="Enter branch address"
+                        required
+                      />
+                      {!newBranch.address && <p className="text-red-500 text-xs mt-1">Branch address is required</p>}
+                    </div>
+                    <div>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newBranch.active}
+                          onChange={(e) => setNewBranch({...newBranch, active: e.target.checked})}
+                          className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
+                        />
+                        <span className="text-sm font-medium text-gray-300">Branch Active</span>
+                      </label>
+                    </div>
+                    <div className="flex space-x-3 pt-4">
+                      <button 
+                        onClick={() => {
+                          if (newBranch.name && newBranch.address) {
+                            setBranches([...branches, newBranch]);
+                            setShowAddBranchForm(false);
+                            setNewBranch({ name: '', address: '', active: true });
+                          }
+                        }} 
+                        className="w-full bg-[#7BC843] hover:bg-[#6AB732] text-black px-4 py-3 rounded-lg transition-colors duration-200 font-medium">
+                        Add Branch
+                      </button>
+                    </div>
+                  </div>
+                </Modal>
+                
+                <Modal 
+                  isOpen={editingBranch !== null} 
+                  onClose={() => setEditingBranch(null)} 
+                  title="Edit Branch"
+                >
+                  {editingBranch && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Branch Name <span className="text-red-500">*</span></label>
+                        <input
+                          type="text"
+                          value={editingBranch.data.name}
+                          onChange={(e) => setEditingBranch({
+                            ...editingBranch, 
+                            data: {...editingBranch.data, name: e.target.value}
+                          })}
+                          className={`w-full px-4 py-3 bg-[#23292F] border ${!editingBranch.data.name && 'border-red-500'} border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent`}
+                          placeholder="Enter branch name"
+                          required
+                        />
+                        {!editingBranch.data.name && <p className="text-red-500 text-xs mt-1">Branch name is required</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Branch Address <span className="text-red-500">*</span></label>
+                        <input
+                          type="text"
+                          value={editingBranch.data.address}
+                          onChange={(e) => setEditingBranch({
+                            ...editingBranch, 
+                            data: {...editingBranch.data, address: e.target.value}
+                          })}
+                          className={`w-full px-4 py-3 bg-[#23292F] border ${!editingBranch.data.address && 'border-red-500'} border-gray-600 text-gray-200 rounded-lg focus:ring-2 focus:ring-[#7BC843] focus:border-transparent`}
+                          placeholder="Enter branch address"
+                          required
+                        />
+                        {!editingBranch.data.address && <p className="text-red-500 text-xs mt-1">Branch address is required</p>}
+                      </div>
+                      <div>
+                        <label className="flex items-center space-x-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editingBranch.data.active}
+                            onChange={(e) => setEditingBranch({
+                              ...editingBranch, 
+                              data: {...editingBranch.data, active: e.target.checked}
+                            })}
+                            className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
+                          />
+                          <span className="text-sm font-medium text-gray-300">Branch Active</span>
+                        </label>
+                      </div>
+                      <div className="flex space-x-3 pt-4">
+                        <button 
+                          onClick={() => {
+                            if (editingBranch.data.name && editingBranch.data.address) {
+                              const updatedBranches = [...branches];
+                              updatedBranches[editingBranch.index] = editingBranch.data;
+                              setBranches(updatedBranches);
+                              setEditingBranch(null);
+                            }
+                          }} 
+                          className="w-full bg-[#7BC843] hover:bg-[#6AB732] text-black px-4 py-3 rounded-lg transition-colors duration-200 font-medium">
+                          Save Changes
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </Modal>
+                
                 <div className="space-y-4">
-                  {[
-                    { name: 'Main Branch - Mumbai', address: '123 Fitness Street, Mumbai', status: 'Active', members: 234 },
-                    { name: 'Branch 2 - Pune', address: '456 Health Avenue, Pune', status: 'Active', members: 189 },
-                    { name: 'Branch 3 - Delhi', address: '789 Wellness Road, Delhi', status: 'Inactive', members: 0 }
-                  ].map((branch, index) => (
+                  {branches.map((branch, index) => (
                     <div key={index} className="flex items-center justify-between p-4 bg-[#1A2026] rounded-lg">
                       <div>
                         <h5 className="font-semibold text-gray-100">{branch.name}</h5>
                         <p className="text-sm text-gray-400">{branch.address}</p>
-                        <p className="text-sm text-gray-400">Members: {branch.members}</p>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          branch.status === 'Active' ? 'bg-green-800 text-green-100' : 'bg-red-800 text-red-100'
-                        }`}>
-                          {branch.status}
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${branch.active ? 'bg-green-900/40 text-green-400' : 'bg-red-900/40 text-red-400'}`}>
+                          {branch.active ? 'Active' : 'Inactive'}
                         </span>
-                        <button className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm">
+                        <button 
+                          className="text-[#7BC843] hover:text-[#6AB732] font-medium text-sm"
+                          onClick={() => setEditingBranch({index, data: {...branch}})}
+                        >
                           Edit
                         </button>
                       </div>
@@ -412,45 +510,39 @@ const AppSettings: React.FC = () => {
                   ))}
                 </div>
               </div>
-
-              <div className="border border-gray-600 bg-[#23292F] rounded-lg p-6">
-                <h4 className="text-lg font-semibold text-gray-100 mb-4">Branch Settings</h4>
-                <div className="space-y-4">
-                  <label className="flex items-center justify-between">
-                    <span className="text-gray-300">Allow cross-branch membership access</span>
-                    <input
-                      type="checkbox"
-                      className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
-                      defaultChecked
-                    />
-                  </label>
-                  <label className="flex items-center justify-between">
-                    <span className="text-gray-300">Centralized payment processing</span>
-                    <input
-                      type="checkbox"
-                      className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
-                      defaultChecked
-                    />
-                  </label>
-                  <label className="flex items-center justify-between">
-                    <span className="text-gray-300">Unified reporting across branches</span>
-                    <input
-                      type="checkbox"
-                      className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
-                      defaultChecked
-                    />
-                  </label>
-                  <label className="flex items-center justify-between">
-                    <span className="text-gray-300">Branch-specific trainer assignments</span>
-                    <input
-                      type="checkbox"
-                      className="rounded border-gray-600 bg-[#1A2026] text-[#7BC843] focus:ring-[#7BC843]"
-                    />
-                  </label>
-                </div>
-              </div>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Modal component for adding new branch
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-[#2A3037] rounded-xl shadow-lg border border-gray-700 w-full max-w-md">
+        <div className="flex justify-between items-center p-5 border-b border-gray-700">
+          <h3 className="text-xl font-semibold text-gray-100">{title}</h3>
+          <button 
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-200"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <div className="p-6">
+          {children}
         </div>
       </div>
     </div>
