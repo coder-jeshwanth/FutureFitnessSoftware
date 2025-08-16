@@ -1,3 +1,5 @@
+//commet to push 
+
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import logoImage from './Images/logo.png';
@@ -12,7 +14,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{email?: string; password?: string}>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,7 +23,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
       setErrors(prev => ({
@@ -32,31 +34,31 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   const validateForm = () => {
-    const newErrors: {email?: string; password?: string} = {};
-    
+    const newErrors: { email?: string; password?: string } = {};
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
@@ -69,7 +71,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23374151%22 fill-opacity=%220.05%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
-      
+
       <div className="relative w-full max-w-md">
         {/* Login Card */}
         <div className="bg-[#2A3037]/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-700/50 p-8">
@@ -99,9 +101,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 bg-[#23292F] border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7BC843] focus:border-transparent transition-all duration-200 ${
-                    errors.email ? 'border-red-500' : 'border-gray-700'
-                  }`}
+                  className={`w-full pl-10 pr-4 py-3 bg-[#23292F] border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7BC843] focus:border-transparent transition-all duration-200 ${errors.email ? 'border-red-500' : 'border-gray-700'
+                    }`}
                   placeholder="Enter your email"
                 />
               </div>
@@ -125,9 +126,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-12 py-3 bg-[#23292F] border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7BC843] focus:border-transparent transition-all duration-200 ${
-                    errors.password ? 'border-red-500' : 'border-gray-700'
-                  }`}
+                  className={`w-full pl-10 pr-12 py-3 bg-[#23292F] border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7BC843] focus:border-transparent transition-all duration-200 ${errors.password ? 'border-red-500' : 'border-gray-700'
+                    }`}
                   placeholder="Enter your password"
                 />
                 <button
